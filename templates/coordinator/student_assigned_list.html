@@ -1,0 +1,112 @@
+{% extends 'coordinator/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="pagetitle">
+    <h1>Grade {{ grade }} - {{ section.section_name }} Student List</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'assessment_view' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'grade_level_7' %}">Grade {{ grade }} Sections</a></li>
+            <li class="breadcrumb-item active">Student List</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Students</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover datatable">
+                            <thead>
+                                <tr>
+                                    <th>LRN</th>
+                                    <th>Name</th>
+                                    <th>Academic Year</th>
+                                    <th>Strand</th>
+                                    <th>Section</th>
+                                    <th>General Average</th>
+                                    <th>Gender</th>
+                                    <th>Class Adviser</th>
+                                    <th>Student Status</th>
+                                    <th>Date</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td>{{ student.lrn }}</td>
+                                    <td>{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</td>
+                                    <td>{{ student.school_year }}</td>
+                                    <td>{{ student.strand }}</td>
+                                    <td>{{ student.section }}</td>
+                                    <td>{{ student.gen_avg }}</td>
+                                    <td>{{ student.gender|upper }}</td>
+                                    <td>{{ section.teacher_name }}</td>
+                                    <td>{{ student.student_status|upper }}</td>
+                                    <td>{{ student.created_at|date:"Y-m-d" }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm view-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editStudentStatusModal{{ student.id }}"
+                                            data-id="{{ student.id }}"><i class="bi bi-pencil-square"></i>
+                                            Change Status
+                                        </button>
+                                        <div class="modal fade" id="editStudentStatusModal{{ student.id }}"
+                                            tabindex="-1" aria-labelledby="editStudentStatusModalLabel"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="editStudentStatusModalLabel">Edit
+                                                            Student Status</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <form method="post"
+                                                        action="{% url 'edit_student_status' student.id %}"
+                                                        class="edit-status-form">
+                                                        {% csrf_token %}
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <label for="studentStatus">Student Status</label>
+                                                                <select class="form-select"
+                                                                    id="studentStatus{{ student.id }}"
+                                                                    name="student_status"
+                                                                    data-current-status="{{ student.student_status }}">
+                                                                    <option value="Enrolled">Enrolled</option>
+                                                                    <option value="Transferred">Transferred</option>
+                                                                    <option value="Dropped">Dropped</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-success">Save</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">No students list.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="{% static 'js/coordinator/grade_level.js' %}"></script>
+{% endblock %}

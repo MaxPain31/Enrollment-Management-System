@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="enrollment-banner banner">
+    <h1>Enrollment</h1>
+    <p>Enroll now and embark on a journey of academic excellence and personal growth.</p>
+</div>
+
+<section class="enrollment">
+    <div class="enrollment-container container">
+        {% if user.is_authenticated %}
+        <div class="col-md-8">
+            <div class="card mb-4 p-3">
+                <div class="card-body">
+                    <h4 class="card-title"><i class="bi bi-megaphone"></i> Announcement</h4>
+                    <p id="announcementText" class="card-text"></p>
+                    <p id="enrollment_date"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card p-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="card-body">
+                            <p class="card-text">Please select the appropriate enrollment category below. You will
+                                be directed to the specific application form based on your selection.</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body" style="background: #f4f7fe;">
+                                    <h5 class="m-0 text-center"><strong>Early Registration</strong></h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="img-form mb-3">
+                                        <img src="{% static 'img/online-registration.png' %}" class="card-img-top"
+                                            style="width: 100px;" alt="Enrollment Image">
+                                    </div>
+                                    <div class="form-group">
+                                        <select id="earlyRegType" class="form-select form-control">
+                                            <option value="junior" {% if info and info.jhs_completed %} disabled {% elif user.jhs_submitted %} disabled {% endif %}>Junior High School</option>
+                                            <option value="senior" {% if info and info.shs_completed %} disabled {% elif user.shs_submitted %} disabled {% endif %}>Senior High School</option>                               
+                                        </select>
+                                    </div>
+                                    <div class="d-grid mb-2">
+                                        <button type="button" id="earlyRegButton" class="btn btn-primary mt-3"
+                                            disabled>Apply
+                                        </button>
+                                    </div>
+                                    <p class="card-text text-center">
+                                        <small class="text-body-secondary">Redirects to Enrollment Form</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body" style="background: #f4f7fe;">
+                                    <h5 class="m-0 text-center"><strong>Enrollment</strong></h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="img-form mb-3">
+                                        <img src="{% static 'img/account.png' %}" class="card-img-top"
+                                            style="width: 100px;" alt="Enrollment Image">
+                                    </div>
+                                    <div class="form-group">
+                                        <select id="enrollmentType" class="form-select form-control">
+                                            <option value="junior" {% if info and info.jhs_completed %} disabled {% elif user.jhs_submitted %} disabled {% endif %}>Junior High School</option>
+                                            <option value="senior" {% if info and info.shs_completed %} disabled {% elif user.shs_submitted %} disabled {% endif %}>Senior High School</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-grid mb-2">
+                                        <button type="button" id="enrollmentButton" class="btn btn-primary mt-3"
+                                            disabled>Apply
+                                        </button>
+                                    </div>
+                                    <p class="card-text text-center">
+                                        <small class="text-body-secondary">Redirects to Early Registration Form</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p>You need to log in to view this page.</p>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+    fetch("{% url 'get_enrollment_management' %}")
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                const settings = data.data;
+                const now = new Date();
+                const enrollmentStart = new Date(settings.enrollment_start_date);
+                const enrollmentEnd = new Date(settings.enrollment_deadline_date);
+                const earlyRegStart = new Date(settings.early_registration_start_date);
+                const earlyRegEnd = new Date(settings.early_registration_deadline_date);
+                document.getElementById('announcementText').innerText = settings.announcement_content || 'No announcements available.';
+                if (settings.enrollment_active && now >= enrollmentStart && now <= enrollmentEnd) {
+                    document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Enrollment Date: </strong>' + enrollmentStart.toDateString() + ' - ' + enrollmentEnd.toDateString();
+                    document.getElementById('enrollmentButton').removeAttribute('disabled');
+                }
+                if (settings.early_registration_active && now >= earlyRegStart && now <= earlyRegEnd) {
+                    document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Early Registration Date: </strong>' + earlyRegStart.toDateString() + ' - ' + earlyRegEnd.toDateString();
+                    document.getElementById('earlyRegButton').removeAttribute('disabled');
+                }
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching enrollment settings:", error);
+        });
+    document.getElementById('earlyRegButton').addEventListener('click', function () {
+        const earlyRegType = document.getElementById('earlyRegType').value;
+        if (earlyRegType === 'junior') {
+            window.location.href = "{% url 'junior_enrollment' %}?early_reg=True";
+        } else if (earlyRegType === 'senior') {
+            window.location.href = "{% url 'senior_enrollment' %}?early_reg=True";
+        }
+    });
+
+    document.getElementById('enrollmentButton').addEventListener('click', function () {
+        const enrollmentType = document.getElementById('enrollmentType').value;
+        if (enrollmentType === 'junior') {
+            window.location.href = "{% url 'junior_enrollment' %}?early_reg=False";
+        } else if (enrollmentType === 'senior') {
+            window.location.href = "{% url 'senior_enrollment' %}?early_reg=False";
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,125 @@
+/* Custom styles for the Enrollment Reports page */
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #012970;
+}
+
+.card {
+  margin: 20px;
+}
+
+.card-body {
+  padding: 20px;
+  margin: 10px;
+}
+
+.progress {
+  height: 20px;
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.btn-primary {
+  background-color: #4154f1;
+  border-color: #4154f1;
+}
+
+.btn-primary:hover {
+  background-color: #5969f3;
+  border-color: #5969f3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+.table-responsive {
+  margin: 20px 0;
+}
+
+.table th,
+.table td {
+  vertical-align: middle;
+}
+
+.badge {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+  border-color: #d39e00;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+.profile-tab {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.profile-tab-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  -webkit-box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+}
+
+.profile-tab h5 {
+  font-size: 1rem;
+  color: #012970;
+  margin: 0;
+}
+
+.profile-tab h6 {
+  font-size: 0.8rem;
+  color: #899bbd;
+  margin: 0;
+}
+
+.circle-logo {
+  background-color: #41f159;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100%;
+  color: #fff;
+}

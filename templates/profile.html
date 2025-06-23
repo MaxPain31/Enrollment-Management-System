@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<section class="profile">
+    <div class="container">
+        {% if info_type == "student" and info %}
+        <div class="profile-banner">
+            <div class="profie-circle">
+                <span>{{ info.first_name|slice:":1"|default:"A" }}</span>
+            </div>
+            <h2>{{ info.first_name|lower|capfirst }} {{ info.last_name|lower|capfirst }}</h2>
+            <h5 class="text-black-50">Grade {{ info.grade }} {{ info_type|capfirst }}</h5>
+            <h5><span class="badge bg-success rounded-pill text-bg-secondary">{{ info.student_status }}</span></h5>
+        </div>
+        <div class="profile-container">
+            <div class="card mb-4 p-3">
+                <div class="card-body">
+                    <h3 class="card-title"><i class="bi bi-person-circle"></i> Student Information</h3>
+                    <p class="text-secondary-emphasis">Your personal and academic details</p>
+                    <div class="row">
+                        <div class="col-md-6 d-flex flex-column justify-content-between">
+                            <div class="mt-4">
+                                <h5 class="text-black-50"><i class="bi bi-person"></i> LRN: <strong class="text-black">{{ info.lrn }}</strong></h5>
+                            </div>
+                            <div class="mt-4">
+                                <h5 class="text-black-50"><i class="bi bi-card-text"></i></i></i> PSA No: <strong class="text-black">{{ info.psa_no }}</strong></h5>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mt-4">
+                                <h5 class="text-black-50"><i class="bi bi-envelope"></i> Email: <strong class="text-black">{{ user.email }}</strong></h5>
+                            </div>
+                            <div class="mt-4">
+                                <h5 class="text-black-50"><i class="bi bi-calendar4"></i></i></i> School Year: <strong class="text-black">{{ info.school_year }}</strong></h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% elif info_type == "applicant" and info %}
+        <div class="profile-banner">
+            <div class="profie-circle">
+                <span>{{ info.first_name|slice:":1"|default:"A" }}</span>
+            </div>
+            <h2>{{ info.first_name|lower|capfirst }} {{ info.last_name|lower|capfirst }}</h2>
+            <h5 class="text-black-50"> {{ info_type|capfirst }}</h5>
+            <h5><span class="badge bg-secondary rounded-pill text-bg-secondary">Not Enrolled</span></h5>
+        </div>
+        <div class="profile-container">
+            <div class="card mb-4 p-3">
+                <div class="card-body">
+                    <h3 class="card-title"><i class="bi bi-person-circle"></i> Student Information</h3>
+                    <p class="text-secondary-emphasis">Your personal and academic details</p>
+                    <div class="row">
+                        <div class="col-md-6 d-flex flex-column justify-content-between">
+                            <div class="mt-4">
+                                <h5 class="text-black-50"><i class="bi bi-person"></i> LRN: <strong class="text-black">{{ info.lrn }}</strong></h5>
+                            </div>
+                            <div class="mt-4">
+                                <h5 class="text-black-50"><i class="bi bi-card-text"></i></i></i> PSA No: <strong
+                                        class="text-black">{{ info.psa_no }}</strong></h5>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mt-4">
+                                <h5 class="text-black-50"><i class="bi bi-envelope"></i> Email: <strong class="text-black">{{ user.email }}</strong></h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% else %}
+<p>You need to log in to view this page.</p>
+{% endif %}
+{% endblock %}

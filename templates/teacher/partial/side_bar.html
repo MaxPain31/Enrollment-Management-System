@@ -1,0 +1,35 @@
+<aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'student_list' %}active{% else %}collapsed{% endif %}"
+                href="#">
+                <i class="bi bi-pen"></i>
+                <span>Student List</span>
+            </a>
+        </li><!-- End Dashboard Nav -->
+
+
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'teacher_logout' %}active{% else %}collapsed{% endif %}"
+                href="{% url 'teacher_logout' %}">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Logout</span>
+            </a>
+        </li>
+
+        <div class="profile-tab">
+            <div class="profile-tab-container">
+                <div class="circle-logo">
+                    <span>{{ request.user.teacherinformation.first_name|slice:":1"|default:"A" }}</span>
+                </div>
+                <div class="profile-tab-content">
+                    <h5>Grade {{ request.user.teacherinformation.grade_level }} - {{ request.user.user_role|default:"Teacher" }}</h5>
+                    <h6>{{ request.user.teacherinformation.first_name}} {{ request.user.teacherinformation.last_name }} </h6>
+                </div>
+            </div>
+        </div>
+    </ul>
+
+</aside><!-- End Sidebar-->

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="announcement-banner banner">
+    <h1>Announcements</h1>
+    <p>Stay updated with the latest news and events at TuloyEskwelaPDBNHS.</p>
+</div>
+<section class="announcement">
+    <div class="announcement-container container">
+        <div class="announcement-content">
+            {% for announcement in announcements %}
+            <div class="card mb-3" style="width: 100%;">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <div class="card-body">
+                            <h1 class="text-primary">{{ announcement.date|date:"d" }}</h1>
+                            <h4>{{ announcement.date|date:"F" }}</h4>
+                            <p>{{ announcement.date|date:"Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title">{{ announcement.title }}</h5>
+                                <p class="card-text">
+                                    <small class="text-body-secondary">
+                                        <i class="bi bi-calendar4"></i>
+                                        {{ announcement.date|date:"F d, Y" }}
+                                    </small>
+                                </p>
+                                <span>{{ announcement.content }}</span>
+                            </div>
+                            <div>
+                                <a href="{% url 'announcement_detail' announcement.id %}" class="btn btn-primary">Read more</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No announcements available.</p>
+            {% endfor %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if announcements.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ announcements.previous_page_number }}"
+                            aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for page_num in announcements.paginator.page_range %}
+                    <li class="page-item {% if announcements.number == page_num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                    </li>
+                    {% endfor %}
+                    {% if announcements.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ announcements.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</section>
+{% endblock %}

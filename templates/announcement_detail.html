@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="announcement-banner banner">
+    <h1>Announcements</h1>
+    <p>Stay updated with the latest news and events at TuloyEskwelaPDBNHS.</p>
+</div>
+<section class="announcement">
+    <div class="announcement-container container">
+        <div class="detail-announcement-content">
+            <div class="row p-2">
+                <h2>{{ announcement.title }}</h2>
+                <p><i class="bi bi-calendar4"></i> {{ announcement.date|date:"F d, Y" }}</p>
+                <div class="d-flex flex-center justify-content-center align-items-center mb-4">
+                    <img class="w-100" src="{{ announcement.image.url }}">
+                </div>
+                <p class="fs-5">{{ announcement.content }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

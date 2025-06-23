@@ -1,0 +1,54 @@
+{% load static %}
+<nav>
+    <div class="nav-container container">
+        <div class="logo">
+            <img src="{% static 'img/logo.png' %}" alt="">
+            <span>TuloyEskwelaPDBNHS</span>
+        </div>
+        <div class="nav-right">
+            <ul class="nav-links">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'about' %}">About</a></li>
+                <li><a href="{% url 'announcements' %}">Announcements</a></li>
+                <li><a href="{% url 'enrollment' %}">Enrollment</a></li>
+                <!-- <li><a href="{% url 'contact' %}">Contact Us</a></li> -->
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}" class="btn btn-outline-primary">My Profile</a>
+                <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
+                {% else %}
+                <li>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#registerModalToggle">
+                        Register
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#loginModalToggle">
+                        Login
+                    </button>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="burger">
+            <div class="line1"></div>
+            <div class="line2"></div>
+            <div class="line3"></div>
+        </div>
+    </div>
+</nav>
+
+{% include 'authentication/login.html' %}
+{% include 'authentication/register.html' %}
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('login_error')) {
+            const loginModal = new bootstrap.Modal(document.getElementById('loginModalToggle'));
+            loginModal.show();
+        }
+    });
+</script>
+{% endblock %}

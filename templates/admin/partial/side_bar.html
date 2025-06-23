@@ -1,0 +1,135 @@
+<aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% else %}collapsed{% endif %}"
+                href="{% url 'admin_dashboard' %}">
+                <i class="bi bi-grid"></i>
+                <span>Dashboard</span>
+            </a>
+        </li><!-- End Dashboard Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'application' or request.resolver_match.url_name == 'application_approved' or request.resolver_match.url_name == 'application_rejected' %}active{% else %}collapsed{% endif %}"
+                data-bs-target="#application-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-file-post"></i><span>Application</span><i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="application-nav"
+                class="nav-content collapse {% if request.resolver_match.url_name == 'application' or request.resolver_match.url_name == 'application_approved' or request.resolver_match.url_name == 'application_rejected' %}show{% endif %}"
+                data-bs-parent="#sidebar-nav">
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'application' %}active{% endif %}"
+                        href="{% url 'application' %}">
+                        <i class="bi bi-circle"></i><span>Application</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{% if request.resolver_match.url_name == 'application_approved' %}active{% endif %}"
+                        href="{% url 'application_approved' %}">
+                        <i class="bi bi-circle"></i><span>Approved</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{% if request.resolver_match.url_name == 'application_rejected' %}active{% endif %}"
+                        href="{% url 'application_rejected' %}">
+                        <i class="bi bi-circle"></i><span>Rejected</span>
+                    </a>
+                </li>
+            </ul>
+        </li><!-- End Grade Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'reports' %}active{% else %}collapsed{% endif %}"
+                href="{% url 'reports' %}">
+                <i class="bi bi-bar-chart"></i>
+                <span>Reports</span>
+            </a>
+        </li><!-- End Reports Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'manage_announcement' or request.resolver_match.url_name == 'manage_enrollment' %}active{% else %}collapsed{% endif %}"
+                data-bs-target="#manage-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-file-post"></i><span>Manage Pages</span><i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="manage-nav"
+                class="nav-content collapse {% if request.resolver_match.url_name == 'manage_announcement' or request.resolver_match.url_name == 'manage_enrollment' %}show{% endif %}"
+                data-bs-parent="#sidebar-nav">
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'manage_announcement' %}active{% endif %}"
+                        href="{% url 'manage_announcement' %}">
+                        <i class="bi bi-circle"></i><span>Announcement</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{% if request.resolver_match.url_name == 'manage_enrollment' %}active{% endif %}"
+                        href="{% url 'manage_enrollment' %}">
+                        <i class="bi bi-circle"></i><span>Enrollment</span>
+                    </a>
+                </li>
+            </ul>
+        </li><!-- End Grade Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'admin_all_users' or request.resolver_match.url_name == 'student_users' or request.resolver_match.url_name == 'teacher_users' or request.resolver_match.url_name == 'admin_users' or request.resolver_match.url_name == 'coordinator_users' %}active{% else %}collapsed{% endif %}"
+                data-bs-target="#account-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-person"></i><span>Account</span><i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="account-nav"
+                class="nav-content collapse {% if request.resolver_match.url_name == 'admin_all_users' or request.resolver_match.url_name == 'student_users' or request.resolver_match.url_name == 'teacher_users' or request.resolver_match.url_name == 'admin_users' or request.resolver_match.url_name == 'coordinator_users' %}show{% endif %}"
+                data-bs-parent="#sidebar-nav">
+                <li>
+                    <a class="{% if request.resolver_match.url_name == 'admin_all_users' %}active{% endif %}"
+                        href="{% url 'admin_all_users' %}">
+                        <i class="bi bi-circle"></i><span>All User</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{% if request.resolver_match.url_name == 'student_users' %}active{% endif %}" 
+                        href="{% url 'student_users' %}">
+                        <i class="bi bi-circle"></i><span>Student</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{% if request.resolver_match.url_name == 'teacher_users' %}active{% endif %}" 
+                        href="{% url 'teacher_users' %}">
+                        <i class="bi bi-circle"></i><span>Teacher</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}"
+                        href="{% url 'admin_users' %}">
+                        <i class="bi bi-circle"></i><span>Admin</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{% if request.resolver_match.url_name == 'coordinator_users' %}active{% endif %}"
+                        href="{% url 'coordinator_users' %}">
+                        <i class="bi bi-circle"></i><span>Coordinator</span>
+                    </a>
+                </li>
+            </ul>
+        </li><!-- End Account Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'admin_logout' %}active{% else %}collapsed{% endif %}"
+                href="{% url 'admin_logout' %}">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Logout</span>
+            </a>
+        </li><!-- End Reports Nav -->
+
+        <div class="profile-tab">
+            <div class="profile-tab-container">
+                <div class="circle-logo">
+                    <span>{{ request.user.admininformation.first_name|slice:":1"|default:"A" }}</span>
+                </div>
+                <div class="profile-tab-content">
+                    <h5>{{ request.user.user_role|default:"Admininistrator" }}</h5>
+                    <h6>{{ request.user.admininformation.first_name|default:"System Administrator" }} {{ request.user.admininformation.last_name }}</h6>
+                </div>
+            </div>
+        </div>
+    </ul>
+
+</aside><!-- End Sidebar-->

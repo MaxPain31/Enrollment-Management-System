@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="home">
+    <div class="home-container container">
+        <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0"
+                        class="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+                        aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+                        aria-label="Slide 3"></button>
+                </div>
+                <div class="carousel-item active c-item">
+                    <img src="{% static 'img/3.jpg' %}" class="d-block w-100 c-img" alt="Image 1">
+                </div>
+                <div class="carousel-item c-item">
+                    <img src="{% static 'img/4.jpg' %}" class="d-block w-100 c-img" alt="Image 2">
+                </div>
+                <div class="carousel-item c-item">
+                    <img src="{% static 'img/1.jpg' %}" class="d-block w-100 c-img" alt="Image 3">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying"
+                data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying"
+                data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+        <div class="home-content">
+            <h1>Welcome to TuloyEskwelaPDBNHS</h1>
+            <p>Ang paaralang ito ay nagbibigay ng de-kalidad na edukasyon
+                para sa Junior High School at Senior High School. Ang aming mga programa ay dinisenyo upang palakasin
+                ang inyong mga anak at ihanda sila para sa kanilang kinabukasan.</p>
+            <div>
+                <button type="button" class="btn btn-primary">About Us</button>
+                <button type="button" class="btn btn-light">Contact Us</button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="summary-announcement">
+    <div class="summary-announcement-container container">
+        <div class="summary-announcement-content">
+            <h2>Announcements</h2>
+            <div class="row">
+                {% for announcement in latest_announcements %}
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-title">
+                                <h4>{{ announcement.title }}</h4>
+                                <span>{{ announcement.date|date:"F d, Y" }}</span>
+                            </div>
+                            <p class="card-text">{{ announcement.content|truncatewords:20 }}</p>
+                            <a class="card-text" href="{% url 'announcement_detail' announcement.id %}">Read more ></a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No announcements available.</p>
+                {% endfor %}
+            </div>
+            <button type="button" class="btn btn-light">
+                <a href="{% url 'announcements' %}" style="text-decoration: none; color: inherit;">View all announcements</a>
+            </button>
+        </div>
+    </div>
+</section>
+{% endblock %}

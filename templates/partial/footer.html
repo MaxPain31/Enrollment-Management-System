@@ -1,0 +1,37 @@
+{% load static %}
+<div class="footer container">
+    <div class="footer-content">
+        <div class="footer-section">
+            <div class="logo-2">
+                <img src="{% static 'img/logo.png' %}" alt="Logo">
+            </div>
+            <h3>TuloyEskwelaPDBNHS</h3>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'about' %}">About</a></li>
+                <li><a href="{% url 'announcements' %}">Announcements</a></li>
+                <li><a href="{% url 'enrollment' %}">Enrollment</a></li>
+                <li><a href="{% url 'contact' %}">Contact Us</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Contact</h3>
+            <p>#0027 Paso de Blas Street<br>TCL, Paso de Blas<br>pasodeblas.nhs@deped.gov.ph<br>(02) 8398-7897 /
+                8806-6446
+            </p>
+        </div>
+        <div class="footer-section social">
+            <h3>Connect</h3>
+            <a href="#"><img src="{% static 'img/facebook.png' %}" alt="Facebook"></a>
+            <a href="#"><img src="{% static 'img/social-media.png' %}" alt="Twitter"></a>
+            <a href="#"><img src="{% static 'img/instagram.png' %}" alt="Instagram"></a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <hr>
+        <p>&copy; 2025 TuloyEskwelaPDBNHS. All rights reserved.</p>
+    </div>
+</div>

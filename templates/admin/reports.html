@@ -1,0 +1,68 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="pagetitle">
+    <h1>Reports</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item active">Reports</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+
+<section class="section report">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body pb-0">
+                    <h5 class="card-title">Application Report <span>| Today</span></h5>
+                    <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">User Report <span>| Today</span></h5>
+                    <canvas id="barChart" style="min-height: 380px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Gender Distribution</h5>
+                    <canvas id="genderChart" style="max-height: 380px;"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Student Type Analytics</h5>
+                    <canvas id="studentTypeChart" style="max-height: 380px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Buttons -->
+    <div class="row mt-4">
+        <div class="col-lg-12 text-end">
+            <button id="exportExcelBtn" class="btn btn-success me-2">Export as Excel</button>
+            <button id="exportCsvBtn" class="btn btn-primary">Generate CSV Report</button>
+        </div>
+    </div>
+</section>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- SheetJS (XLSX) CDN for Excel export -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="{% static 'js/admin/dashboard.js' %}"></script>
+{% endblock %}
