@@ -60,7 +60,11 @@ class AdminApplicationView(View):
         enrollment_type = request.GET.get("enrollment_type", None)
 
         applications = EnrollmentForm.objects.filter(is_approved=None)
-        settings = EnrollmentManagement.objects.get(id=1)
+        try:
+            settings = EnrollmentManagement.objects.get(id=1)
+        except EnrollmentManagement.DoesNotExist:
+            settings = None
+
         if enrollment_type:
             applications = applications.filter(enrollment_type=enrollment_type)
         if grade_level:
