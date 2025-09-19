@@ -146,6 +146,7 @@ class JuniorEnrollmentView(View):
         model_fields = [f.name for f in EnrollmentForm._meta.get_fields()]
         valid_data = {k: v for k, v in cleaned_data.items() if k in model_fields}
         valid_data['user'] = request.user
+        valid_data['user_id'] = request.user.id
 
         enrollment, created = EnrollmentForm.objects.update_or_create(
             lrn=cleaned_data["lrn"],
@@ -236,7 +237,9 @@ class SeniorEnrollmentView(View):
 
         model_fields = [f.name for f in EnrollmentForm._meta.get_fields()]
         valid_data = {k: v for k, v in cleaned_data.items() if k in model_fields}
-
+        valid_data['user'] = request.user
+        valid_data['user_id'] = request.user.id
+        
         enrollment, created = EnrollmentForm.objects.update_or_create(
             lrn=cleaned_data["lrn"],
             defaults=valid_data,

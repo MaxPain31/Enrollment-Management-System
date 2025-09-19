@@ -220,7 +220,7 @@ class AdminApplicationActionView(View):
                             "first_name": application.first_name,
                             "middle_name": application.middle_name,
                             "last_name": application.last_name,
-                            "extension_name": application.extension_name,
+                            "extension_name": application.extension_name, 
                             "birth_date": application.birth_date,
                             "age": application.age,
                             "gender": application.gender,
@@ -399,12 +399,23 @@ class AdminApplicationReApproveView(View):
             data = json.loads(request.body)
             application_id = data.get("application_id")
 
+
             with transaction.atomic():
                 # Get the record from ApplicationRejected table
                 application_rejected = ApplicationRejected.objects.get(pk=application_id)
 
                 # Get the record from EnrollmentForm table
                 enrollment_form = EnrollmentForm.objects.get(pk=application_rejected.enrollment_id)
+                
+                            
+                if enrollment_form.status == "Missing":
+                    return JsonResponse(
+                        {
+                            "success": False,
+                            "message": "Application cannot be approved while status is 'Missing'.",
+                        },
+                        status=400,
+                    )
 
                 # Update enrollment form
                 enrollment_form.is_approve = True
@@ -440,6 +451,7 @@ class AdminApplicationReApproveView(View):
                 {"success": False, "message": "An error occurred."}, status=500
             )
 
+
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -454,7 +466,7 @@ class AdminApplicationBulkReApproveView(View):
             if not application_ids:
                 return JsonResponse({"success": False, "message": "No applications selected."}, status=400)
 
-            # Unique key for tracking progress
+            # Unique batch key
             batch_key = f"bulk_reapprove_{uuid.uuid4()}"
             cache.set(batch_key, {"reapproved": 0, "total": total, "skipped": []}, timeout=3600)
 
@@ -464,61 +476,72 @@ class AdminApplicationBulkReApproveView(View):
 
                 for app_id in application_ids:
                     try:
-                        with transaction.atomic():
-                            application_rejected = ApplicationRejected.objects.get(pk=app_id)
+                        # Fetch rejected application
+                        application_rejected = ApplicationRejected.objects.get(pk=app_id)
 
-                            try:
-                                enrollment_form = EnrollmentForm.objects.get(pk=application_rejected.enrollment_id)
-                            except EnrollmentForm.DoesNotExist:
-                                skipped.append(str(app_id))
-                                continue
+                        # Fetch related enrollment
+                        enrollment_form = EnrollmentForm.objects.filter(pk=application_rejected.enrollment_id).first()
+                        if not enrollment_form:
+                            skipped.append(app_id)
+                            continue
 
-                            enrollment_form.is_approve = True
-                            enrollment_form.save()
+                        # Mark as approved
+                        enrollment_form.is_approve = True
+                        enrollment_form.save()
 
-                            ApplicationApproved.objects.create(
-                                is_assessed=0,
-                                enrollment_id=application_rejected.enrollment_id
+                        # Insert into ApplicationApproved (if not exists)
+                        ApplicationApproved.objects.get_or_create(
+                            enrollment=enrollment_form,
+                            defaults={"is_assessed": False}
+                        )
+
+                        # Remove from rejected
+                        application_rejected.delete()
+
+                        # Send notification
+                        try:
+                            emailNotification(
+                                enrollment_form.first_name,
+                                enrollment_form.last_name,
+                                enrollment_form.application_no,
+                                enrollment_form.user.email,
+                                "approved"
                             )
+                        except Exception as e:
+                            logger.error(f"Email failed for {enrollment_form.application_no}: {e}")
 
-                            application_rejected.delete()
-
-                            try:
-                                emailNotification(
-                                    enrollment_form.first_name,
-                                    enrollment_form.last_name,
-                                    enrollment_form.application_no,
-                                    enrollment_form.user.email,
-                                    "approved"
-                                )
-                            except Exception as e:
-                                logger.error(f"Email failed for {enrollment_form.application_no}: {e}")
-
-                            reapproved_count += 1
-
-                            progress = cache.get(batch_key) or {"reapproved": 0, "total": total, "skipped": []}
-                            progress.update({"reapproved": reapproved_count, "skipped": skipped})
-                            cache.set(batch_key, progress, timeout=3600)
+                        reapproved_count += 1
 
                     except ApplicationRejected.DoesNotExist:
-                        skipped.append(str(app_id))
+                        skipped.append(app_id)
+                        continue
                     except Exception as e:
                         logger.error(f"Error re-approving application {app_id}: {e}")
-                        skipped.append(str(app_id))
+                        skipped.append(app_id)
+                        continue
 
-                cache.set(batch_key, {
-                    "reapproved": reapproved_count,
-                    "total": total,
-                    "skipped": skipped,
-                    "done": True  
-                }, timeout=3600)
+                    # ✅ Always update cache inside loop
+                    cache.set(
+                        batch_key,
+                        {"reapproved": reapproved_count, "total": total, "skipped": skipped},
+                        timeout=3600
+                    )
+
+                # ✅ Final cache update when loop ends
+                cache.set(
+                    batch_key,
+                    {"reapproved": reapproved_count, "total": total, "skipped": skipped},
+                    timeout=3600
+                )
 
             Thread(target=process_bulk, daemon=True).start()
 
             return JsonResponse({"success": True, "batch_key": batch_key, "total": total})
 
         except Exception as e:
+            logger.error(f"Bulk reapprove failed: {e}")
             return JsonResponse({"success": False, "message": str(e)}, status=500)
+
 
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
@@ -528,9 +551,9 @@ class BulkReApproveProgressView(View):
     def get(self, request, batch_key):
         progress = cache.get(batch_key)
         if not progress:
-            return JsonResponse({"reapproved": 0, "total": 0, "skipped": [], "done": False})
+            return JsonResponse({"reapproved": 0, "total": 0, "skipped": []})
         return JsonResponse(progress)
-
+    
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -668,8 +691,11 @@ class UpdateApplicationView(View):
                     application.status = "Missing"
                 application.save()
 
-            return JsonResponse({"success": True, "message": "Application updated successfully."})
-
+            return JsonResponse({
+                "success": True,
+                "message": "Application updated successfully.",
+                "status": application.status
+            })
         except EnrollmentForm.DoesNotExist:
             return JsonResponse({"success": False, "message": "Application not found."}, status=404)
         except ValidationError as e:
@@ -864,7 +890,7 @@ class AddCoordinatorUserView(View):
             )
             
             return JsonResponse(
-                {"status": "success", "message": "Admin user created successfully"}
+                {"status": "success", "message": "Coordinator user created successfully"}
             )
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
@@ -918,7 +944,7 @@ class AddTeacherUserView(View):
             )
             
             return JsonResponse(
-                {"status": "success", "message": "Admin user created successfully"}
+                {"status": "success", "message": "Teacher user created successfully"}
             )
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)

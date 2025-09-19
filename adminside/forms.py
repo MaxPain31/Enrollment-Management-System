@@ -116,15 +116,19 @@ class ApplicationForm(forms.Form):
     def clean_science_avg(self):
         science_avg = self.cleaned_data.get("science_avg")
         enrollment_type = self.cleaned_data.get("enrollment_type")
-        if enrollment_type != "JHS" and (science_avg is None or not (75 <= science_avg <= 100)):
-            raise ValidationError("Science average must be between 75 and 100.")
+        # Only validate if non-JHS and value is provided
+        if enrollment_type != "JHS" and science_avg is not None:
+            if not (75 <= science_avg <= 100):
+                raise ValidationError("Science average must be between 75 and 100.")
         return science_avg
 
     def clean_math_avg(self):
         math_avg = self.cleaned_data.get("math_avg")
         enrollment_type = self.cleaned_data.get("enrollment_type")
-        if enrollment_type != "JHS" and (math_avg is None or not (75 <= math_avg <= 100)):
-            raise ValidationError("Mathematics average must be between 75 and 100.")
+        # Only validate if non-JHS and value is provided
+        if enrollment_type != "JHS" and math_avg is not None:
+            if not (75 <= math_avg <= 100):
+                raise ValidationError("Mathematics average must be between 75 and 100.")
         return math_avg
 
     def clean_age(self):

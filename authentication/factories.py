@@ -27,8 +27,8 @@ class EnrollmentFormFactory(factory.django.DjangoModelFactory):
     created_at = factory.LazyFunction(timezone.now)
     status = "Missing"
     school_year = "2025-2026"
-    grade_level = "7"
-    student_type = "NEW STUDENT"
+    grade_level = "11"
+    student_type = "TRANSFEREE"
     gen_avg = factory.LazyFunction(lambda: random.randint(75, 100))
 
     # Application no like 2025-0918009
@@ -43,13 +43,13 @@ class EnrollmentFormFactory(factory.django.DjangoModelFactory):
 
     # LRN 12 digits
     lrn = factory.LazyFunction(lambda: f"{random.randint(10**11, 10**12-1)}")
-    enrollment_type = "JHS"
+    enrollment_type = "SHS"
 
     first_name = factory.LazyAttribute(lambda _: fake.first_name())
     middle_name = factory.LazyAttribute(lambda _: fake.first_name())
     last_name = factory.LazyAttribute(lambda _: fake.last_name())
     extension_name = ""
-    birth_date = factory.LazyFunction(lambda: fake.date_of_birth(minimum_age=12, maximum_age=14))
+    birth_date = factory.LazyFunction(lambda: fake.date_of_birth(minimum_age=14, maximum_age=16))
     age = factory.LazyAttribute(lambda obj: timezone.now().year - obj.birth_date.year)
     gender = factory.LazyAttribute(lambda _: random.choice(["MALE", "FEMALE"]))
     place_of_birth = "VALENZUELA"

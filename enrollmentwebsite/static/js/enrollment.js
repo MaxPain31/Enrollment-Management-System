@@ -118,9 +118,9 @@ $(document).ready(function () {
                                 <label for="grade_level" class="form-label">Grade Level</label>
                                 <select class="form-select" id="grade_level" name="grade_level" disabled>
                                     <option value="7" ${data.grade_level=='7'?'selected':''}>GRADE 7</option>
-                                    <option value="8" ${data.GRADE_level=='8'?'selected':''}>GRADE 8</option>
-                                    <option value="9" ${data.GRADE_level=='9'?'selected':''}>GRADE 9</option>
-                                    <option value="10" ${data.GRADE_level=='10'?'selected':''}>GRADE 10</option>
+                                    <option value="8" ${data.grade_level=='8'?'selected':''}>GRADE 8</option>
+                                    <option value="9" ${data.grade_level=='9'?'selected':''}>GRADE 9</option>
+                                    <option value="10" ${data.grade_level=='10'?'selected':''}>GRADE 10</option>
                                 </select>
                                 <div class="invalid-feedback"></div>
                             </div>
@@ -299,7 +299,7 @@ $(document).ready(function () {
                             icon: "success", 
                             confirmButtonText: "OK" 
                         }).then(() => { 
-                            $("#applicationTable tbody").load(location.href + " #applicationTable tbody > *");
+                            location.reload();
                         });
                     } else if (res.errors) {
                         $.each(res.errors, function (field, messages) {
@@ -421,6 +421,7 @@ function clearFiltersAndSubmit() {
 $(document).ready(function () {
     const $approveAllBtn = $("#approveAllBtn");
     const $reapproveAllBtn = $("#reapproveAllBtn"); // <-- new button
+    const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
     enforceMissingRule();
 
@@ -499,7 +500,7 @@ $(document).ready(function () {
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({ application_ids: ids }),
-                    headers: { "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val() },
+                    headers: { "X-CSRFToken": getCookie("csrftoken"), },
                 }).then((res) => {
                     if (!res.success) {
                         throw new Error(res.message || `Failed to start bulk ${actionName.toLowerCase()}.`);
@@ -522,11 +523,24 @@ $(document).ready(function () {
                 showConfirmButton: false,
                 didOpen: () => {
                     Swal.showLoading();
-
                     const interval = setInterval(function () {
-                        $.get(`/admin/bulk-${actionName.toLowerCase()}-progress/${batchKey}/`, function (data) {
-                            $("#progressText").html(`<strong>${data.reapproved || data.approved} / ${data.total}</strong> ${actionName.toLowerCase()}d`);
-                            if ((data.reapproved || data.approved) >= data.total) {
+                        let progressUrl = "";
+
+                        if (actionName === "Approve") {
+                            progressUrl = `/admin/bulk-approve-progress/${batchKey}/`;
+                        } else if (actionName === "Re-Approve") {
+                            progressUrl = `/admin/bulk-reapprove-progress/${batchKey}/`;
+                        }
+
+                        $.get(progressUrl, function (data) {
+                            // ✅ Safe handling for 0 values
+                            const processed = (data.reapproved !== undefined) ? data.reapproved : data.approved;
+
+                            $("#progressText").html(
+                                `<strong>${processed} / ${data.total}</strong> ${actionName.toLowerCase()}d`
+                            );
+
+                            if (processed >= data.total) {
                                 clearInterval(interval);
                                 Swal.fire({
                                     icon: "success",
@@ -537,6 +551,7 @@ $(document).ready(function () {
                             }
                         });
                     }, 1000);
+
                 }
             });
         });
@@ -658,7 +673,7 @@ function submitRejectReason() {
     });
 }
 
-$(document).on("click", "#reApproveBtn", function (e) {
+$(document).on("click", "#reApproveBtn", function (e) { 
     e.preventDefault();
     const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
     const applicationId = $(this).data("id");
@@ -681,19 +696,26 @@ $(document).on("click", "#reApproveBtn", function (e) {
                 contentType: "application/json",
                 data: JSON.stringify({ application_id: applicationId }),
                 headers: {
-                    "X-CSRFToken": csrfToken,
+                    "X-CSRFToken": getCookie("csrftoken"),
                     "X-Requested-With": "XMLHttpRequest"
                 },
             })
-                .then((res) => {
-                    if (!res.success) {
-                        throw new Error(res.message || "Failed to re-approve application.");
-                    }
-                    return res;
-                })
-                .catch((err) => {
-                    Swal.showValidationMessage(`Request failed: ${err}`);
-                });
+            .then((res) => {
+                if (!res.success) {
+                    throw new Error(res.message || "Failed to re-approve application.");
+                }
+                return res;
+            })
+            .catch((jqXHR) => {
+                // Extract custom error message
+                let errMsg = "Request failed.";
+                if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                    errMsg = jqXHR.responseJSON.message;
+                } else if (jqXHR.responseText) {
+                    errMsg = jqXHR.responseText;
+                }
+                Swal.showValidationMessage(errMsg);
+            });
         }
     }).then((result) => {
         if (result.isConfirmed) {
