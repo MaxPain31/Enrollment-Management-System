@@ -1,55 +1,66 @@
 {% load static %}
 <div class="modal fade" id="registerModalToggle" aria-hidden="true" aria-labelledby="registerModalToggleLabel"
     tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="registerModalToggleLabel">Register</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
             <div class="modal-body">
+                <div class="d-flex align-items-center justify-content-end">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="d-flex align-items-center justify-content-center">
+                    <img src="{% static "img/logo.png" %}" alt="logo" style="width: 50px;">
+                </div>
+                <h2 class="modal-title text-center mb-4">Register Student Account</h2>
                 <form id="registerForm" method="post" action="{% url 'register' %}">
                     {% csrf_token %}
                     <div id="registerMessages"></div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="lrn" class="form-label">Learner Reference Number</label>
                         <input type="text" class="form-control" id="lrn" name="lrn" placeholder="Enter your LRN">
+                        <div class="invalid-feedback register-error"></div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="psa_no" class="form-label">PSA Birth Certificate No.</label>
                         <input type="text" class="form-control" id="psa_no" name="psa_no"
                             placeholder="Enter your PSA birth certificate no.">
+                        <div class="invalid-feedback register-error"></div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="first_name" class="form-label">First Name</label>
                         <input type="text" class="form-control" id="first_name" name="first_name"
                             placeholder="Enter your first name">
+                        <div class="invalid-feedback register-error"></div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="middle_name" class="form-label">Middle Name</label>
                         <input type="text" class="form-control" id="middle_name" name="middle_name"
                             placeholder="Enter your middle name">
+                        <div class="invalid-feedback register-error"></div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="last_name" class="form-label">Last Name</label>
                         <input type="text" class="form-control" id="last_name" name="last_name"
                             placeholder="Enter your last name">
+                        <div class="invalid-feedback register-error"></div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email">
+                        <div class="invalid-feedback register-error"></div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password"
                             placeholder="Enter your password">
+                        <div class="invalid-feedback register-error"></div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="confirm_password" class="form-label">Confirm Password</label>
                         <input type="password" class="form-control" id="confirm_password" name="confirm_password"
                             placeholder="Enter your confirm password">
+                        <div class="invalid-feedback register-error"></div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="d-flex align-items-center justify-content-center gap-2 my-4">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" id="registerButton" class="btn btn-primary">Register</button>
                     </div>

@@ -1,54 +1,69 @@
 {% load static %}
-<nav>
-    <div class="nav-container container">
-        <div class="logo">
-            <img src="{% static 'img/logo.png' %}" alt="">
-            <span>TuloyEskwelaPDBNHS</span>
-        </div>
-        <div class="nav-right">
-            <ul class="nav-links">
-                <li><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="{% url 'about' %}">About</a></li>
-                <li><a href="{% url 'announcements' %}">Announcements</a></li>
-                <li><a href="{% url 'enrollment' %}">Enrollment</a></li>
-                <!-- <li><a href="{% url 'contact' %}">Contact Us</a></li> -->
-                {% if user.is_authenticated %}
-                <a href="{% url 'profile' %}" class="btn btn-outline-primary">My Profile</a>
-                <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
-                {% else %}
-                <li>
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
-                        data-bs-target="#registerModalToggle">
-                        Register
-                    </button>
-                </li>
-                <li>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#loginModalToggle">
-                        Login
-                    </button>
-                </li>
-                {% endif %}
-            </ul>
-        </div>
-        <div class="burger">
-            <div class="line1"></div>
-            <div class="line2"></div>
-            <div class="line3"></div>
-        </div>
+
+<nav class="navbar navbar-expand-lg bg-light fixed-top shadow-sm">
+  <div class="container">
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+      <img src="{% static 'img/logo.png' %}" alt="Logo" width="40" class="me-2">
+      <span>TuloyEskwelaPDBNHS</span>
+    </a>
+
+    <!-- Toggler (for Offcanvas) -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+      aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+      <div class="offcanvas-header">
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex gap-2">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'home' %}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'about' %}">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'announcements' %}">Announcements</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'enrollment' %}">Enrollment</a>
+          </li>
+          <!-- Authentication Links -->
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a href="{% url 'profile' %}" class="btn btn-outline-primary me-2">My Profile</a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
+          </li>
+          {% else %}
+          <li class="nav-item mb-2">
+            <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal"
+              data-bs-target="#registerModalToggle">
+              Register
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+              data-bs-target="#loginModalToggle">
+              Login
+            </button>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
     </div>
+  </div>
 </nav>
 
+<!-- Include Modals -->
 {% include 'authentication/login.html' %}
 {% include 'authentication/register.html' %}
+
 {% block extra_js %}
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('login_error')) {
-            const loginModal = new bootstrap.Modal(document.getElementById('loginModalToggle'));
-            loginModal.show();
-        }
-    });
-</script>
 {% endblock %}

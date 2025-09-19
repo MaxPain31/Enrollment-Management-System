@@ -77,11 +77,11 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
 class TeacherInformation(models.Model):
     user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=255)
-    middle_name = models.CharField(max_length=255, blank=True, null=True)
-    last_name = models.CharField(max_length=255)
-    position = models.CharField(max_length=255, blank=True, null=True)
-    grade_level = models.CharField(max_length=255, blank=True, null=True)
+    first_name = models.CharField(max_length=191)
+    middle_name = models.CharField(max_length=191, blank=True, null=True)
+    last_name = models.CharField(max_length=191)
+    position = models.CharField(max_length=191, blank=True, null=True)
+    grade_level = models.CharField(max_length=191, blank=True, null=True)
 
     class Meta:
         db_table = "teacher_information"
@@ -97,11 +97,11 @@ class TeacherInformation(models.Model):
 
 class ApplicantInformation(models.Model):
     user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
-    lrn = models.CharField(max_length=255, unique=True, blank=True, null=True)
-    psa_no = models.CharField(max_length=255, unique=True, blank=True, null=True)
-    first_name = models.CharField(max_length=255)
-    middle_name = models.CharField(max_length=255, blank=True, null=True)
-    last_name = models.CharField(max_length=255)
+    lrn = models.CharField(max_length=191, unique=True, blank=True, null=True)
+    psa_no = models.CharField(max_length=191, unique=True, blank=True, null=True)
+    first_name = models.CharField(max_length=191)
+    middle_name = models.CharField(max_length=191, blank=True, null=True)
+    last_name = models.CharField(max_length=191)
 
     class Meta:
         db_table = "applicant_information"
@@ -115,10 +115,10 @@ class ApplicantInformation(models.Model):
 
 class AdminInformation(models.Model):
     user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=255)
-    middle_name = models.CharField(max_length=255, blank=True, null=True)
-    last_name = models.CharField(max_length=255)
-    position = models.CharField(max_length=255, blank=True, null=True)
+    first_name = models.CharField(max_length=191)
+    middle_name = models.CharField(max_length=191, blank=True, null=True)
+    last_name = models.CharField(max_length=191)
+    position = models.CharField(max_length=191, blank=True, null=True)
 
     class Meta:
         db_table = "admin_information"
@@ -133,10 +133,10 @@ class AdminInformation(models.Model):
 
 class CoordinatorInformation(models.Model):
     user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=255)
-    middle_name = models.CharField(max_length=255, blank=True, null=True)
-    last_name = models.CharField(max_length=255)
-    position = models.CharField(max_length=255, blank=True, null=True)
+    first_name = models.CharField(max_length=191)
+    middle_name = models.CharField(max_length=191, blank=True, null=True)
+    last_name = models.CharField(max_length=191)
+    position = models.CharField(max_length=191, blank=True, null=True)
 
     class Meta:
         db_table = "coordinator_information"

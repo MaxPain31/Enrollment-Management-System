@@ -90,6 +90,7 @@ DATABASES = {
         "USER": env("DB_USER"),
         "PASSWORD": env("DB_PASSWORD"),
         "HOST": env("DB_HOST"),
+        'PORT': '3306',
     }
 }
 
@@ -102,12 +103,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 8},
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
+    {
+        "NAME": "authentication.validators.UpperLowerSymbolValidator", 
     },
 ]
 

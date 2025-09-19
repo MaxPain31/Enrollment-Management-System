@@ -1,8 +1,13 @@
 from django.urls import path
 from adminside.views import (
+    AdminApplicationBulkApproveView,
+    AdminApplicationBulkReApproveView,
+    AdminApplicationReApproveView,
     AdminDashboardView,
     AdminApplicationView,
     AdminReportsView,
+    BulkApproveProgressView,
+    BulkReApproveProgressView,
     GetApplicationDataView,
     UpdateApplicationView,
     AllUserView,
@@ -84,6 +89,23 @@ urlpatterns = [
         "application_action/",
         AdminApplicationActionView.as_view(),
         name="application_action",
+    ),
+    path(
+        "bulk_approve/",
+        AdminApplicationBulkApproveView.as_view(),
+        name="bulk_approve",
+    ),
+    path(
+        "bulk_reapprove/",
+        AdminApplicationBulkReApproveView.as_view(),
+        name="bulk_reapprove",
+    ),
+    path('bulk-reapprove-progress/<str:batch_key>/', BulkReApproveProgressView.as_view(), name='bulk-reapprove-progress'),
+    path('bulk-approve-progress/<str:batch_key>/', BulkApproveProgressView.as_view(), name='bulk-approve-progress'),
+    path(
+        "reapprove_action/",
+        AdminApplicationReApproveView.as_view(),
+        name="reapprove_action",
     ),
     path("coordinator-users/", CoordinatorUserView.as_view(), name="coordinator_users"),
     path(

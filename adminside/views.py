@@ -1,3 +1,4 @@
+from webbrowser import get
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import logout, login, authenticate
 from django.views import View
@@ -23,6 +24,12 @@ from django.core.files.storage import default_storage
 from django.utils.dateparse import parse_date
 from django.core.mail import send_mail
 from django.forms.models import model_to_dict
+from .forms import AddStudentForm, ApplicationForm as ApplicationFormValidation
+from .utils import emailNotification
+from django.core.cache import cache
+from threading import Thread
+import uuid
+from django.db import transaction
 
 
 def is_admin(user):
@@ -158,7 +165,6 @@ class AdminApplicationRejectedView(View):
             {"application_rejected": application_rejected},
         )
 
-
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -186,9 +192,6 @@ class AdminApplicationActionView(View):
                         status=400,
                     )
 
-                # Remove applicant info
-                ApplicantInformation.objects.filter(user=application.user).delete()
-
                 # Create or update ApplicationApproved (always)
                 app_approved, _ = ApplicationApproved.objects.update_or_create(
                     enrollment=application,
@@ -196,6 +199,9 @@ class AdminApplicationActionView(View):
                 )
 
                 if application.grade_level != "7":
+                    # Promote to student
+                    ApplicantInformation.objects.filter(user=application.user).delete()
+                    application.user.user_role = "Student"
                     StudentInformation.objects.update_or_create(
                         application_approved=app_approved,
                         defaults={
@@ -229,49 +235,22 @@ class AdminApplicationActionView(View):
                             "student_status": "Enrolled",
                         },
                     )
-
-                    # Promote to student
-                    application.user.user_role = "Student"
                     application.user.save()
                     
                 user = application.user
                 if application.enrollment_type == "SHS":
+                    user.jhs_submitted = True
                     user.shs_submitted = True
                 elif application.enrollment_type == "JHS":
                     user.jhs_submitted = True
                 user.save()
+                
                 # Mark as approved
                 application.is_approved = True
                 application.save()
-
-                # Send email notification
-                subject = "Application Approved"
-                message_plain = f"""Dear {application.first_name} {application.last_name},
-
-                Congratulations! Your application has been approved.
-                Application No: {application.application_no}
-
-                Thank you for choosing our school!
-                """
-                message_html = f"""
-                <html>
-                <body style="font-family: Arial, sans-serif; line-height: 1.6;">
-                    <h2 style="color: #2c3e50;">Application Approved</h2>
-                    <p>Dear <strong>{application.first_name} {application.last_name}</strong>,</p>
-                    <p>Congratulations! Your application has been approved.</p>
-                    <p><strong style="color: #2980b9;">Application No: {application.application_no}</strong></p>
-                    <p>Thank you for choosing our school!</p>
-                </body>
-                </html>
-                """
-                send_mail(
-                    subject,
-                    message_plain,
-                    "pdbnhs@gmail.com",
-                    [application.user.email],
-                    html_message=message_html,
-                    fail_silently=False,
-                )
+                
+                # Send email notificatio
+                emailNotification(application.first_name, application.last_name, application.application_no, application.user.email, "approved")
                 return JsonResponse(
                     {
                         "success": True,
@@ -292,49 +271,16 @@ class AdminApplicationActionView(View):
                 user.save()
                 application.is_approved = False
                 application.save()
-
-                subject = "Application Rejected"
-                message_plain = f"""Dear {application.first_name} {application.last_name},
-
-                We regret to inform you that your application has been rejected.
-                Application No: {application.application_no}
-
-                Reason for rejection:
-                {message_rejected}
-
-                If you have any questions, please contact us.
-
-                Thank you.
-                """
-                message_html = f"""
-                <html>
-                <body style="font-family: Arial, sans-serif; line-height: 1.6;">
-                    <h2 style="color: #2c3e50;">Application Rejected</h2>
-                    <p>Dear <strong>{application.first_name} {application.last_name}</strong>,</p>
-                    <p>We regret to inform you that your application has been rejected.</p>
-                    <p><strong style="color: #2980b9;">Application No: {application.application_no}</strong></p>
-                    <p><strong>Reason for rejection:</strong></p>
-                    <p>{message_rejected}</p>
-                    <p>If you have any questions, please contact us.</p>
-                    <p>Thank you.</p>
-                </body>
-                </html>
-                """
-                send_mail(
-                    subject,
-                    message_plain,
-                    "pdbnhs@gmail.com",
-                    [application.user.email],
-                    html_message=message_html,
-                    fail_silently=False,
-                )
+                
+                # Send Email Notificatio
+                emailNotification(application.first_name, application.last_name, application.application_no, application.user.email, "rejected", message_rejected)
+                
                 return JsonResponse(
                     {
                         "success": True,
                         "message": "Application was rejected. Email sent.",
                     }
                 )
-
             else:
                 return JsonResponse(
                     {"success": False, "message": "Invalid action"}, status=400
@@ -346,6 +292,257 @@ class AdminApplicationActionView(View):
                 {"success": False, "message": "An error occurred"}, status=500
             )
 
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AdminApplicationBulkApproveView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            application_ids = data.get("application_ids", [])
+            total = len(application_ids)
+
+            if not application_ids:
+                return JsonResponse({"success": False, "message": "No applications selected."}, status=400)
+
+            batch_key = f"bulk_approve_{uuid.uuid4()}"
+            cache.set(batch_key, {"approved": 0, "total": total, "skipped": []}, timeout=3600)
+
+            def process_bulk():
+                approved_count = 0
+                skipped = []
+
+                for app_id in application_ids:
+                    try:
+                        application = EnrollmentForm.objects.get(pk=app_id)
+                        if application.status == "Missing":
+                            skipped.append(application.application_no)
+                            continue
+
+                        # --- perform your approval logic ---
+                        ApplicantInformation.objects.filter(user=application.user).delete()
+                        app_approved, _ = ApplicationApproved.objects.update_or_create(
+                            enrollment=application, defaults={"is_assessed": False}
+                        )
+
+                        if application.grade_level != "7":
+                            application.user.user_role = "Student"
+                            StudentInformation.objects.update_or_create(
+                                application_approved=app_approved,
+                                defaults={
+                                    "user": application.user,
+                                    "application_no": application.application_no,
+                                    "status": application.status,
+                                    "created_at": application.created_at,
+                                    "school_year": application.school_year,
+                                    "grade": application.grade_level,
+                                    "with_lrn": application.with_lrn,
+                                    "student_type": application.student_type,
+                                    "gen_avg": application.gen_avg,
+                                    "section": None,
+                                    "psa_no": application.psa_no,
+                                    "lrn": application.lrn,
+                                    "first_name": application.first_name,
+                                    "middle_name": application.middle_name,
+                                    "last_name": application.last_name,
+                                    "extension_name": application.extension_name,
+                                    "birth_date": application.birth_date,
+                                    "age": application.age,
+                                    "gender": application.gender,
+                                    "place_of_birth": application.place_of_birth,
+                                    "mother_tongue": application.mother_tongue,
+                                    "documents_submitted": application.documents_submitted,
+                                    "early_reg": application.early_reg,
+                                    "is_approved": True,
+                                    "enrollment_type": application.enrollment_type,
+                                    "semester": application.semester,
+                                    "strand": application.strand,
+                                    "student_status": "Enrolled",
+                                },
+                            )
+                        application.user.save()
+
+                        if application.enrollment_type == "SHS":
+                            application.user.jhs_submitted = True
+                            application.user.shs_submitted = True
+                        elif application.enrollment_type == "JHS":
+                            application.user.jhs_submitted = True
+                        application.user.save()
+
+                        application.is_approved = True
+                        application.save()
+                        approved_count += 1
+
+                        cache.set(batch_key, {"approved": approved_count, "total": total, "skipped": skipped}, timeout=3600)
+
+                        emailNotification(application.first_name, application.last_name, application.application_no, application.user.email, "approved")
+
+                    except EnrollmentForm.DoesNotExist:
+                        skipped.append(str(app_id))
+                        continue
+
+            Thread(target=process_bulk).start()
+
+            return JsonResponse({"success": True, "batch_key": batch_key, "total": total})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)}, status=500)
+        
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AdminApplicationReApproveView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            application_id = data.get("application_id")
+
+            with transaction.atomic():
+                # Get the record from ApplicationRejected table
+                application_rejected = ApplicationRejected.objects.get(pk=application_id)
+
+                # Get the record from EnrollmentForm table
+                enrollment_form = EnrollmentForm.objects.get(pk=application_rejected.enrollment_id)
+
+                # Update enrollment form
+                enrollment_form.is_approve = True
+                enrollment_form.save()
+
+                # Insert into ApplicationApproved
+                ApplicationApproved.objects.create(
+                    is_assessed=0,
+                    enrollment_id=application_rejected.enrollment_id
+                )
+                
+                # Send email notificatio
+                emailNotification(enrollment_form.first_name, enrollment_form.last_name, enrollment_form.application_no, enrollment_form.user.email, "approved")
+
+                # Delete from ApplicationRejected
+                application_rejected.delete()
+
+            return JsonResponse(
+                {"success": True, "message": "Application re-approved successfully."}, status=200
+            )
+
+        except ApplicationRejected.DoesNotExist:
+            return JsonResponse(
+                {"success": False, "message": "Application not found."}, status=404
+            )
+        except EnrollmentForm.DoesNotExist:
+            return JsonResponse(
+                {"success": False, "message": "Enrollment form not found."}, status=404
+            )
+        except Exception as e:
+            logger.error(f"Error processing application action: {e}")
+            return JsonResponse(
+                {"success": False, "message": "An error occurred."}, status=500
+            )
+
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AdminApplicationBulkReApproveView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            application_ids = data.get("application_ids", [])
+            total = len(application_ids)
+
+            if not application_ids:
+                return JsonResponse({"success": False, "message": "No applications selected."}, status=400)
+
+            # Unique key for tracking progress
+            batch_key = f"bulk_reapprove_{uuid.uuid4()}"
+            cache.set(batch_key, {"reapproved": 0, "total": total, "skipped": []}, timeout=3600)
+
+            def process_bulk():
+                reapproved_count = 0
+                skipped = []
+
+                for app_id in application_ids:
+                    try:
+                        with transaction.atomic():
+                            application_rejected = ApplicationRejected.objects.get(pk=app_id)
+
+                            try:
+                                enrollment_form = EnrollmentForm.objects.get(pk=application_rejected.enrollment_id)
+                            except EnrollmentForm.DoesNotExist:
+                                skipped.append(str(app_id))
+                                continue
+
+                            enrollment_form.is_approve = True
+                            enrollment_form.save()
+
+                            ApplicationApproved.objects.create(
+                                is_assessed=0,
+                                enrollment_id=application_rejected.enrollment_id
+                            )
+
+                            application_rejected.delete()
+
+                            try:
+                                emailNotification(
+                                    enrollment_form.first_name,
+                                    enrollment_form.last_name,
+                                    enrollment_form.application_no,
+                                    enrollment_form.user.email,
+                                    "approved"
+                                )
+                            except Exception as e:
+                                logger.error(f"Email failed for {enrollment_form.application_no}: {e}")
+
+                            reapproved_count += 1
+
+                            progress = cache.get(batch_key) or {"reapproved": 0, "total": total, "skipped": []}
+                            progress.update({"reapproved": reapproved_count, "skipped": skipped})
+                            cache.set(batch_key, progress, timeout=3600)
+
+                    except ApplicationRejected.DoesNotExist:
+                        skipped.append(str(app_id))
+                    except Exception as e:
+                        logger.error(f"Error re-approving application {app_id}: {e}")
+                        skipped.append(str(app_id))
+
+                cache.set(batch_key, {
+                    "reapproved": reapproved_count,
+                    "total": total,
+                    "skipped": skipped,
+                    "done": True  
+                }, timeout=3600)
+
+            Thread(target=process_bulk, daemon=True).start()
+
+            return JsonResponse({"success": True, "batch_key": batch_key, "total": total})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class BulkReApproveProgressView(View):
+    def get(self, request, batch_key):
+        progress = cache.get(batch_key)
+        if not progress:
+            return JsonResponse({"reapproved": 0, "total": 0, "skipped": [], "done": False})
+        return JsonResponse(progress)
+
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)       
+class BulkApproveProgressView(View):
+    def get(self, request, batch_key):
+        progress = cache.get(batch_key)
+        if not progress:
+            return JsonResponse({"approved": 0, "total": 0, "skipped": []})
+
+        return JsonResponse(progress)
+
 
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
@@ -354,7 +551,6 @@ class AdminApplicationActionView(View):
 class AdminReportsView(View):
     def get(self, request):
         return render(request, "admin/reports.html")
-
 
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
@@ -375,6 +571,7 @@ class GetApplicationDataView(View):
 
         data = {
             "id": application.id,
+            "enrollment_type": application.enrollment_type,
             "school_year": application.school_year,
             "grade_level": application.grade_level,
             "with_lrn": application.with_lrn,
@@ -401,9 +598,7 @@ class GetApplicationDataView(View):
             "documents_submitted": documents_submitted,
             "early_reg": application.early_reg,
         }
-
         return JsonResponse(data)
-
 
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
@@ -417,7 +612,6 @@ class UpdateApplicationView(View):
     def put(self, request, *args, **kwargs):
         application_id = kwargs.get("application_id")
         return self.update_application(request, application_id)
-
     def update_application(self, request, application_id):
         try:
             application = EnrollmentForm.objects.get(id=application_id)
@@ -427,53 +621,51 @@ class UpdateApplicationView(View):
             print("Action:", payload.get("action"))
             print("Nested Data:", nested_data)
 
-            if (
-                int(nested_data.get("gen_avg")) < 75
-                or int(nested_data.get("gen_avg")) > 100
-            ):
-                return JsonResponse({'success': False, "message": "General Average must be between 75 and 100."}, status=400)
-            
-            if (int(nested_data.get("age")) < 11):
-                return JsonResponse({'success': False, "message": "Age must be 11 or older."}, status=400)
-
             documents_submitted = payload.get("documents_submitted", [])
-            if isinstance(documents_submitted, list):
-                application.documents_submitted = json.dumps(documents_submitted)
+            nested_data["documents_submitted"] = json.dumps(documents_submitted)
+            
+            nested_data.update({
+                "enrollment_type": application.enrollment_type,
+                "user_id": application.user.id,
+                "user_role": application.user.user_role,
+                "application_no": application.application_no,
+                "status": application.status,
+                "early_reg": application.early_reg,
+            })
 
-            application.school_year = nested_data.get("school_year", application.school_year)
-            application.grade_level = nested_data.get("grade_level", application.grade_level)
-            application.student_type = nested_data.get("student_type", application.student_type)
-            application.semester = nested_data.get("semester", application.semester)
-            application.strand = nested_data.get("strand", application.strand)
-            application.gen_avg = nested_data.get("gen_avg", application.gen_avg)
-            application.psa_no = nested_data.get("psa_no", application.psa_no)
-            application.lrn = nested_data.get("lrn", application.lrn)
-            application.first_name = nested_data.get("first_name", application.first_name)
-            application.middle_name = nested_data.get("middle_name", application.middle_name)
-            application.last_name = nested_data.get("last_name", application.last_name)
-            application.extension_name = nested_data.get("extension_name", application.extension_name)
-            application.birth_date = nested_data.get("birth_date", application.birth_date)
-            application.age = nested_data.get("age", application.age)
-            application.gender = nested_data.get("gender", application.gender)
-            application.place_of_birth = nested_data.get("place_of_birth", application.place_of_birth)
-            application.mother_tongue = nested_data.get("mother_tongue", application.mother_tongue)
-            application.early_reg = nested_data.get("early_reg", application.early_reg)
+            form = ApplicationFormValidation(data=nested_data)
+            if not form.is_valid():
+                return JsonResponse({"success": False, "errors": form.errors}, status=200)
+            
+            cleaned = form.cleaned_data
+            application.school_year = cleaned["school_year"]
+            application.grade_level = cleaned["grade_level"]
+            application.student_type = cleaned["student_type"]
+            application.semester = cleaned.get("semester")
+            application.strand = cleaned.get("strand")
+            application.gen_avg = cleaned["gen_avg"]
+            application.psa_no = cleaned["psa_no"]
+            application.lrn = cleaned["lrn"]
+            application.first_name = cleaned["first_name"]
+            application.middle_name = cleaned.get("middle_name")
+            application.last_name = cleaned["last_name"]
+            application.extension_name = cleaned.get("extension_name")
+            application.birth_date = cleaned["birth_date"]
+            application.age = cleaned["age"]
+            application.gender = cleaned["gender"]
+            application.place_of_birth = cleaned["place_of_birth"]
+            application.mother_tongue = cleaned["mother_tongue"]
+            application.documents_submitted = nested_data["documents_submitted"]
+            application.early_reg = cleaned["early_reg"]
             application.save()
 
+            # 🔹 Extra check when saving
             if payload.get("action") == "save":
-                try:
-                    documents_submitted = json.loads(application.documents_submitted or "[]")
-                except Exception as e:
-                    print("Error parsing documents_submitted:", e)
-                    documents_submitted = []
-
-                print("Documents Submitted:", documents_submitted)
-
-                if "PSA" in documents_submitted and "Report Card" in documents_submitted:
+                docs = application.documents_submitted or []
+                if "PSA" in docs and "Report Card" in docs:
                     application.status = "Complete"
                 else:
                     application.status = "Missing"
-
                 application.save()
 
             return JsonResponse({"success": True, "message": "Application updated successfully."})
@@ -487,7 +679,7 @@ class UpdateApplicationView(View):
         except Exception as e:
             print("Unhandled exception:", e)
             return JsonResponse({"success": False, "message": "An error occurred."}, status=500)
-
+        
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -522,7 +714,6 @@ class AdminUserView(View):
                 users = users.filter(is_active=False)
         return render(request, "admin/admin_admins.html", {"users": users})
 
-
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -541,7 +732,6 @@ class StudentUserView(View):
                 users = users.filter(is_active=False)
         return render(request, "admin/student_user.html", {"users": users})
 
-
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -557,7 +747,6 @@ class TeacherUserView(View):
                 users = users.filter(is_active=False)
         return render(request, "admin/teacher_user.html", {"users": users})
 
-
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -572,7 +761,6 @@ class CoordinatorUserView(View):
             elif is_active == "No":
                 users = users.filter(is_active=False)
         return render(request, "admin/coordinator_user.html", {"users": users})
-
 
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
@@ -592,7 +780,6 @@ class AdminDeleteUserView(View):
             )
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
-
 
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
@@ -630,7 +817,6 @@ class AddAdminUserView(View):
             )
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
-
 
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
@@ -682,7 +868,6 @@ class AddCoordinatorUserView(View):
             )
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
-
 
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
@@ -738,7 +923,6 @@ class AddTeacherUserView(View):
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
-
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -747,114 +931,47 @@ class AddStudentUserView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
-            # Account
-            email = data.get("email")
-            password = data.get("password")
-            # Student Information
-            lrn = data.get("lrn")
-            psa_no = data.get("psa_no")
-            first_name = data.get("first_name")
-            middle_name = data.get("middle_name")
-            last_name = data.get("last_name")
-            extension_name = data.get("extension_name")
-            enrollment_type = data.get("enrollment_type")
-            student_type = data.get("student_type")
-            school_year = data.get("school_year")
-            grade = data.get("grade_level")
-            gen_avg = data.get("gen_avg")
-            semester = data.get("semester")
-            strand = data.get("strand")
-            birth_date = data.get("birth_date")
-            age = data.get("age")
-            gender = data.get("gender")
-            place_of_birth = data.get("place_of_birth")
-            mother_tongue = data.get("mother_tongue")
-            documents_submitted = data.get("documents_submitted")
-            if (
-                not email
-                or not password
-                or not first_name
-                or not last_name
-                or not lrn
-                or not psa_no
-                or not enrollment_type
-                or not student_type
-                or not school_year
-                or not grade
-                or not gen_avg
-                or not birth_date
-                or not age
-                or not gender
-                or not place_of_birth
-                or not mother_tongue
-                or not documents_submitted
-            ):
+            form = AddStudentForm(data)
+
+            if not form.is_valid():
                 return JsonResponse(
-                    {"status": "error", "message": "All fields are required"},
-                    status=400,
-                )
-            if "@" not in email:
-                return JsonResponse(
-                    {"status": "error", "message": "Email is invalid"}, status=400
+                    {"status": "error", "errors": form.errors}, status=400
                 )
 
-            if int(gen_avg) < 75 or int(gen_avg) > 100:
-                return JsonResponse(
-                    {"status": "error", "message": "General Average must be between 75 and 100."},
-                    status=400,
-                )
-            if int(gen_avg) < 11:
-                return JsonResponse(
-                    {"status": "error", "message": "Age must be 11 or older."},
-                    status=400,
-                )   
-            try:
-                documents_list = json.loads(documents_submitted)
-            except json.JSONDecodeError:
-                return JsonResponse(
-                    {"status": "error", "message": "Invalid format for documents_submitted"},
-                    status=400
-                )
-
-            required_docs = {"PSA", "Report Card"}
-            if not required_docs.issubset(set(documents_list)):
-                return JsonResponse(
-                    {"status": "error", "message": "PSA and Report Card are required documents."},
-                    status=400
-                )
+            cleaned = form.cleaned_data
 
             user = MyUser.objects.create_user(
-                email=email,
-                password=password,
+                email=cleaned["email"],
+                password=cleaned["password"],
                 user_role="Student",
             )
 
             StudentInformation.objects.create(
                 user=user,
-                lrn=lrn,
-                psa_no=psa_no,
-                first_name=first_name,
-                middle_name=middle_name,
-                last_name=last_name,
-                extension_name=extension_name,
-                enrollment_type=enrollment_type,
-                student_type=student_type,
-                school_year=school_year,
-                grade=grade,
-                gen_avg=gen_avg,
+                lrn=cleaned["lrn"],
+                psa_no=cleaned["psa_no"],
+                first_name=cleaned["first_name"],
+                middle_name=cleaned.get("middle_name"),
+                last_name=cleaned["last_name"],
+                extension_name=cleaned.get("extension_name"),
+                enrollment_type=cleaned["enrollment_type"],
+                student_type=cleaned["student_type"],
+                school_year=cleaned["school_year"],
+                grade=cleaned["grade_level"],
+                gen_avg=cleaned["gen_avg"],
                 section=None,
                 status="Complete",
-                semester=semester,
-                strand=strand,
-                birth_date=birth_date,
-                age=age,
-                gender=gender,
-                place_of_birth=place_of_birth,
-                mother_tongue=mother_tongue,
-                documents_submitted=documents_submitted,
+                semester=cleaned.get("semester"),
+                strand=cleaned.get("strand"),
+                birth_date=cleaned["birth_date"],
+                age=cleaned["age"],
+                gender=cleaned["gender"],
+                place_of_birth=cleaned["place_of_birth"],
+                mother_tongue=cleaned["mother_tongue"],
+                documents_submitted=cleaned["documents_submitted"],
                 student_status="Enrolled",
             )
-            print(data)
+
             return JsonResponse(
                 {"status": "success", "message": "Student user created successfully"}
             )
@@ -896,7 +1013,7 @@ class AdminLogoutView(View):
 
         logout(request)
         messages.success(request, "Logged out successfully!")
-        return redirect("admin_login")
+        return redirect("signin")
 
 
 @method_decorator(
@@ -1005,7 +1122,10 @@ class DeleteAnnouncementView(View):
 class ManageEnrollmentView(View):
     def get(self, request):
         try:
-            settings = EnrollmentManagement.objects.get(id=1)
+            settings = EnrollmentManagement.objects.filter(id=1).first()
+            if settings is None:
+                settings = EnrollmentManagement.objects.create(id=1)
+                
             return render(request, "admin/manage_enrollment.html", {"settings": settings})
         except Exception as e:
             logger.error(f"Error fetching enrollment settings: {e}")
@@ -1063,8 +1183,8 @@ class AdminDashboardDataAPI(View):
         applicant_count = MyUser.objects.filter(user_role="Applicant").count()
         student_junior_count = StudentInformation.objects.filter(enrollment_type="JHS").count()
         student_senior_count = StudentInformation.objects.filter(enrollment_type="SHS").count()
-        male_count = StudentInformation.objects.filter(gender__iexact="male").count()
-        female_count = StudentInformation.objects.filter(gender__iexact="female").count()
+        male_count = StudentInformation.objects.filter(gender__iexact="MALE").count()
+        female_count = StudentInformation.objects.filter(gender__iexact="FEMALE").count()
 
         print("student_junior_count:", student_junior_count)
         print("student_senior_count:", student_senior_count)

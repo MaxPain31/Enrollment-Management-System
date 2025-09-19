@@ -1,34 +1,33 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from authentication.models import TeacherInformation,MyUser
-import json
-
+from authentication.models import TeacherInformation
 
 class EnrollmentForm(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    application_no = models.CharField(max_length=255)
+    application_no = models.CharField(max_length=191)
     status = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=timezone.now)
-    school_year = models.CharField(max_length=255)
-    grade_level = models.CharField(max_length=255)
+    school_year = models.CharField(max_length=191)
+    grade_level = models.CharField(max_length=191)
     with_lrn = models.BooleanField(null=True, blank=True)
-    student_type = models.CharField(max_length=255, null=True, blank=True)
+    student_type = models.CharField(max_length=191, null=True, blank=True)
     gen_avg = models.IntegerField()
-    psa_no = models.CharField(max_length=255)
-    lrn = models.CharField(max_length=255)
-    first_name = models.CharField(max_length=255)
-    middle_name = models.CharField(max_length=255, null=True, blank=True)
-    last_name = models.CharField(max_length=255)
-    extension_name = models.CharField(max_length=255, null=True, blank=True)
+    psa_no = models.CharField(max_length=191)
+    lrn = models.CharField(max_length=191)
+    first_name = models.CharField(max_length=191)
+    middle_name = models.CharField(max_length=191, null=True, blank=True)
+    last_name = models.CharField(max_length=191)
+    extension_name = models.CharField(max_length=191, null=True, blank=True)
     birth_date = models.DateField()
     age = models.IntegerField()
     gender = models.CharField(max_length=50)
-    place_of_birth = models.CharField(max_length=255)
-    mother_tongue = models.CharField(max_length=255)
+    place_of_birth = models.CharField(max_length=191)
+    mother_tongue = models.CharField(max_length=191)
     documents_submitted = models.TextField(null=True, blank=True)
     early_reg = models.BooleanField(null=True, blank=True)
     is_approved = models.BooleanField(null=True, blank=True)
+    accept_term = models.BooleanField(default=False)
     enrollment_type = models.CharField(
         max_length=3,
         choices=[("JHS", "Junior High School"), ("SHS", "Senior High School")],
@@ -91,9 +90,9 @@ class Assessment(models.Model):
     application_approved = models.OneToOneField(
         ApplicationApproved, on_delete=models.CASCADE
     )
-    literacy_level = models.CharField(max_length=255)
+    literacy_level = models.CharField(max_length=191)
     literacy_result = models.TextField()
-    numeracy_level = models.CharField(max_length=255)
+    numeracy_level = models.CharField(max_length=191)
     numeracy_result = models.TextField()
     assessed_at = models.DateTimeField(default=timezone.now)
     class Meta:
@@ -106,26 +105,26 @@ class StudentInformation(models.Model):
         ApplicationApproved, null=True, on_delete=models.SET_NULL
     )
     assessment = models.ForeignKey(Assessment, null=True, on_delete=models.SET_NULL)
-    application_no = models.CharField(max_length=255)
+    application_no = models.CharField(max_length=191)
     status = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=timezone.now)
-    school_year = models.CharField(max_length=255)
-    grade = models.CharField(max_length=255)
+    school_year = models.CharField(max_length=191)
+    grade = models.CharField(max_length=191)
     with_lrn = models.BooleanField(null=True, blank=True)
-    student_type = models.CharField(max_length=255, null=True, blank=True)
+    student_type = models.CharField(max_length=191, null=True, blank=True)
     gen_avg = models.IntegerField()
-    section = models.CharField(max_length=255, null=True, blank=True)
-    psa_no = models.CharField(max_length=255)
-    lrn = models.CharField(max_length=255)
-    first_name = models.CharField(max_length=255)
-    middle_name = models.CharField(max_length=255, null=True, blank=True)
-    last_name = models.CharField(max_length=255)
-    extension_name = models.CharField(max_length=255, null=True, blank=True)
+    section = models.CharField(max_length=191, null=True, blank=True)
+    psa_no = models.CharField(max_length=191)
+    lrn = models.CharField(max_length=191)
+    first_name = models.CharField(max_length=191)
+    middle_name = models.CharField(max_length=191, null=True, blank=True)
+    last_name = models.CharField(max_length=191)
+    extension_name = models.CharField(max_length=191, null=True, blank=True)
     birth_date = models.DateField()
     age = models.IntegerField()
     gender = models.CharField(max_length=50)
-    place_of_birth = models.CharField(max_length=255)
-    mother_tongue = models.CharField(max_length=255)
+    place_of_birth = models.CharField(max_length=191)
+    mother_tongue = models.CharField(max_length=191)
     documents_submitted = models.TextField(null=True, blank=True)
     early_reg = models.BooleanField(null=True, blank=True)
     is_approved = models.BooleanField(null=True, blank=True)
@@ -241,13 +240,13 @@ class Announcement(models.Model):
         ("active", "Active"),
         ("inactive", "Inactive"),
     )
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=191)
     content = models.TextField()
     image = models.ImageField(upload_to="announcements/", blank=True, null=True)
     date = models.DateField()
     created_at = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
-    type = models.CharField(max_length=255, null=True, blank=True)
+    type = models.CharField(max_length=191, null=True, blank=True)
     
     class Meta:
         db_table = "announcement"
@@ -285,7 +284,7 @@ class EnrollmentManagement(models.Model):
         super(EnrollmentManagement, self).save(*args, **kwargs)
 
 class DocumentList(models.Model):
-    document_name = models.CharField(max_length=255)
+    document_name = models.CharField(max_length=191)
     is_required = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(null=True, blank=True)

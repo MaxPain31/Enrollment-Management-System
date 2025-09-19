@@ -17,15 +17,20 @@
             <!-- content -->
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Application Rejected</h5>
-                    <div class="d-flex justify-content-start mb-3">
+                    <h5 class="card-title">Application Pending</h5>
+                    <div class="d-flex justify-content-between mb-3">
                         <button type="button" class="btn btn-outline-primary" onclick="toggleFilter()">
                             <i class="bi bi-funnel"></i>
                             <span>Filter</span>
                         </button>
+                        <button type="button" class="btn btn-success" id="reapproveAllBtn" disabled>
+                            <i class="bi bi-check"></i>
+                            <span>Reapprove</span>
+                        </button>
                     </div>
                     <div class="filter-container" id="filter-container" style="display: none;">
                         <form id="application-filter-form" method="get">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                             <div class="filter-form">
                                 <div class="filter-group">
                                     <label for="filter-grade-level">Grade Level</label>
@@ -66,26 +71,37 @@
                         </form>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover datatable">
+                        <table class="table table-striped table-hover table-bordered datatable">
                             <thead>
                                 <tr>
-                                    <th>Application ID</th>
-                                    <th>Student Name</th>
-                                    <th>Grade Level</th>
-                                    <th data-sortable="false">Document</th>
-                                    <th data-sortable="false">Rejection Reason</th>
-                                    <th>Date</th>
-                                    <th data-sortable="false">Form</th>
+                                    <th class="align-middle text-center" data-sortable="false">
+                                        <input class="form-check-input" type="checkbox" id="checkAll">
+                                    </th>
+                                    <th class="align-middle text-center">Application ID</th>
+                                    <th class="align-middle text-center">Student Name</th>
+                                    <th class="align-middle text-center">Grade Level</th>
+                                    <th class="align-middle text-center">Document Status</th>
+                                    <th data-sortable="false" class="align-middle text-center">Pending Reason</th>
+                                    <th class="align-middle text-center">Date</th>
+                                    <th data-sortable="false" class="align-middle text-center">Form</th>
+                                    <th data-sortable="false" class="align-middle text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for application in application_rejected %}
                                 <tr id="application-row-{{ application.enrollment.id }}">
-                                    <td>{{ application.enrollment.application_no }}</td>
-                                    <td>{{ application.enrollment.first_name }} {{ application.enrollment.last_name }}
+                                    <td class="align-middle text-center">
+                                        <input class="form-check-input row-check"
+                                            type="checkbox"
+                                            data-id="{{ application.id }}"
+                                            data-status="{{ application.enrollment.status }}"
+                                        >
                                     </td>
-                                    <td class="application-grade-level">{{ application.enrollment.grade_level }}</td>
-                                    <td>
+                                    <td class="align-middle text-center">{{ application.enrollment.application_no }}</td>
+                                    <td class="align-middle text-center">{{ application.enrollment.first_name }} {{ application.enrollment.last_name }}
+                                    </td>
+                                    <td class="application-grade-level align-middle text-center">{{ application.enrollment.grade_level }}</td>
+                                    <td class="align-middle text-center">
                                         {% if application.enrollment.status == "Complete" %}
                                         <span
                                             class="badge bg-success application-status">{{application.enrollment.status|upper}}</span>
@@ -94,15 +110,24 @@
                                             class="badge bg-danger application-status">{{application.enrollment.status|upper}}</span>
                                         {% endif %}
                                     </td>
-                                    <td class="application-student-type text-danger">{{ application.message_rejected }}</td>
-                                    <td>{{ application.enrollment.created_at|date:"Y-m-d" }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm view-btn" data-bs-toggle="modal"
+                                    <td class="application-student-type text-danger align-middle text-center">{{ application.message_rejected }}</td>
+                                    <td class="align-middle text-center">{{ application.enrollment.created_at|date:"Y-m-d" }}</td>
+                                    <td class="align-middle text-center">
+                                        <button type="button" class="btn btn-primary btn-sm view-btn" data-bs-toggle="modal"
                                             data-bs-target="#viewApplicationModal" data-type="{{ application.enrollment.enrollment_type }}"
-                                            data-id="{{ application.enrollment.id }}" onclick="fetchData('{{ application.enrollment.id }}')">
-                                            <i class="bi bi-eye"></i> VIEW
+                                            data-id="{{ application.enrollment.id }}" onclick="fetchData('{{ application.enrollment.id }}')" >
+                                            <i class="bi bi-eye"></i>
                                         </button>
                                     </td>
+                                    <td class="align-middle text-center">
+                                        <button class="btn btn-success btn-sm" id="reApproveBtn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Re-Approve" data-id="{{ application.id }}" >
+                                            <i class="bi bi-check2"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="9" class="text-center">No applications found.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -119,264 +144,115 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Application Form</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeButton"></button>
             </div>
             <div class="modal-body">
-                <div class="modal-body">
-                    <form id="enrollmentForm" disabled>
-                        {% csrf_token %}
-                        <div id="enrollment_information">
-                        </div>
-                        <div class="learner_information">
-                            <h5>Learner's Information</h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="psa_no" class="form-label">PSA Birth
-                                            Certificate No.</label>
-                                        <input type="text" class="form-control text-uppercase" id="psa_no" name="psa_no"
-                                            required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="lrn" class="form-label">Learner Reference
-                                            No.</label>
-                                        <input type="text" class="form-control text-uppercase" id="lrn" name="lrn"
-                                            required>
-                                    </div>
+                <form id="enrollmentForm" method="post" action="{% url 'junior_enrollment' %}" disabled>
+                    {% csrf_token %}
+                    <div id="enrollemnt_jhs"></div>
+                    <div id="enrollemnt_shs"></div>
+                    <div class="learner_information">
+                        <h5>Learner's Information</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="psa_no" class="form-label">PSA Birth Certificate No.</label>
+                                    <input type="text" class="form-control text-uppercase" id="psa_no" name="psa_no" disabled>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="mb-3">
-                                        <label for="first_name" class="form-label">First
-                                            Name</label>
-                                        <input type="text" class="form-control text-uppercase" id="first_name"
-                                            name="first_name" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="mb-3">
-                                        <label for="middle_name" class="form-label">Middle
-                                            Name</label>
-                                        <input type="text" class="form-control text-uppercase" id="middle_name"
-                                            name="middle_name">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="mb-3">
-                                        <label for="last_name" class="form-label">Last Name</label>
-                                        <input type="text" class="form-control text-uppercase" id="last_name"
-                                            name="last_name" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="mb-3">
-                                        <label for="extension_name" class="form-label">Extension
-                                            Name</label>
-                                        <input type="text" class="form-control text-uppercase" id="extension_name"
-                                            name="extension_name">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="birth_date" class="form-label">Birth
-                                            Date</label>
-                                        <input type="date" class="form-control" id="birth_date" name="birth_date"
-                                            required>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="age" class="form-label">Age</label>
-                                        <input type="number" class="form-control" id="age" name="age" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="gender" class="form-label">Gender</label>
-                                        <select class="form-select form-control" id="gender" name="gender" required>
-                                            <option value="male">Male</option>
-                                            <option value="female">Female
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="place_of_birth" class="form-label">Place of Birth
-                                            (Municipality/City)</label>
-                                        <input type="text" class="form-control text-uppercase" id="place_of_birth"
-                                            name="place_of_birth" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="mother_tongue" class="form-label">Mother
-                                            Tongue</label>
-                                        <input type="text" class="form-control text-uppercase" id="mother_tongue"
-                                            name="mother_tongue" required>
-                                    </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="lrn" class="form-label">Learner Reference No.</label>
+                                    <input type="text" class="form-control text-uppercase" id="lrn" name="lrn" disabled>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    <form id="documentForm">
-                        {% csrf_token %}
-                    </form>
-                </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <input type="text" class="form-control text-uppercase" id="first_name" name="first_name" disabled>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="middle_name" class="form-label">Middle Name</label>
+                                    <input type="text" class="form-control text-uppercase" id="middle_name" name="middle_name" disabled>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control text-uppercase" id="last_name" name="last_name" disabled>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="extension_name" class="form-label">Extension Name</label>
+                                    <input type="text" class="form-control text-uppercase" id="extension_name" name="extension_name" disabled>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="birth_date" class="form-label">Birth Date</label>
+                                    <input type="date" class="form-control" id="birth_date" name="birth_date" disabled>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="age" class="form-label">Age</label>
+                                    <input type="number" class="form-control" id="age" name="age" disabled>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="gender" class="form-label">Gender</label>
+                                    <select class="form-select form-control" id="gender" name="gender" disabled>
+                                        <option value="MALE">MALE</option>
+                                        <option value="FEMALE">FEMALE</option>
+                                    </select>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="place_of_birth" class="form-label">Place of Birth (Municipality/City)</label>
+                                    <input type="text" class="form-control text-uppercase" id="place_of_birth" name="place_of_birth" disabled>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mother_tongue" class="form-label">Mother Tongue</label>
+                                    <input type="text" class="form-control text-uppercase" id="mother_tongue" name="mother_tongue" disabled>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form id="documentForm">
+                    {% csrf_token %}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="editButton">Edit</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeButton">Close</button>
+                <button type="button" class="btn btn-success" id="saveButton" style="display: none;">Save changes</button>
             </div>
         </div>
     </div>
 </div>
-
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const modal = document.getElementById('viewApplicationModal');
-        modal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const type = button.getAttribute('data-type');
-            const enrollmentInformation = document.getElementById('enrollment_information');
-            if (type === 'JHS') {
-                enrollmentInformation.innerHTML = `
-                    <h5>Enrollment Information</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="school_year" class="form-label">School
-                                    Year</label>
-                                <input type="text" class="form-control text-uppercase" id="school_year"
-                                    name="school_year" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="grade_level" class="form-label">Grade
-                                    Level</label>
-                                <select class="form-select form-control" id="grade_level" name="grade_level"
-                                    required>
-                                    <option value="7">Grade 7</option>
-                                    <option value="8">Grade 8</option>
-                                    <option value="9">Grade 9</option>
-                                    <option value="10">Grade 10</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="student_type" class="form-label">Student
-                                    Type</label>
-                                <select class="form-select form-control" id="student_type"
-                                    name="student_type" required>
-                                    <option value="new student">New Student
-                                    </option>
-                                    <option value="returning">Returning
-                                        (Balik Aral)</option>
-                                    <option value="transferee">
-                                        Transferee</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="gen_avg" class="form-label">General
-                                    Average</label>
-                                <input type="number" class="form-control" id="gen_avg" name="gen_avg"
-                                    required>
-                            </div>
-                        </div>
-                    </div>
-                `
-            } else if (type === 'SHS') {
-                enrollmentInformation.innerHTML = `
-                    <h5>Enrollment Information</h5>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="school_year" class="form-label">School
-                                    Year</label>
-                                <input type="text" class="form-control text-uppercase" id="school_year"
-                                    name="school_year" required>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="student_type" class="form-label">Student
-                                    Type</label>
-                                <select class="form-select form-control" id="student_type"
-                                    name="student_type" required>
-                                    <option value="new student">New
-                                        Student
-                                    </option>
-                                    <option value="returning">Returning
-                                        (Balik Aral)</option>
-                                    <option value="transferee">
-                                        Transferee</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="grade_level" class="form-label">Grade
-                                    Level</label>
-                                <select class="form-select form-control" id="grade_level" name="grade_level"
-                                    required>
-                                    <option value="11">Grade 11</option>
-                                    <option value="12">Grade 12</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="gen_avg" class="form-label">General
-                                    Average</label>
-                                <input type="number" class="form-control" id="gen_avg" name="gen_avg"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="semester" class="form-label">Semester</label>
-                                <select class="form-select form-control" id="semester" name="semester"
-                                    required>
-                                    <option value="1st">1st</option>
-                                    <option value="2nd">2nd</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="strand" class="form-label">Strand</label>
-                                <select class="form-select form-control" id="strand" name="strand" required>
-                                    <option value="">Select strand...
-                                    </option>
-                                    <option value="ABM">ABM(Accountancy,
-                                        Business and Management)
-                                    </option>
-                                    <option value="STEM">STEM(Science,
-                                        Technology, Engineering and
-                                        Mathematics)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                `
-            } else {
-                match = 'No match found.';
-            }
-
-            document.getElementById('enrollment-type-match').innerText = 'Matched: ' + match;
-        });
-    });
-</script>
 {% endblock %}

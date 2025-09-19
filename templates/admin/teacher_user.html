@@ -113,7 +113,7 @@
                                                 <div class="form-floating mb-3">
                                                     <input type="text" class="form-control" id="floatingInput"
                                                         name="position" placeholder="Doe" required>
-                                                    <label for="floatingInput">Position</label>
+                                                    <label for="floatingInput">Job Title</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -163,34 +163,34 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover datatable">
+                        <table class="table table-striped table-hover table-bordered datatable">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>User Role</th>
-                                    <th>Account Created</th>
-                                    <th>Last Login</th>
-                                    <th>Active</th>
-                                    <th>Actions</th>
+                                    <th class="align-middle text-center">Name</th>
+                                    <th class="align-middle text-center">Email</th>
+                                    <th class="align-middle text-center">User Role</th>
+                                    <th class="align-middle text-center">Account Created</th>
+                                    <th class="align-middle text-center">Last Login</th>
+                                    <th class="align-middle text-center">Active</th>
+                                    <th class="align-middle text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for user in users %}
                                 <tr>
-                                    <td>{{ user.teacherinformation.first_name|upper }} {{ user.teacherinformation.last_name|upper }}</td>
-                                    <td>{{ user.email }}</td>
-                                    <td>{{ user.user_role|upper }}</td>
-                                    <td>{{ user.created_at|localtime|date:"F d, Y"|upper }}</td>
-                                    <td>{{ user.updated_at|localtime|date:"F d, Y h:i A"|upper }}</td>
-                                    <td>
+                                    <td class="align-middle text-center">{{ user.teacherinformation.first_name|upper }} {{ user.teacherinformation.last_name|upper }}</td>
+                                    <td class="align-middle text-center">{{ user.email }}</td>
+                                    <td class="align-middle text-center">{{ user.user_role|upper }}</td>
+                                    <td class="align-middle text-center">{{ user.created_at|localtime|date:"F d, Y"|upper }}</td>
+                                    <td class="align-middle text-center">{{ user.updated_at|localtime|date:"F d, Y h:i A"|upper }}</td>
+                                    <td class="align-middle text-center">
                                         {% if user.is_active %}
                                         <span class="badge bg-success">ACTIVE</span>
                                         {% else %}
                                         {{ user.updated_at|timesince|upper }} AGO
                                         {% endif %}
                                     </td>
-                                    <td>
+                                    <td class="align-middle text-center">
                                         <button class="btn btn-outline-secondary btn-sm" onclick="viewUser('{{ user.id }}','{{ user.user_role }}')"
                                             data-user-id="{{ user.id }}" data-bs-toggle="modal" data-bs-target="#editUserModal">
                                             <i class="bi bi-pencil"></i>                       
@@ -234,7 +234,7 @@
                                                                 <div class="col-md-12">
                                                                     <div class="form-floating mb-3">
                                                                         <input type="text" class="form-control" id="position" name="position" placeholder="Doe" required>
-                                                                        <label for="position">Position</label>
+                                                                        <label for="position">Job Title</label>
                                                                     </div>
                                                                 </div>
                                                             </div>

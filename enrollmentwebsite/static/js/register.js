@@ -1,36 +1,52 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const registerForm = document.getElementById("registerForm");
-    const registerButton = document.getElementById("registerButton");
-    const registerMessages = document.getElementById("registerMessages");
+$(document).ready(function () {
+    $("#registerForm").on("submit", function (e) {
+        e.preventDefault();
 
-    registerForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        registerButton.disabled = true;
-        registerButton.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>`;
-        const formData = new FormData(registerForm);
+        let $form = $(this);
+        let $button = $("#registerButton");
+        let $messages = $("#registerMessages");
 
-        fetch(registerForm.action, {
+        $form.find(".form-control").removeClass("is-invalid");
+        $form.find(".register-error").text("");
+
+        $button.prop("disabled", true).html(
+            `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`
+        );
+
+        $.ajax({
+            url: $form.attr("action"),
             method: "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
+            data: $form.serialize(),
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+            success: function (data) {
+                setTimeout(function () {
+                    $button.prop("disabled", false).text("Register");
+                    if (data.success) {
+                        $messages.html(`<div class="alert alert-success">${data.message}</div>`);
+                        $form[0].reset();
+                    } else if (data.errors) {
+                        $.each(data.errors, function (field, messages) {
+                            let $input = $("#registerForm").find(`[name="${field}"], #${field}`);
+                            if ($input.length) {
+                                $input.addClass("is-invalid");
+                                $input.closest(".mb-2").find(".register-error").text(messages.join(" "));
+                            }
+                            $input.on("input", function () {
+                                $(this).removeClass("is-invalid");
+                                $(this).closest(".mb-2").find(".register-error").text("");
+                            });
+                        });
+                    } else if (data.message) {
+                        $messages.html(`<div class="alert alert-danger">${data.message}</div>`);
+                    }
+                }, 1000);
+            },
+            error: function () {
+                setTimeout(function () {
+                    $button.prop("disabled", false).text("Register");
+                    $messages.html(`<div class="alert alert-danger">An error occurred. Please try again.</div>`);
+                }, 1000);
             }
-        })
-            .then(response => response.json())
-            .then(data => {
-                registerButton.disabled = false;
-                registerButton.textContent = "Register";
-
-                if (data.success) {
-                    registerMessages.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-                } else {
-                    registerMessages.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
-                }
-            })
-            .catch(error => {
-                registerButton.disabled = false;
-                registerButton.textContent = "Register";
-                registerMessages.innerHTML = `<div class="alert alert-danger">An error occurred. Please try again.</div>`;
-            });
+        });
     });
 });

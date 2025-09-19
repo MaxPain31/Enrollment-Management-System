@@ -7,116 +7,96 @@ from .models import MyUser, ApplicantInformation
 from landingpage.models import StudentInformation
 from .utils import capitalize_words
 from django.http import JsonResponse, HttpResponse
+from .forms import RegistrationForm, LoginForm
 from django.utils import timezone
 import pytz
 
 
 class RegistrationView(View):
     def get(self, request):
-        return render(request, "authentication/register.html")
+        form = RegistrationForm()
+        return render(request, "authentication/register.html", {"form": form})
 
     def post(self, request):
-        email = request.POST.get("email")
-        lrn = request.POST.get("lrn")
-        psa_no = request.POST.get("psa_no")
-        first_name = capitalize_words(request.POST.get("first_name"))
-        middle_name = capitalize_words(request.POST.get("middle_name"))
-        last_name = capitalize_words(request.POST.get("last_name"))
-        password = request.POST.get("password")
-        confirm_password = request.POST.get("confirm_password")
+        form = RegistrationForm(request.POST)
 
-        if password != confirm_password:
-            message = {"success": False, "message": "Passwords do not match!"}
+        if not form.is_valid():
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                return JsonResponse(message)
-            messages.error(request, message["message"])
-            return redirect("register")
-
-        if MyUser.objects.filter(email=email).exists():
-            message = {"success": False, "message": "Email already exists!"}
-            if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                return JsonResponse(message)
-            messages.error(request, message["message"])
-            return redirect("register")
-
-        if ApplicantInformation.objects.filter(lrn=lrn).exists() or StudentInformation.objects.filter(
-            lrn=lrn
-        ).exists():
-            message = {"success": False, "message": "LRN already exists!"}
-            if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                return JsonResponse(message)
-            messages.error(request, message["message"])
-            return redirect("register")
+                return JsonResponse({
+                    "success": False,
+                    "errors": form.errors
+                })
 
         user = MyUser.objects.create_user(
-            email=email,
-            password=password,
+            email=form.cleaned_data["email"],
+            password=form.cleaned_data["password"],
             user_role="Applicant",
         )
-        user.save()
 
         ApplicantInformation.objects.create(
             user=user,
-            first_name=first_name,
-            middle_name=middle_name,
-            last_name=last_name,
-            lrn=lrn,
-            psa_no=psa_no,
+            first_name=capitalize_words(form.cleaned_data["first_name"]),
+            middle_name=capitalize_words(form.cleaned_data["middle_name"]),
+            last_name=capitalize_words(form.cleaned_data["last_name"]),
+            lrn=form.cleaned_data["lrn"],
+            psa_no=form.cleaned_data["psa_no"],
         )
 
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse(
-                {
-                    "success": True,
-                    "message": "Account created successfully! You can now log in.",
-                }
-            )
+            return JsonResponse({"success": True, "message": "Account created successfully! You can now log in."})
+
+        messages.success(request, "Account created successfully! You can now log in.")
         return redirect("login")
 
 
 class LoginView(View):
     def get(self, request):
-        return render(request, "authentication/login.html")
+        form = LoginForm()
+        return render(request, "authentication/login.html", {"form": form})
 
     def post(self, request):
-        lrn = request.POST.get("lrn")
-        password = request.POST.get("password")
-        user = authenticate(request, lrn=lrn, password=password)
+        form = LoginForm(request.POST)
 
-        if user is not None:
-            if hasattr(user, 'deactivated') and user.deactivated:
+        if form.is_valid():
+            lrn = form.cleaned_data["lrn"]
+            password = form.cleaned_data["password"]
+
+            user = authenticate(request, lrn=lrn, password=password)
+
+            if user is not None:
+                if hasattr(user, "deactivated") and user.deactivated:
+                    response_data = {
+                        "success": False,
+                        "message": "Your account has been deactivated. Please visit the school administrator for assistance.",
+                    }
+                    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                        return JsonResponse(response_data)
+                    return render(request, "authentication/login.html", {"form": form, "error": response_data["message"]})
+
+                user.updated_at = timezone.now().astimezone(pytz.timezone("Asia/Manila"))
+                user.is_active = True
+                user.save(update_fields=["updated_at", "is_active"])
+                login(request, user)
+                request.session.set_expiry(86400)
+
                 response_data = {
-                    "success": False,
-                    "message": "Your account has been deactivated. Please visit the school administrator for assistance.",
+                    "success": True,
+                    "message": "Logged in successfully!",
+                    "redirect_url": "/",
                 }
                 if request.headers.get("x-requested-with") == "XMLHttpRequest":
                     return JsonResponse(response_data)
-                return render(request, "authentication/login.html", {"error": response_data["message"]})
-            user.updated_at = timezone.now().astimezone(pytz.timezone("Asia/Manila"))
-            user.is_active = True
-            user.save(update_fields=["updated_at", "is_active"])
-            login(request, user)
-            request.session.set_expiry(86400)
-
-            response_data = {
-                "success": True,
-                "message": "Logged in successfully!",
-                "redirect_url": "/",
-            }
-        else:
+                return redirect("home")
             response_data = {"success": False, "message": "Invalid LRN or password"}
-
+        else:
+            response_data = {
+                "success": False,
+                "errors": form.errors,
+            }
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse(response_data)
 
-        if user and (not hasattr(user, 'deactivated') or not user.deactivated):
-            return redirect("home")
-        return render(
-            request,
-            "authentication/login.html",
-            {"error": response_data["message"]},
-        )
-
+        return render(request, "authentication/login.html", {"form": form, "error": response_data.get("message")})
 
 class LogoutView(View):
     def get(self, request):

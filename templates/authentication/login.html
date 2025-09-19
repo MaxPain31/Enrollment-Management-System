@@ -2,29 +2,34 @@
 <div class="modal fade" id="loginModalToggle" aria-hidden="true" aria-labelledby="loginModalToggleLabel" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="loginModalToggleLabel">Login</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+
             <div class="modal-body">
+                <div class="d-flex align-items-center justify-content-end">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="d-flex align-items-center justify-content-center">
+                    <img src="{% static "img/logo.png" %}" alt="logo" style="width: 50px;">
+                </div>
+                <h2 class="modal-title text-center mb-4">Login Student Account</h2>
                 <form id="loginForm" method="post" action="{% url 'login' %}">
                     {% csrf_token %}
                     <div id="loginMessages"></div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="lrn" class="form-label">Learner Reference Number</label>
-                        <input type="text" class="form-control" id="lrn" name="lrn" placeholder="Enter your LRN"
-                            required>
+                        <input type="text" class="form-control" id="lrn" name="lrn" placeholder="Enter your LRN">
+                        <div class="invalid-feedback login-error"></div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password"
-                            placeholder="Enter your password" required>
+                            placeholder="Enter your password">
+                        <div class="invalid-feedback login-error"></div>
                     </div>
-                    <div class="mb-3 form-check">
+                    <div class="mb-2 form-check">
                         <input type="checkbox" class="form-check-input" id="rememberMe">
                         <label class="form-check-label" for="rememberMe">Remember me</label>
                     </div>
-                    <div class="modal-footer">
+                    <div class="d-flex align-items-center justify-content-center gap-2 my-4">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" id="loginButton" class="btn btn-primary">Login</button>
                     </div>

@@ -16,6 +16,7 @@
                     {% csrf_token %}
                     <input type="hidden" name="enrollment_type" value="JHS">
                     <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <input type="hidden" name="user_role" value="{{ user.user_role }}">
                     <input type="hidden" name="application_no" value="{{ application_no }}">
                     <input type="hidden" name="status" value="Missing">
                     <input type="hidden" name="early_reg" value="{{ early_reg }}">
@@ -25,22 +26,22 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="school_year" class="form-label">School Year</label>
-                                    <select class="form-select form-control" id="school_year" name="school_year"
-                                        required>
+                                    <select class="form-select form-control" id="school_year" name="school_year">
                                         <option value="{{ settings.academic_year_start }}-{{ settings.academic_year_end }}">{{ settings.academic_year_start }}-{{ settings.academic_year_end }}</option>
                                     </select>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="grade_level" class="form-label">Grade Level</label>
-                                    <select class="form-select form-control" id="grade_level" name="grade_level"
-                                        required>
+                                    <select class="form-select form-control" id="grade_level" name="grade_level">
                                         <option value="7">Grade 7</option>
                                         <option value="8">Grade 8</option>
                                         <option value="9">Grade 9</option>
                                         <option value="10">Grade 10</option>
                                     </select>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                         </div>
@@ -48,18 +49,19 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="student_type" class="form-label">Student Type</label>
-                                    <select class="form-select form-control" id="student_type" name="student_type"
-                                        required>
+                                    <select class="form-select form-control" id="student_type" name="student_type">
                                         <option value="new student">New Student</option>
                                         <option value="returning">Returning (Balik Aral)</option>
                                         <option value="transferee">Transferee</option>
                                     </select>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="gen_avg" class="form-label">General Average</label>
-                                    <input type="number" class="form-control" id="gen_avg" name="gen_avg" required>
+                                    <input type="number" class="form-control" id="gen_avg" name="gen_avg">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                         </div>
@@ -70,15 +72,15 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="psa_no" class="form-label">PSA Birth Certificate No.</label>
-                                    <input type="text" class="form-control text-uppercase" id="psa_no" name="psa_no"
-                                        required value="{{ info.psa_no }}" readonly>
+                                    <input type="text" class="form-control text-uppercase" id="psa_no" name="psa_no" value="{{ info.psa_no }}" readonly>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="lrn" class="form-label">Learner Reference No.</label>
-                                    <input type="text" class="form-control text-uppercase" id="lrn" name="lrn" required
-                                        value="{{ info.lrn }}" readonly>
+                                    <input type="text" class="form-control text-uppercase" id="lrn" name="lrn" value="{{ info.lrn }}" readonly>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                         </div>
@@ -86,29 +88,29 @@
                             <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="first_name" class="form-label">First Name</label>
-                                    <input type="text" class="form-control text-uppercase" id="first_name"
-                                        name="first_name" required value="{{ info.first_name }}" readonly>
+                                    <input type="text" class="form-control text-uppercase" id="first_name" name="first_name" value="{{ info.first_name }}" readonly>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="middle_name" class="form-label">Middle Name</label>
-                                    <input type="text" class="form-control text-uppercase" id="middle_name"
-                                        name="middle_name" required value="{{ info.middle_name }}" readonly>
+                                    <input type="text" class="form-control text-uppercase" id="middle_name" name="middle_name" value="{{ info.middle_name }}" readonly>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="last_name" class="form-label">Last Name</label>
-                                    <input type="text" class="form-control text-uppercase" id="last_name"
-                                        name="last_name" required value="{{ info.last_name }}" readonly>
+                                    <input type="text" class="form-control text-uppercase" id="last_name" name="last_name" value="{{ info.last_name }}" readonly>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="extension_name" class="form-label">Extension Name</label>
-                                    <input type="text" class="form-control text-uppercase" id="extension_name"
-                                        name="extension_name" value="{{ info.extension_name }}">
+                                    <input type="text" class="form-control text-uppercase" id="extension_name" name="extension_name" value="{{ info.extension_name }}">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                         </div>
@@ -116,22 +118,25 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="birth_date" class="form-label">Birth Date</label>
-                                    <input type="date" class="form-control" id="birth_date" name="birth_date" required>
+                                    <input type="date" class="form-control" id="birth_date" name="birth_date">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="age" class="form-label">Age</label>
-                                    <input type="number" class="form-control" id="age" name="age" required>
+                                    <input type="number" class="form-control" id="age" name="age">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="gender" class="form-label">Gender</label>
-                                    <select class="form-select form-control" id="gender" name="gender" required>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
+                                    <select class="form-select form-control" id="gender" name="gender">
+                                        <option value="MALE">MALE</option>
+                                        <option value="FEMALE">FEMALE</option>
                                     </select>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                         </div>
@@ -140,29 +145,30 @@
                                 <div class="mb-3">
                                     <label for="place_of_birth" class="form-label">Place of Birth
                                         (Municipality/City)</label>
-                                    <input type="text" class="form-control text-uppercase" id="place_of_birth"
-                                        name="place_of_birth" required>
+                                    <input type="text" class="form-control text-uppercase" id="place_of_birth" name="place_of_birth">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="mother_tongue" class="form-label">Mother Tongue</label>
-                                    <input type="text" class="form-control text-uppercase" id="mother_tongue"
-                                        name="mother_tongue" required>
+                                    <input type="text" class="form-control text-uppercase" id="mother_tongue" name="mother_tongue">
+                                    <div class="invalid-feedback"></div>    
                                 </div>
                             </div>
                         </div>
                         <div class="accept_terms">
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms"
-                                    required>
-                                <label class="form-check-label" for="accept_terms" style="font-weight: 500;">
+                                >
+                                <label for="accept_terms" style="font-weight: 500;">
                                     I hereby certify that the above information given are True and correct to the best
                                     of my knowledge and I allow the Department of Education to use my child's details to
                                     create and/or update his/her learner profile in the Learner Information System. The
                                     information here in shall be treated as confidential in compliance with the Data
                                     Privacy Act of 2012.
                                 </label>
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                         <div class="d-grid gap-2 col-2 mx-auto">
@@ -178,22 +184,47 @@
     </div>
 </section>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const gradeLevelSelect = document.getElementById("grade_level");
-        const studentTypeSelect = document.getElementById("student_type");
-        console.log("Initial selection:", gradeLevelSelect.value);
-        gradeLevelSelect.addEventListener("change", function () {
-            if (this.value === "7" || this.value === "11") {
-                studentTypeSelect.innerHTML = `
+    $(document).ready(function () {
+        let $gradeLevelSelect = $("#grade_level");
+        let $studentTypeSelect = $("#student_type");
+        $gradeLevelSelect.on("change", function () {
+            let grade = $(this).val();
+            if (grade === "7" || grade === "11") {
+                $studentTypeSelect.html(`
                     <option value="new student">New Student</option>
                     <option value="returning">Returning (Balik Aral)</option>
                     <option value="transferee">Transferee</option>
-                `;
+                `);
             } else {
-                studentTypeSelect.innerHTML = `
+                $studentTypeSelect.html(`
                     <option value="returning">Returning (Balik Aral)</option>
                     <option value="transferee">Transferee</option>
-                `;
+                `);
+            }
+        });
+    });
+    $(document).ready(function () {
+        $("#birth_date").on("change", function () {
+            let birthDateVal = $(this).val();
+            if (birthDateVal) {
+                let birthDate = new Date(birthDateVal);
+                let today = new Date();
+
+                if (birthDate > today) {
+                    $("#age").val(0);
+                    return;
+                }
+
+                let age = today.getFullYear() - birthDate.getFullYear();
+                let monthDiff = today.getMonth() - birthDate.getMonth();
+                let dayDiff = today.getDate() - birthDate.getDate();
+
+                if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                    age--;
+                }
+                $("#age").val(age);
+            } else {
+                $("#age").val("");
             }
         });
     });

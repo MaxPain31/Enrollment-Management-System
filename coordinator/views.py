@@ -16,7 +16,7 @@ from landingpage.models import (
 )
 from django.db.models import F
 import pytz
-from authentication.models import MyUser, TeacherInformation
+from authentication.models import ApplicantInformation, MyUser, TeacherInformation
 import json
 
 def is_coordinator(user):
@@ -76,7 +76,6 @@ class DoneAssessmentView(View):
 
         try:
             application = ApplicationApproved.objects.get(enrollment=enrollment_id)
-
             assessment_obj, _ = Assessment.objects.update_or_create(
                 application_approved=application,
                 defaults={
@@ -127,6 +126,7 @@ class DoneAssessmentView(View):
                 },
             )
 
+            ApplicantInformation.objects.filter(user=application.enrollment.user).delete()
             application.enrollment.user.user_role = "Student"
             application.enrollment.user.save()
 

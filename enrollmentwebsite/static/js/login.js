@@ -1,39 +1,53 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const loginForm = document.getElementById("loginForm");
-    const loginButton = document.getElementById("loginButton");
-    const loginMessages = document.getElementById("loginMessages");
-    const csrfToken = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+$(document).ready(function () {
+    $("#loginForm").on("submit", function (e) {
+        e.preventDefault();
 
+        let $form = $(this);
+        let $button = $("#loginButton");
+        let $messages = $("#loginMessages");
 
-    loginForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        loginButton.disabled = true;
-        loginButton.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>`;
-        const formData = new FormData(loginForm);
+        $form.find(".form-control").removeClass("is-invalid");
+        $form.find(".login-error").text("");
 
-        fetch(loginForm.action, {
+        $button.prop("disabled", true).html(
+            `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`
+        );
+
+        $.ajax({
+            url: $form.attr("action"),
             method: "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-                "X-CSRFToken": csrfToken
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                loginButton.disabled = false;
-                loginButton.textContent = "Login";
+            data: $form.serialize(),
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+            success: function (data) {
+                setTimeout(function () {
+                    $button.prop("disabled", false).text("Login");
 
-                if (data.success) {
-                    window.location.href = data.redirect_url;
-                } else {
-                    loginMessages.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
-                }
-            })
-            .catch(error => {
-                loginButton.disabled = false;
-                loginButton.textContent = "Login";
-                loginMessages.innerHTML = `<div class="alert alert-danger">An error occurred. Please try again.</div>`;
-            });
+                    if (data.success) {
+                        window.location.href = data.redirect_url;
+                    } else if (data.errors) {
+                        $.each(data.errors, function (field, messages) {
+                            let $input = $("#loginForm").find(`[name="${field}"], #${field}`);
+                            if ($input.length) {
+                                $input.addClass("is-invalid");
+                                $input.closest(".mb-2").find(".login-error").text(messages.join(" "));
+                            }
+                        });
+                    } else if (data.message) {
+                        $messages.html(`<div class="alert alert-danger">${data.message}</div>`);
+                    }
+                }, 1000);
+            },
+            error: function () {
+                setTimeout(function () {
+                    $button.prop("disabled", false).text("Login");
+                    $messages.html(`<div class="alert alert-danger">An error occurred. Please try again.</div>`);
+                }, 1000);
+            }
+        });
+    });
+
+    $("#loginForm .form-control").on("input", function () {
+        $(this).removeClass("is-invalid");
+        $(this).closest(".mb-2").find(".login-error").text("");
     });
 });
