@@ -200,8 +200,8 @@ class AdminApplicationActionView(View):
 
                 if application.grade_level != "7":
                     # Promote to student
-                    ApplicantInformation.objects.filter(user=application.user).delete()
                     application.user.user_role = "Student"
+                    ApplicantInformation.objects.filter(user=application.user).delete()
                     StudentInformation.objects.update_or_create(
                         application_approved=app_approved,
                         defaults={
@@ -321,13 +321,13 @@ class AdminApplicationBulkApproveView(View):
                             continue
 
                         # --- perform your approval logic ---
-                        ApplicantInformation.objects.filter(user=application.user).delete()
                         app_approved, _ = ApplicationApproved.objects.update_or_create(
                             enrollment=application, defaults={"is_assessed": False}
                         )
 
                         if application.grade_level != "7":
                             application.user.user_role = "Student"
+                            ApplicantInformation.objects.filter(user=application.user).delete()
                             StudentInformation.objects.update_or_create(
                                 application_approved=app_approved,
                                 defaults={
