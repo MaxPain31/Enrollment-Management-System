@@ -11,47 +11,46 @@
         </li><!-- End Dashboard Nav -->
 
         <li class="nav-item">
-            <a class="nav-link {% if 'student_unassigned_list' in request.resolver_match.url_name|default:'' %}active{% else %}collapsed{% endif %}"
+            <a class="nav-link {% if request.resolver_match.url_name == 'student_unassigned_list' %}active{% else %}collapsed{% endif %}"
                 data-bs-target="#student-unassigned-nav" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-card-list"></i><span>Student Unassigned List</span><i
-                    class="bi bi-chevron-down ms-auto"></i>
+                <i class="bi bi-card-list"></i><span>Student Unassigned List</span>
+                <i class="bi bi-chevron-down ms-auto"></i>
             </a>
-            <ul id="student-unassigned-nav"
-                class="nav-content collapse {% if 'student_unassigned_list' in request.resolver_match.url_name|default:'' %}show{% endif %}"
+            <ul id="student-unassigned-nav" class="nav-content collapse {% if request.resolver_match.url_name == 'student_unassigned_list' %}show{% endif %}"
                 data-bs-parent="#sidebar-nav">
                 <li class="nav-item">
-                    <a href="{% url 'student_unassigned_list_grade_7' %}"
-                        class="{% if request.resolver_match.url_name == 'student_unassigned_list_grade_7' %}active{% endif %}">
+                    <a href="{% url 'student_unassigned_list' 7 %}"
+                        class="{% if request.resolver_match.url_name == 'student_unassigned_list' and request.resolver_match.kwargs.grade == 7 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 7</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'student_unassigned_list_grade_8' %}"
-                        class="{% if request.resolver_match.url_name == 'student_unassigned_list_grade_8' %}active{% endif %}">
+                    <a href="{% url 'student_unassigned_list' 8 %}"
+                        class="{% if request.resolver_match.url_name == 'student_unassigned_list' and request.resolver_match.kwargs.grade == 8 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 8</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'student_unassigned_list_grade_9' %}"
-                        class="{% if request.resolver_match.url_name == 'student_unassigned_list_grade_9' %}active{% endif %}">
+                    <a href="{% url 'student_unassigned_list' 9 %}"
+                        class="{% if request.resolver_match.url_name == 'student_unassigned_list' and request.resolver_match.kwargs.grade == 9 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 9</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'student_unassigned_list_grade_10' %}"
-                        class="{% if request.resolver_match.url_name == 'student_unassigned_list_grade_10' %}active{% endif %}">
+                    <a href="{% url 'student_unassigned_list' 10 %}"
+                        class="{% if request.resolver_match.url_name == 'student_unassigned_list' and request.resolver_match.kwargs.grade == 10 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 10</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'student_unassigned_list_grade_11' %}"
-                        class="{% if request.resolver_match.url_name == 'student_unassigned_list_grade_11' %}active{% endif %}">
+                    <a href="{% url 'student_unassigned_list' 11 %}"
+                        class="{% if request.resolver_match.url_name == 'student_unassigned_list' and request.resolver_match.kwargs.grade == 11 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 11</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'student_unassigned_list_grade_12' %}"
-                        class="{% if request.resolver_match.url_name == 'student_unassigned_list_grade_12' %}active{% endif %}">
+                    <a href="{% url 'student_unassigned_list' 12 %}"
+                        class="{% if request.resolver_match.url_name == 'student_unassigned_list' and request.resolver_match.kwargs.grade == 12 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 12</span>
                     </a>
                 </li>
@@ -59,46 +58,43 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link {% if 'grade_level' in request.resolver_match.url_name|default:'' %}active{% else %}collapsed{% endif %}"
-                data-bs-target="#section-nav" data-bs-toggle="collapse" href="#">
+            <a class="nav-link {% if request.resolver_match.url_name == 'grade_level_academic_year' or request.resolver_match.url_name == 'grade_level' or request.resolver_match.url_name == 'student_assigned_list' %}active{% else %}collapsed{% endif %}" data-bs-target="#section-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-list-nested"></i><span>Grade Levels</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-            <ul id="section-nav"
-                class="nav-content collapse {% if 'grade_level' in request.resolver_match.url_name|default:'' %}show{% endif %}"
-                data-bs-parent="#sidebar-nav">
+            <ul id="section-nav" class="nav-content collapse {% if request.resolver_match.url_name == 'grade_level_academic_year' or request.resolver_match.url_name == 'grade_level' or request.resolver_match.url_name == 'student_assigned_list' %}show{% endif %}" data-bs-parent="#sidebar-nav">
                 <li class="nav-item">
-                    <a href="{% url 'grade_level_7' %}"
-                        class="{% if request.resolver_match.url_name == 'grade_level_7' %}active{% endif %}">
+                    <a href="{% url 'grade_level_academic_year' 7 %}"
+                        class="{% if request.resolver_match.url_name == 'grade_level_academic_year' and request.resolver_match.kwargs.grade == 7 or request.resolver_match.url_name == 'grade_level' and request.resolver_match.kwargs.grade == 7 or request.resolver_match.url_name == 'student_assigned_list' and request.resolver_match.kwargs.grade == 7 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 7</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'grade_level_8' %}"
-                        class="{% if request.resolver_match.url_name == 'grade_level_8' %}active{% endif %}">
+                    <a href="{% url 'grade_level_academic_year' 8 %}"
+                        class="{% if request.resolver_match.url_name == 'grade_level_academic_year' and request.resolver_match.kwargs.grade == 8 or request.resolver_match.url_name == 'grade_level' and request.resolver_match.kwargs.grade == 8 or request.resolver_match.url_name == 'student_assigned_list' and request.resolver_match.kwargs.grade == 8 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 8</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'grade_level_9' %}"
-                        class="{% if request.resolver_match.url_name == 'grade_level_9' %}active{% endif %}">
+                    <a href="{% url 'grade_level_academic_year' 9 %}"
+                        class="{% if request.resolver_match.url_name == 'grade_level_academic_year' and request.resolver_match.kwargs.grade == 9 or request.resolver_match.url_name == 'grade_level' and request.resolver_match.kwargs.grade == 9 or request.resolver_match.url_name == 'student_assigned_list' and request.resolver_match.kwargs.grade == 9 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 9</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'grade_level_10' %}"
-                        class="{% if request.resolver_match.url_name == 'grade_level_10' %}active{% endif %}">
+                    <a href="{% url 'grade_level_academic_year' 10 %}"
+                        class="{% if request.resolver_match.url_name == 'grade_level_academic_year' and request.resolver_match.kwargs.grade == 10 or request.resolver_match.url_name == 'grade_level' and request.resolver_match.kwargs.grade == 10 or request.resolver_match.url_name == 'student_assigned_list' and request.resolver_match.kwargs.grade == 10 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 10</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'grade_level_11' %}"
-                        class="{% if request.resolver_match.url_name == 'grade_level_11' %}active{% endif %}">
+                    <a href="{% url 'grade_level_academic_year' 11 %}"
+                        class="{% if request.resolver_match.url_name == 'grade_level_academic_year' and request.resolver_match.kwargs.grade == 11 or request.resolver_match.url_name == 'grade_level' and request.resolver_match.kwargs.grade == 11 or request.resolver_match.url_name == 'student_assigned_list' and request.resolver_match.kwargs.grade == 11 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 11</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'grade_level_12' %}"
-                        class="{% if request.resolver_match.url_name == 'grade_level_12' %}active{% endif %}">
+                    <a href="{% url 'grade_level_academic_year' 12 %}"
+                        class="{% if request.resolver_match.url_name == 'grade_level_academic_year' and request.resolver_match.kwargs.grade == 12 or request.resolver_match.url_name == 'grade_level' and request.resolver_match.kwargs.grade == 12 or request.resolver_match.url_name == 'student_assigned_list' and request.resolver_match.kwargs.grade == 12 %}active{% endif %}">
                         <i class="bi bi-circle"></i><span>Grade 12</span>
                     </a>
                 </li>
@@ -120,9 +116,15 @@
                 </div>
                 <div class="profile-tab-content">
                     <h5>{{ request.user.user_role|default:"Coordinator" }}</h5>
-                    <h6>{{ request.user.coordinatorinformation.first_name}} {{ request.user.coordinatorinformation.last_name }} - {{ request.user.coordinatorinformation.position }}</h6>
+                    <h6>{{ request.user.coordinatorinformation.first_name}} {{ request.user.coordinatorinformation.last_name }}</h6>
+                    <h6><strong>{{ request.user.coordinatorinformation.position }}</strong></h6>
                 </div>
             </div>
         </div>
     </ul>
 </aside><!-- End Sidebar-->
+
+<script>
+    console.log("{{ request.resolver_match.url_name }}");
+    console.log("{{ request.resolver_match.kwargs.grade }}");
+</script>

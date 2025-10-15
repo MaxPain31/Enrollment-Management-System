@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 text: "Do you want to add this section?",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: "Yes, add it!",
+                confirmButtonText: "Yes",
                 cancelButtonText: "Cancel",
             }).then((result) => {
                 if (result.isConfirmed) {

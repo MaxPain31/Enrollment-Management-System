@@ -1,29 +1,29 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from authentication.models import TeacherInformation
+from authentication.models import MyUser, TeacherInformation
 
 class EnrollmentForm(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    application_no = models.CharField(max_length=191)
+    application_no = models.CharField(max_length=50)
     status = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=timezone.now)
-    school_year = models.CharField(max_length=191)
-    grade_level = models.CharField(max_length=191)
+    school_year = models.CharField(max_length=50)
+    grade_level = models.CharField(max_length=50)
     with_lrn = models.BooleanField(null=True, blank=True)
-    student_type = models.CharField(max_length=191, null=True, blank=True)
+    student_type = models.CharField(max_length=50, null=True, blank=True)
     gen_avg = models.IntegerField()
-    psa_no = models.CharField(max_length=191)
-    lrn = models.CharField(max_length=191)
-    first_name = models.CharField(max_length=191)
-    middle_name = models.CharField(max_length=191, null=True, blank=True)
-    last_name = models.CharField(max_length=191)
-    extension_name = models.CharField(max_length=191, null=True, blank=True)
+    psa_no = models.CharField(max_length=50)
+    lrn = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50)
+    middle_name = models.CharField(max_length=50, null=True, blank=True)
+    last_name = models.CharField(max_length=50)
+    extension_name = models.CharField(max_length=50, null=True, blank=True)
     birth_date = models.DateField()
     age = models.IntegerField()
     gender = models.CharField(max_length=50)
-    place_of_birth = models.CharField(max_length=191)
-    mother_tongue = models.CharField(max_length=191)
+    place_of_birth = models.CharField(max_length=50)
+    mother_tongue = models.CharField(max_length=50)
     documents_submitted = models.TextField(null=True, blank=True)
     early_reg = models.BooleanField(null=True, blank=True)
     is_approved = models.BooleanField(null=True, blank=True)
@@ -72,35 +72,38 @@ class ApplicationApproved(models.Model):
     enrollment = models.OneToOneField(
         EnrollmentForm, on_delete=models.CASCADE, null=True, blank=True
     )
-    is_assessed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
     class Meta:
         db_table = "application_approved"
 
 
-class ApplicationRejected(models.Model):
+class ApplicationPending(models.Model):
     enrollment = models.OneToOneField(
         EnrollmentForm, on_delete=models.CASCADE, null=True, blank=True
     )
-    message_rejected = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    message_pending = models.TextField(null=True, blank=True)
     class Meta:
-        db_table = "application_rejected"
+        db_table = "application_pending"
 
 
 class Assessment(models.Model):
     application_approved = models.OneToOneField(
         ApplicationApproved, on_delete=models.CASCADE
     )
-    literacy_level = models.CharField(max_length=191)
-    literacy_result = models.TextField()
-    numeracy_level = models.CharField(max_length=191)
-    numeracy_result = models.TextField()
-    assessed_at = models.DateTimeField(default=timezone.now)
+    literacy_level = models.CharField(max_length=191, null=True, blank=True)
+    literacy_result = models.TextField(null=True, blank=True)
+    numeracy_level = models.CharField(max_length=191, null=True, blank=True)
+    numeracy_result = models.TextField(null=True, blank=True)
+    is_assessed = models.BooleanField(default=False)
+    assessed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
     class Meta:
         db_table = "assessment"
 
 
 class StudentInformation(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
     application_approved = models.ForeignKey(
         ApplicationApproved, null=True, on_delete=models.SET_NULL
     )
@@ -209,22 +212,13 @@ class Section(models.Model):
     academic_year = models.CharField(max_length=10)
     status = models.CharField(
         max_length=10,
-        choices=[("Active", "Active"), ("Inactive", "Inactive")],
+        choices=[("Active", "Active"), ("Inactive", "Inactive"), ("Completed", "Completed")],
         default="Active",
     )
 
     class Meta:
         db_table = "section"
 
-    def save(self, *args, **kwargs):
-        self.current_slot = StudentInformation.objects.filter(
-            section=self.section_name,
-            grade=str(self.grade_level),
-            school_year=self.academic_year,
-            student_status="Enrolled",
-            user__deactivated=False,
-        ).count()
-        super(Section, self).save(*args, **kwargs)
 
     def __str__(self):
         adviser = (
@@ -283,10 +277,57 @@ class EnrollmentManagement(models.Model):
 
         super(EnrollmentManagement, self).save(*args, **kwargs)
 
-class DocumentList(models.Model):
+class Document(models.Model):
     document_name = models.CharField(max_length=191)
     is_required = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        db_table = "document"
+        
+class DocumentList(models.Model):
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, null=True, blank=True, related_name="document_lists")
+    enrollment = models.ForeignKey(EnrollmentForm, on_delete=models.CASCADE, null=True, blank=True, related_name="documents")
+    student_information = models.ForeignKey(StudentInformation, on_delete=models.CASCADE, null=True, blank=True, related_name="documents")
+    updated_by = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         db_table = "document_list"
+        
+class SchoolYear(models.Model):
+    name = models.CharField(max_length=10, null=True, blank=True)
+    school_year_start = models.CharField(max_length=10, null=True, blank=True)
+    school_year_end = models.CharField(max_length=10, null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        db_table = "school_year"
+    
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        self.name = f"{self.school_year_start}-{self.school_year_end}"
+        super(SchoolYear, self).save(*args, **kwargs)
+        
+        
+class StudentListHistory(models.Model):
+    teacher_information = models.ForeignKey(TeacherInformation, on_delete=models.SET_NULL, null=True, blank=True)
+    student_information = models.ForeignKey(StudentInformation, on_delete=models.CASCADE, null=True, blank=True)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, null=True, blank=True)
+    grade_level = models.IntegerField(null=True, blank=True)
+    previous_final_average = models.IntegerField(null=True, blank=True)
+    final_average = models.IntegerField(null=True, blank=True)
+    school_year = models.CharField(max_length=10, null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        db_table = "student_list_history"
+        
+    
+    

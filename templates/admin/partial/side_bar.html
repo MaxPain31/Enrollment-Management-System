@@ -11,12 +11,10 @@
         </li><!-- End Dashboard Nav -->
 
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'application' or request.resolver_match.url_name == 'application_approved' or request.resolver_match.url_name == 'application_rejected' %}active{% else %}collapsed{% endif %}"
-                data-bs-target="#application-nav" data-bs-toggle="collapse" href="#">
+            <a class="nav-link {% if request.resolver_match.url_name == 'application' or request.resolver_match.url_name == 'application_approved' or request.resolver_match.url_name == 'application_rejected' %}active{% else %}collapsed{% endif %}" data-bs-target="#application-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-file-post"></i><span>Application</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-            <ul id="application-nav"
-                class="nav-content collapse {% if request.resolver_match.url_name == 'application' or request.resolver_match.url_name == 'application_approved' or request.resolver_match.url_name == 'application_rejected' %}show{% endif %}"
+            <ul id="application-nav" class="nav-content collapse {% if request.resolver_match.url_name == 'application' or request.resolver_match.url_name == 'application_approved' or request.resolver_match.url_name == 'application_rejected' %}show{% endif %}"
                 data-bs-parent="#sidebar-nav">
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'application' %}active{% endif %}"
@@ -52,9 +50,7 @@
                 data-bs-target="#manage-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-file-post"></i><span>Manage Pages</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-            <ul id="manage-nav"
-                class="nav-content collapse {% if request.resolver_match.url_name == 'manage_announcement' or request.resolver_match.url_name == 'manage_enrollment' %}show{% endif %}"
-                data-bs-parent="#sidebar-nav">
+            <ul id="manage-nav" class="nav-content collapse {% if request.resolver_match.url_name == 'manage_announcement' or request.resolver_match.url_name == 'manage_enrollment' %}show{% endif %}" data-bs-parent="#sidebar-nav">
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'manage_announcement' %}active{% endif %}"
                         href="{% url 'manage_announcement' %}">
@@ -97,15 +93,15 @@
                     </a>
                 </li>
                 <li>
-                    <a class="{% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}"
-                        href="{% url 'admin_users' %}">
-                        <i class="bi bi-circle"></i><span>Admin</span>
-                    </a>
-                </li>
-                <li>
                     <a class="{% if request.resolver_match.url_name == 'coordinator_users' %}active{% endif %}"
                         href="{% url 'coordinator_users' %}">
                         <i class="bi bi-circle"></i><span>Coordinator</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}"
+                        href="{% url 'admin_users' %}">
+                        <i class="bi bi-circle"></i><span>Admin</span>
                     </a>
                 </li>
             </ul>

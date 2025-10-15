@@ -16,6 +16,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     email = factory.LazyFunction(lambda: fake.unique.email())
     password = factory.PostGenerationMethodCall('set_password', 'MaxPain11@')
+    updated_at = factory.LazyFunction(timezone.now)
     user_role = "Applicant"
 
 
@@ -28,7 +29,9 @@ class EnrollmentFormFactory(factory.django.DjangoModelFactory):
     status = "Missing"
     school_year = "2025-2026"
     grade_level = "11"
-    student_type = "TRANSFEREE"
+    strand = random.choice(["ABM", "STEM"])
+    semester = "1st"
+    student_type = "NEW STUDENT"
     gen_avg = factory.LazyFunction(lambda: random.randint(75, 100))
 
     # Application no like 2025-0918009
@@ -49,7 +52,7 @@ class EnrollmentFormFactory(factory.django.DjangoModelFactory):
     middle_name = factory.LazyAttribute(lambda _: fake.first_name())
     last_name = factory.LazyAttribute(lambda _: fake.last_name())
     extension_name = ""
-    birth_date = factory.LazyFunction(lambda: fake.date_of_birth(minimum_age=14, maximum_age=16))
+    birth_date = factory.LazyFunction(lambda: fake.date_of_birth(minimum_age=12, maximum_age=14))
     age = factory.LazyAttribute(lambda obj: timezone.now().year - obj.birth_date.year)
     gender = factory.LazyAttribute(lambda _: random.choice(["MALE", "FEMALE"]))
     place_of_birth = "VALENZUELA"

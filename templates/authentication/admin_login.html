@@ -97,7 +97,6 @@
             const loginForm = document.getElementById("loginForm");
             const loginButton = document.querySelector("button[type='submit']");
             const csrfToken = document.querySelector("input[name='csrfmiddlewaretoken']").value;
-            console.log(csrfToken);
 
             loginForm.addEventListener("submit", function (event) {
                 event.preventDefault();
@@ -125,7 +124,7 @@
                         loginButton.innerHTML = "Login";
 
                         if (data.success) {
-                            window.location.href = data.redirect_url; // Redirect on success
+                            window.location.href = data.redirect_url;
                         } else {
                             Swal.fire({
                                 icon: "error",

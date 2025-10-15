@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 <div class="pagetitle">
-    <h1>Announcement Management</h1>
+    <h1>Announcement</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Home</a></li>
@@ -12,210 +12,235 @@
 </div><!-- End Page Title -->
 
 <section class="section">
-    <div class="row">
-        <div class="col-lg-12 m-4">
+    <!-- <div class="row">
+        <div class="col-lg-12">
             <div>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                <button type="button" class="btn btn-primary mx-4 my-2" data-bs-toggle="modal"
                     data-bs-target="#addAnnouncementModal">
                     <i class="bi bi-plus"></i> Announcement
                 </button>
             </div>
         </div>
-    </div>
-    <div class="modal fade" id="addAnnouncementModal" tabindex="-1" aria-labelledby="addAnnouncementModal"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addAnnouncementModal">Add Announcement</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" id="addAnnouncementForm" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="announcement_title" class="form-label">Title</label>
-                            <input type="text" class="form-control" name="announcement_title"
-                                placeholder="Your title here" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="announcement_content" class="form-label">Content</label>
-                            <textarea class="form-control" name="announcement_content" rows="3"
-                                placeholder="Your content here" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="announcement_date" class="form-label">Date</label>
-                            <input type="date" class="form-control" name="announcement_date" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="announcement_type" class="form-label">Type</label>
-                            <input type="text" class="form-control" name="announcement_type"
-                                placeholder="Example: Important, Event, Achievement etc." required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="announcement_status" class="form-label">Status</label>
-                            <select class="form-select" name="announcement_status" required>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="announcement_image" class="form-label">Image</label>
-                            <input type="file" class="form-control" name="announcement_image" accept="image/*">
-                        </div>
-                        <div class="d-flex justify-content-center mb-3">
-                            <button type="submit" class="btn btn-outline-primary" style="width: 30%;">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    </div> -->
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover table-bordered datatable">
-                            <thead>
-                                <tr>
-                                    <th class="align-middle text-center">Title</th>
-                                    <th class="align-middle text-center">Content</th>
-                                    <th class="align-middle text-center">Type</th>
-                                    <th class="align-middle text-center">Status</th>
-                                    <th class="align-middle text-center">Date</th>
-                                    <th class="align-middle text-center">Image</th>
-                                    <th class="align-middle text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for announcement in announcements %}
-                                <tr>
-                                    <td>{{ announcement.title }}</td>
-                                    <td>
-                                        <span class="d-inline-block text-truncate" style="max-width: 450px;">
-                                            {{ announcement.content }}
-                                        </span>
-                                    </td>
-                                    <td>{{ announcement.type }}</td>
-                                    <td>
-                                        <span
-                                            class="badge {% if announcement.status == 'active' %}bg-success{% else %}bg-danger{% endif %}">
-                                            {{ announcement.status|capfirst }}
-                                        </span>
-                                    </td>
-                                    <td>{{ announcement.date }}</td>
-                                    <td>
-                                        {% if announcement.image %}
-                                        <img src="{{ announcement.image.url }}" alt="Announcement Image"
-                                            style="max-width: 100px;">
-                                        {% else %}
-                                        No Image
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm edit-btn"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editAnnouncementModal{{ announcement.id }}">
-                                            <i class="bi bi-pencil-square"></i> Edit
-                                        </button>
-                                        <div class="modal fade" id="editAnnouncementModal{{ announcement.id }}"
-                                            tabindex="-1" aria-labelledby="editAnnouncementModal" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <form method="post" enctype="multipart/form-data"
-                                                        id="editAnnouncement">
-                                                        {% csrf_token %}
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Edit Announcement</h5>
-                                                            <button type="button" class="btn-close"
-                                                                data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label for="announcement_title"
-                                                                    class="form-label">Title</label>
-                                                                <input type="text" class="form-control"
-                                                                    name="announcement_title"
-                                                                    value="{{ announcement.title }}" required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="announcement_content"
-                                                                    class="form-label">Content</label>
-                                                                <textarea class="form-control"
-                                                                    name="announcement_content" rows="3"
-                                                                    required>{{ announcement.content }}</textarea>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="announcement_date"
-                                                                    class="form-label">Date</label>
-                                                                <input type="date" class="form-control"
-                                                                    name="announcement_date"
-                                                                    value="{{ announcement.date|date:'Y-m-d' }}"
-                                                                    required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="announcement_type"
-                                                                    class="form-label">Type</label>
-                                                                <input type="text" class="form-control"
-                                                                    name="announcement_type"
-                                                                    value="{{ announcement.type }}" required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="announcement_status"
-                                                                    class="form-label">Status</label>
-                                                                <select class="form-select" name="announcement_status"
-                                                                    required>
-                                                                    <option value="active" {% if
-                                                                        announcement.status=='active' %}selected{% endif
-                                                                        %}>Active</option>
-                                                                    <option value="inactive" {% if
-                                                                        announcement.status=='inactive' %}selected{%
-                                                                        endif %}>Inactive</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="mb-3 d-flex flex-column">
-                                                                {% if announcement.image %}
-                                                                <label class="mb-2">Current Image</label>
-                                                                <img src="{{ announcement.image.url }}"
-                                                                    alt="Current Image" class="img-fluid"
-                                                                    style="max-width: 100%;">
-                                                                {% endif %}
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="announcement_image" class="form-label">New
-                                                                    Image</label>
-                                                                <input type="file" class="form-control"
-                                                                    name="announcement_image" accept="image/*">
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">Close</button>
-                                                            <button type="submit" class="btn btn-success">Save</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn btn-danger btn-sm delete-btn"
-                                            data-id="{{ announcement.id }}">
-                                            <i class="bi bi-trash"></i> Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="7" class="text-center">No announcements available</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <h5 class="card-title">Manage Announcements</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <button type="button" class="btn btn-outline-primary" id="filter-container-btn">
+                            <i class="bi bi-funnel"></i>
+                            <span>Filter</span>
+                        </button>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAnnouncementModal">
+                            <i class="bi bi-plus-lg"></i>
+                            Announcement
+                        </button>
                     </div>
+                    <div class="filter-container" id="filter-container" style="display: none;">
+                        <div class="filter-form">
+                            <div class="filter-group">
+                                <label for="filter-announcement-status">Announcement Status</label>
+                                <select class="form-select" id="filter-announcement-status" name="announcement_status">
+                                    <option value="">All</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <button class="clear-filter-button" type="button" id="clearFilters">
+                                Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                    <table class="table table-striped table-hover table-bordered my-3" id="announcementTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Title</th>
+                                <th>Content</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Image</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- {% for announcement in announcements %}
+                            <tr>
+                                <td>{{ announcement.title }}</td>
+                                <td>
+                                    <span class="d-inline-block text-truncate" style="max-width: 450px;">
+                                        {{ announcement.content }}
+                                    </span>
+                                </td>
+                                <td>{{ announcement.type }}</td>
+                                <td>
+                                    <span
+                                        class="badge {% if announcement.status == 'active' %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ announcement.status|capfirst }}
+                                    </span>
+                                </td>
+                                <td>{{ announcement.date }}</td>
+                                <td>
+                                    {% if announcement.image %}
+                                    <img src="{{ announcement.image.url }}" alt="Announcement Image"
+                                        style="max-width: 100px;">
+                                    {% else %}
+                                    No Image
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm edit-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editAnnouncementModal{{ announcement.id }}">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm delete-btn"
+                                        data-id="{{ announcement.id }}">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center">No announcements available</td>
+                            </tr>
+                            {% endfor %} -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </section>
-<script src="{% static 'js/admin/manage_announcement.js' %}"></script>
+
+<!-- Add Announcement Modal -->
+<div class="modal fade" id="addAnnouncementModal" tabindex="-1" aria-labelledby="addAnnouncementModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="addAnnouncementForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAnnouncementModal">Add Announcement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" name="title" placeholder="Your title here">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" name="content" rows="3" placeholder="Your content here"></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" name="date">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Type</label>
+                        <input type="text" class="form-control" name="type" placeholder="Example: Important, Event, Achievement etc.">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" name="status">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Image</label>
+                        <input type="file" class="form-control" name="image" accept="image/*">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="d-flex justify-content-center mb-3">
+                        <button type="submit" class="btn btn-outline-primary" style="width: 30%;" id="saveButton">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Announcement Modal -->
+<div class="modal fade" id="editAnnouncementModal" tabindex="-1" aria-labelledby="editAnnouncementModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <form id="editAnnouncementForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Announcement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" name="title" id="title">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" name="content" rows="3" style="height: 200px; resize: none;" id="content"></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="date" class="form-label">Date</label>
+                                <input type="date" class="form-control" name="date" id="date">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="type" class="form-label">Type</label>
+                                <input type="text" class="form-control" name="type" id="type">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" name="status" id="status">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3 d-flex flex-column">
+                        <label class="form-label">Current Image</label>
+                        <div class="d-flex flex-row justify-content-center align-items-center">
+                            <img id="currentImage" alt="Current Image" class="img-fluid preview-image" style="width: 300px; cursor: pointer;">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">New Image</label>
+                        <input type="file" class="form-control" name="image" accept="image/*" id="image">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" id="editAnnouncementButton">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Image viewer modal -->
+<div id="image-viewer">
+    <span class="close">&times;</span>
+    <div class="d-flex flex-column justify-content-center align-items-center h-100 w-100">
+        <img class="modal-image" id="imageViewer" src="" alt="Full Image">
+    </div>
+</div>
+  
+<script src="{% static 'js/admin/announcement-manager.js' %}"></script>
 {% endblock %}

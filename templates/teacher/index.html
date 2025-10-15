@@ -2,8 +2,23 @@
 {% load static %}
 {% block content %}
 
+{% if section is None %}
+<div class="d-flex flex-column justify-content-center align-items-center" style="height: 100%;">
+    <img src="{% static 'img/not_assigned.png' %}" alt="No Section" class="img-fluid">
+    <h5 class="card-title text-center">You are not assigned to any section</h5>
+</div>
+{% else %}
 <div class="pagetitle">
-    <h1>Student List - Grade {{ section.grade_level }} {{ section.section_name }}</h1> <!-- Use dynamic section name -->
+    <div class="d-flex align-items-center gap-2">
+        <h1 class="pt-1">Student List - Grade {{ section.grade_level }} {{ section.section_name }} S.Y. {{ school_year }}</h1>
+        {% if section.status == 'Completed' or section.academic_year|stringformat:"s" != school_year|stringformat:"s" %}
+        <span class="badge bg-success">Completed</span>
+        {% elif section.status == 'Inactive' %}
+        <span class="badge bg-danger">Inactive</span>
+        {% else %}
+        <span class="badge bg-primary">Active</span>
+        {% endif %}
+    </div>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -17,7 +32,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Class Adviser - {{ section.teacher.first_name }} {{ section.teacher.last_name }}</h5>
+                    <h5 class="card-title">Class Adviser - {{ section.teacher.first_name }} {{ section.teacher.last_name }} </h5>
                     <!-- <div class="d-flex justify-content-end">
                         <a href="{% url 'export_students_excel' %}" class="btn btn-primary view-btn">
                             <i class="bi bi-box-arrow-up-right"></i>
@@ -25,101 +40,218 @@
                         </a>
                     </div> -->
                     <div class="d-flex justify-content-between mb-3">
-                        <button type="button" class="btn btn-outline-primary" onclick="toggleFilter()">
+                        <button type="button" class="btn btn-outline-primary" id="filter-container-btn">
                             <i class="bi bi-funnel"></i>
                             <span>Filter</span>
                         </button>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-success" id="markAsCompletedSectionBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Mark Section as Completed" disabled data-section-id="{{ section.section_id }}">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Completed</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-success" id="exportAsExcelBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export as Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                                <span>Export</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="filter-container" id="filter-container" style="display: none;">
-                        <form id="application-filter-form" method="get">
-                            <div class="filter-form">
-                                <div class="filter-group">
-                                    <label for="filter-gender">Gender</label>
-                                    <select class="form-select" id="filter-gender" name="gender">
-                                        <option value="">All</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
-                                </div>
-                                <button class="apply-filter-button" type="submit">
-                                    Apply Filters
-                                </button>
-                                <button class="clear-filter-button" type="button" onclick="clearFiltersAndSubmit('teacher_list')">
-                                    Clear Filters
-                                </button>
+                        <div class="filter-form">
+                            <div class="filter-group">
+                                <label for="filter-gender">Gender</label>
+                                <select class="form-select" id="filter-gender" name="gender">
+                                    <option value="">All</option>
+                                    <option value="MALE">MALE</option>
+                                    <option value="FEMALE">FEMALE</option>
+                                </select>
                             </div>
-                        </form>
+                            <button class="clear-filter-button" type="button" id="clearFilters">
+                                Clear Filters
+                            </button>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover table-bordered datatable">
-                            <thead>
-                                <tr>
-                                    <th class="align-middle text-center">LRN</th>
-                                    <th class="align-middle text-center">Name</th>
-                                    <th class="align-middle text-center">Section</th>
-                                    <th class="align-middle text-center">General Average</th>
-                                    <th class="align-middle text-center">Gender</th>
-                                    <th class="align-middle text-center">Student Status</th>
-                                    <th class="align-middle text-center">Date</th>
-                                    <th data-sortable="false">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for student in students %}
-                                <tr data-student-id="{{ student.id }}">
-                                    <td>{{ student.lrn }}</td>
-                                    <td>{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</td>
-                                    <td>{{ student.section }}</td>
-                                    <td>{{ student.gen_avg }}</td>
-                                    <td>{{ student.gender|upper }}</td>
-                                    <td>{{ student.student_status|upper }}</td>
-                                    <td>{{ student.created_at|date:"Y-m-d" }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-success btn-sm input-grade-btn" data-bs-toggle="modal" data-bs-target="#inputGradeModal">
-                                            <i class="bi bi-pencil-square"></i>
-                                            INPUT
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="8" class="text-center">No students assigned to this section.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                    <table class="table table-striped table-hover table-bordered my-3" id="studentListTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>LRN</th>
+                                <th>Name</th>
+                                <th>Grade</th>
+                                <th>Section</th>
+                                <th>Previous Average</th>
+                                <th>Final Average</th>
+                                <th>Gender</th>
+                                <th>Class Adviser</th>
+                                <th>Student Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </section>
+{% endif %}
+
 
 <div class="modal fade" id="inputGradeModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Input Final Grade</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="inputFinalGradeForm" method="post">
-                    {% csrf_token %}
-                    <div class="row">
+            <form id="inputFinalGradeForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="d-flex align-items-center justify-content-end mb-3">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="row px-3 py-3">
                         <div class="col-md-12">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control" id="gen_avg" name="gen_avg" placeholder="Final Grade Average" required>
-                                <label for="gen_avg">Final Grade Average</label>
+                                <input type="text" class="form-control" id="final_average" name="final_average" placeholder="Final Grade">
+                                <label for="final_average">Final Grade</label>
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" id="saveFinalGradeBtn">Save</button>
+                    <div class="d-flex align-items-center justify-content-end gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success" id="saveButton">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Student Modal-->
+<div class="d-grid gap-2 d-md-block">
+    <div class="modal fade" id="viewStudentModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Student Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" id="viewStudentForm">
+                        {% csrf_token %}
+                        <div id="enrollemnt_jhs"></div>
+                        <div id="enrollemnt_shs"></div>
+                        <div class="learner_information">
+                            <h5>Learner's Information</h5>
+                            <input type="hidden" id="id" name="id">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="psa_no" class="form-label">PSA Birth Certificate No.</label>
+                                        <input type="text" class="form-control text-uppercase" id="psa_no" name="psa_no" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="lrn" class="form-label">Learner Reference No.</label>
+                                        <input type="text" class="form-control text-uppercase" id="lrn" name="lrn" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label for="first_name" class="form-label">First Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="first_name" name="first_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label for="middle_name" class="form-label">Middle Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="middle_name" name="middle_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label for="last_name" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="last_name" name="last_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label for="extension_name" class="form-label">Extension Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="extension_name" name="extension_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="birth_date" class="form-label">Birth Date</label>
+                                        <input type="date" class="form-control" id="birth_date" name="birth_date" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="age" class="form-label">Age</label>
+                                        <input type="number" class="form-control" id="age" name="age" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="gender" class="form-label">Gender</label>
+                                        <select class="form-select form-control" id="gender" name="gender" disabled>
+                                            <option value="MALE">MALE</option>
+                                            <option value="FEMALE">FEMALE</option>
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="place_of_birth" class="form-label">Place of Birth (Municipality/City)</label>
+                                        <input type="text" class="form-control text-uppercase" id="place_of_birth" name="place_of_birth" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mother_tongue" class="form-label">Mother Tongue</label>
+                                        <input type="text" class="form-control text-uppercase" id="mother_tongue" name="mother_tongue" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="documentForm">
+                            <h5>Document Submitted</h5>
+                            {% for document in documents %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="document-{{ document.id }}" 
+                                name="documents" value="{{ document.id }}" disabled>
+                                <label class="form-check-label" for="document-{{ document.id }}">{{ document.document_name }} 
+                                    {% if document.is_required %}
+                                        <span class="text-danger">(Required)</span>
+                                    {% else %}
+                                        <span>(Optional)</span>
+                                    {% endif %}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<script src="{% static 'js/teacher/student-list.js' %}"></script>
 {% endblock %}

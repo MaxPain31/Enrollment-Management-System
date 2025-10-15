@@ -1,11 +1,3 @@
-/**
-* Template Name: NiceAdmin
-* Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
-* Updated: Apr 20 2024 with Bootstrap v5.3.3
-* Author: BootstrapMade.com
-* License: https://bootstrapmade.com/license/
-*/
-
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
@@ -823,6 +815,21 @@ h6 {
   background: #f6f6fe;
 }
 
+.dashboard .students-card .card-icon {
+  color: #ffbb2c;
+  background: #fff8e5;
+}
+
+.dashboard .male-card .card-icon {
+  color: #2986cc;
+  background: #a5d6fc;
+}
+
+.dashboard .female-card .card-icon {
+  color: #c90076;
+  background: #ffaddd;
+}
+
 .dashboard .revenue-card .card-icon {
   color: #2eca6a;
   background: #e0f8e9;
@@ -833,6 +840,16 @@ h6 {
   background: #ffecdf;
 }
 
+.dashboard .approved-card .card-icon {
+  color: rgb(0, 227, 150);
+  background: rgb(195 253 234);
+}
+
+
+.dashboard .rejected-card .card-icon {
+  color: rgb(255, 69, 96);
+  background: rgb(255, 203, 211);
+}
 /* Activity */
 .dashboard .activity {
   font-size: 14px;

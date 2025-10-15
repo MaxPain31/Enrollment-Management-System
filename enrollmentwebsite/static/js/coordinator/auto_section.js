@@ -6,7 +6,7 @@ function autoSection(gradeLevel) {
         text: "This will automatically assign students to sections.",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Yes, proceed!",
+        confirmButtonText: "Yes",
         cancelButtonText: "Cancel",
     }).then((result) => {
         if (result.isConfirmed) {
@@ -47,7 +47,7 @@ document.querySelectorAll(".btn-danger").forEach((button) => {
             text: "This will permanently delete the student.",
             icon: "warning",
             showCancelButton: true,
-            confirmButtonText: "Yes, delete!",
+            confirmButtonText: "Yes",
             cancelButtonText: "Cancel",
         }).then((result) => {
             if (result.isConfirmed) {

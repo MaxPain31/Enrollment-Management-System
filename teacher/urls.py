@@ -1,15 +1,21 @@
 from django.urls import path
 from teacher.views import (
-    TeacherStudentList,
+    MarkAsCompletedSectionView,
+    StudentListAPI,
+    StudentListView,
     TeacherLogoutView,
     InputFinalGradeView,
-    ExportStudentsExcelView,  # add this import
+    ExportStudentsExcelView, 
+    InputFinalAverageView,
 )
 
 
 urlpatterns = [
-    path("student_list/", TeacherStudentList.as_view(), name="student_list"),
+    path("student_list/", StudentListView.as_view(), name="student_list"),
+    path("student_list/data/", StudentListAPI.as_view(), name="student_list_data"),
     path("logout/", TeacherLogoutView.as_view(), name="teacher_logout"),
     path("input_final_grade/<int:student_id>/", InputFinalGradeView.as_view(), name="input_final_grade"),
     path("export_students_excel/", ExportStudentsExcelView.as_view(), name="export_students_excel"),
+    path("input_final_average/", InputFinalAverageView.as_view(), name="input_final_average"),
+    path("mark_as_completed_section/", MarkAsCompletedSectionView.as_view(), name="mark_as_completed_section"),
 ]

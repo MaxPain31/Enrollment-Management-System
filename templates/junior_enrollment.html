@@ -26,8 +26,10 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="school_year" class="form-label">School Year</label>
-                                    <select class="form-select form-control" id="school_year" name="school_year">
-                                        <option value="{{ settings.academic_year_start }}-{{ settings.academic_year_end }}">{{ settings.academic_year_start }}-{{ settings.academic_year_end }}</option>
+                                    <select class="form-select form-control" id="school_year" name="school_year" >
+                                        <option value="{{ settings.academic_year_start }}-{{ settings.academic_year_end }}">
+                                            {{ settings.academic_year_start }}-{{ settings.academic_year_end }}
+                                        </option>
                                     </select>
                                     <div class="invalid-feedback"></div>
                                 </div>

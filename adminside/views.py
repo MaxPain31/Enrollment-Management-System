@@ -1,3 +1,4 @@
+from email.mime import application
 from webbrowser import get
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import logout, login, authenticate
@@ -9,7 +10,7 @@ from django.utils.decorators import method_decorator
 from landingpage.models import (
     EnrollmentForm,
     ApplicationApproved,
-    ApplicationRejected,
+    ApplicationPending,
     Announcement,
     EnrollmentManagement,
     StudentInformation,
@@ -24,21 +25,47 @@ from django.core.files.storage import default_storage
 from django.utils.dateparse import parse_date
 from django.core.mail import send_mail
 from django.forms.models import model_to_dict
-from .forms import AddStudentForm, ApplicationForm as ApplicationFormValidation
+from .forms import ApplicationForm as ApplicationFormValidation
 from .utils import emailNotification
 from django.core.cache import cache
 from threading import Thread
 import uuid
 from django.db import transaction
+from .services.all_service import (
+    AdminInformationService,
+    AnnouncementService,
+    ApplicationPendingService,
+    ApplicationApprovedService,
+    CoordinatorInformationService,
+    EnrollmentFormService,
+    RequestHelper,
+    TeacherInformationService,
+    UserInformationService,
+    StudentInformationService
+)
+from .repositories.all_repository import (
+    ApplicantInformationRepository,
+    ApplicationApprovedRepository,
+    ApplicationPendingRepository,
+    AssessmentRepository,
+    DocumentListRepository,
+    DocumentRepository,
+    EnrollmentFormRepository,
+    EnrollmentManagementRepository,
+    SchoolYearRepository,
+    StudentInformationRepository,
+    CoordinatorInformationRepository
+)
+from django.core.paginator import Paginator
 
 
 def is_admin(user):
-    return user.is_authenticated and user.user_role in ["Administrator"]
+    return (user.is_authenticated and user.user_role in ["Administrator"] and not user.deactivated)
 
 
 logger = logging.getLogger(__name__)
 
-
+# DASHBOARD
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -54,117 +81,135 @@ class AdminDashboardView(View):
 
         return render(request, "admin/index.html")
 
+# ADMIN DASHBOARD DATA API
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AdminDashboardDataAPI(View):
+    def get(self, request):
+        approved_count = ApplicationApproved.objects.count()
+        rejected_count = ApplicationPending.objects.count()
+        applcant_total = ApplicantInformation.objects.count()
+        application_junior_count = EnrollmentForm.objects.filter(enrollment_type="JHS", is_approved=None).count()
+        application_senior_count = EnrollmentForm.objects.filter( enrollment_type="SHS", is_approved=None).count()
+        users_count = MyUser.objects.count()
+        administrator_count = MyUser.objects.filter(user_role="Administrator").count()
+        coordinator_count = MyUser.objects.filter(user_role="Coordinator").count()
+        teacher_count = MyUser.objects.filter(user_role="Teacher").count()
+        student_count = MyUser.objects.filter(user_role="Student").count()
+        applicant_count = MyUser.objects.filter(user_role="Applicant").count()
+        student_junior_count = StudentInformation.objects.filter(enrollment_type="JHS").count()
+        student_senior_count = StudentInformation.objects.filter(enrollment_type="SHS").count()
+        male_count = StudentInformation.objects.filter(gender__iexact="MALE").count()
+        female_count = StudentInformation.objects.filter(gender__iexact="FEMALE").count()
 
+        print("student_junior_count:", student_junior_count)
+        print("student_senior_count:", student_senior_count)
+        application_report_data = [
+            {"value": approved_count, "name": "Approved"},
+            {"value": rejected_count, "name": "Rejected"},
+        ]
+
+        user_report_data = [
+            {"value": applcant_total, "name": "Applicant"},
+            {"value": student_count, "name": "Student"},
+            {"value": teacher_count, "name": "Teacher"},
+            {"value": coordinator_count, "name": "Coordinator"},
+            {"value": administrator_count, "name": "Administrator"},
+        ]
+
+        data = {
+            "approved": approved_count,
+            "rejected": rejected_count,
+            "junior": application_junior_count,
+            "senior": application_senior_count,
+            "total_applicant": application_junior_count + application_senior_count,
+            "users": users_count,
+            "application_report": application_report_data,
+            "user_report": user_report_data,
+            "male": male_count,
+            "female": female_count,
+            "student_junior": student_junior_count,
+            "student_senior": student_senior_count,
+            "all_student_count": student_count,
+        }
+
+        return JsonResponse(data)
+    
+
+
+# APPLICATION
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
 class AdminApplicationView(View):
     def get(self, request):
-        grade_level = request.GET.get("grade_level", None)
-        student_type = request.GET.get("student_type", None)
-        early_reg = request.GET.get("early_reg", None)
-        enrollment_type = request.GET.get("enrollment_type", None)
+        documents = DocumentRepository.get_all()
+        return render(request, "admin/application.html", {"documents": documents})
 
-        applications = EnrollmentForm.objects.filter(is_approved=None)
-        try:
-            settings = EnrollmentManagement.objects.get(id=1)
-        except EnrollmentManagement.DoesNotExist:
-            settings = None
+#APPLICATION DATA API
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class GetApplicationDataAPI(View):
+    def get(self, request):
+        response_data = EnrollmentFormService.get_application_data_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
+    
+# UPDATE APPLICATION DATA
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AdminApplicationUpdateView(View):
+    def post(self, request, *args, **kwargs):
+        result = EnrollmentFormService.update_application_data(request)
+        return JsonResponse(result)
 
-        if enrollment_type:
-            applications = applications.filter(enrollment_type=enrollment_type)
-        if grade_level:
-            applications = applications.filter(grade_level=grade_level)
-        if student_type:
-            applications = applications.filter(student_type=student_type)
-        if early_reg:
-            if early_reg == "Yes":
-                applications = applications.filter(early_reg=True)
-            elif early_reg == "No":
-                applications = applications.filter(early_reg=False)
-
-        return render(request, "admin/application.html", {"applications": applications, "settings": settings})
-
-
+# APPLICATION APPROVED VIEW
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
 class AdminApplicationApprovedView(View):
     def get(self, request):
-        grade_level = request.GET.get("grade_level", None)
-        student_type = request.GET.get("student_type", None)
-        early_reg = request.GET.get("early_reg", None)
+        documents = DocumentRepository.get_all()
+        return render(request, "admin/application_approved.html", {"documents": documents})
 
-        application_approved = ApplicationApproved.objects.all()
-
-        if grade_level:
-            application_approved = application_approved.filter(
-                enrollment__grade_level=grade_level
-            )
-        if student_type:
-            application_approved = application_approved.filter(
-                enrollment__student_type=student_type
-            )
-        if early_reg:
-            if early_reg == "Yes":
-                application_approved = application_approved.filter(
-                    enrollment__early_reg=True
-                )
-            elif early_reg == "No":
-                application_approved = application_approved.filter(
-                    enrollment__early_reg=False
-                )
-
-        # Normalize enrollment_type in each application instance
-        for app in application_approved:
-            if app.enrollment.enrollment_type:
-                app.enrollment.enrollment_type = app.enrollment.enrollment_type.strip().upper()
-            else:
-                app.enrollment.enrollment_type = ''
-
-        return render(
-            request,
-            "admin/application_approved.html",
-            {"application_approved": application_approved},
-        )
-
-
+#APPLICATION APPROVED DATA API
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
-class AdminApplicationRejectedView(View):
+class GetApplicationApprovedDataAPI(View):
     def get(self, request):
-        grade_level = request.GET.get("grade_level", None)
-        student_type = request.GET.get("student_type", None)
-        early_reg = request.GET.get("early_reg", None)
+        response_data = ApplicationApprovedService.get_application_data_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
 
-        application_rejected = ApplicationRejected.objects.all()
-        if grade_level:
-            application_rejected = application_rejected.filter(
-                enrollment__grade_level=grade_level
-            )
-        if student_type:
-            application_rejected = application_rejected.filter(
-                enrollment__student_type=student_type
-            )
-        if early_reg:
-            if early_reg == "Yes":
-                application_rejected = application_rejected.filter(
-                    enrollment__early_reg=True
-                )
-            elif early_reg == "No":
-                application_rejected = application_rejected.filter(
-                    enrollment__early_reg=False
-                )
-        return render(
-            request,
-            "admin/application_rejected.html",
-            {"application_rejected": application_rejected},
-        )
+# APPLICATION ACTION FOR APPROVING
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AdminApplicationApprovedActionView(View):
+    def post(self, request):
+        result = ApplicationApprovedService.action_application_approved(request)
+        return JsonResponse(result)
+    
+# APPLICATION ACTION FOR PENDING
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AdminApplicationPendingActionView(View):
+    def post(self, request):
+        result = ApplicationPendingService.action_application_pending(request)
+        return JsonResponse(result)
 
+# CAN BE DELETED THIS FUNCTION
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -179,7 +224,6 @@ class AdminApplicationActionView(View):
             logger.info(
                 f"Received application_id: {application_id}, action: {action}, message_rejected: {message_rejected}"
             )
-
             application = get_object_or_404(EnrollmentForm, pk=application_id)
 
             if action == "approve":
@@ -259,7 +303,7 @@ class AdminApplicationActionView(View):
                 )
 
             elif action == "reject":
-                ApplicationRejected.objects.create(
+                ApplicationPending.objects.create(
                     enrollment=application,
                     message_rejected=message_rejected,
                 )
@@ -292,6 +336,7 @@ class AdminApplicationActionView(View):
                 {"success": False, "message": "An error occurred"}, status=500
             )
 
+# APPLICATION BULK APPORVE
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -300,36 +345,36 @@ class AdminApplicationBulkApproveView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
-            application_ids = data.get("application_ids", [])
+            application_ids = data.get("application_ids")
+            logger.info(f"Application IDs: {application_ids}")
             total = len(application_ids)
-
+            
             if not application_ids:
-                return JsonResponse({"success": False, "message": "No applications selected."}, status=400)
-
+                return {"success": False, "message": "No applications selected."}
+            
             batch_key = f"bulk_approve_{uuid.uuid4()}"
             cache.set(batch_key, {"approved": 0, "total": total, "skipped": []}, timeout=3600)
-
+            
             def process_bulk():
                 approved_count = 0
                 skipped = []
-
-                for app_id in application_ids:
+                
+                for application_id in application_ids:
                     try:
-                        application = EnrollmentForm.objects.get(pk=app_id)
+                        application = EnrollmentFormRepository.get_by_id(application_id)
                         if application.status == "Missing":
-                            skipped.append(application.application_no)
+                            skipped.append(application_id)
                             continue
-
-                        # --- perform your approval logic ---
-                        app_approved, _ = ApplicationApproved.objects.update_or_create(
-                            enrollment=application, defaults={"is_assessed": False}
+                        
+                        application_approved, _ = ApplicationApprovedRepository.update_or_create(
+                            enrollment=application,
                         )
-
+                        
                         if application.grade_level != "7":
                             application.user.user_role = "Student"
-                            ApplicantInformation.objects.filter(user=application.user).delete()
-                            StudentInformation.objects.update_or_create(
-                                application_approved=app_approved,
+                            ApplicantInformationRepository.delete_by_user(application.user)
+                            student_information, _ = StudentInformationRepository.update_or_create(
+                                application_approved=application_approved,
                                 defaults={
                                     "user": application.user,
                                     "application_no": application.application_no,
@@ -346,13 +391,12 @@ class AdminApplicationBulkApproveView(View):
                                     "first_name": application.first_name,
                                     "middle_name": application.middle_name,
                                     "last_name": application.last_name,
-                                    "extension_name": application.extension_name,
+                                    "extension_name": application.extension_name, 
                                     "birth_date": application.birth_date,
                                     "age": application.age,
                                     "gender": application.gender,
                                     "place_of_birth": application.place_of_birth,
                                     "mother_tongue": application.mother_tongue,
-                                    "documents_submitted": application.documents_submitted,
                                     "early_reg": application.early_reg,
                                     "is_approved": True,
                                     "enrollment_type": application.enrollment_type,
@@ -361,25 +405,41 @@ class AdminApplicationBulkApproveView(View):
                                     "student_status": "Enrolled",
                                 },
                             )
-                        application.user.save()
-
+                            DocumentListRepository.get_filtered_by_enrollment(application).update(
+                                student_information=student_information,
+                                updated_at=timezone.now()
+                            )
+                            application.user.save()
+                        else:
+                            AssessmentRepository.create(
+                                application_approved=application_approved,
+                                literacy_level=None,
+                                literacy_result=None,
+                                numeracy_level=None,
+                                numeracy_result=None,
+                            )
+                        
+                        user = application.user
                         if application.enrollment_type == "SHS":
-                            application.user.jhs_submitted = True
-                            application.user.shs_submitted = True
+                            user.jhs_submitted = True
+                            user.shs_submitted = True
                         elif application.enrollment_type == "JHS":
-                            application.user.jhs_submitted = True
-                        application.user.save()
-
+                            user.jhs_submitted = True
+                        user.save()
+                        
+                        # Mark as approved
                         application.is_approved = True
                         application.save()
+                        
                         approved_count += 1
-
+                        
                         cache.set(batch_key, {"approved": approved_count, "total": total, "skipped": skipped}, timeout=3600)
-
+                            
+                        # Send email notification
                         emailNotification(application.first_name, application.last_name, application.application_no, application.user.email, "approved")
 
                     except EnrollmentForm.DoesNotExist:
-                        skipped.append(str(app_id))
+                        skipped.append(str(application_id))
                         continue
 
             Thread(target=process_bulk).start()
@@ -389,6 +449,55 @@ class AdminApplicationBulkApproveView(View):
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)}, status=500)
         
+# BULK APPROVE PROGRESS VIEW
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)       
+class BulkApproveProgressView(View):
+    def get(self, request, batch_key):
+        progress = cache.get(batch_key)
+        if not progress:
+            return JsonResponse({"approved": 0, "total": 0, "skipped": []})
+
+        return JsonResponse(progress)
+
+
+
+
+
+
+# APPLICATION REAPPROVE ACTION
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AdminApplicationReapproveActionView(View):
+    def post(self, request):
+        result = ApplicationPendingService.reapprove_application(request)
+        return JsonResponse(result)
+    
+# APPLICATION PENDING
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AdminApplicationPendingView(View):
+    def get(self, request):
+        documents = DocumentRepository.get_all()
+        return render(request, "admin/application_rejected.html", {"documents": documents})
+
+#APPLICATION PENDING DATA API
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class GetApplicationPendingDataAPI(View):
+    def get(self, request):
+        response_data = ApplicationPendingService.get_application_data_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
+
+# CAN BE DELETED
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -401,8 +510,8 @@ class AdminApplicationReApproveView(View):
 
 
             with transaction.atomic():
-                # Get the record from ApplicationRejected table
-                application_rejected = ApplicationRejected.objects.get(pk=application_id)
+                # Get the record from ApplicationPending table
+                application_rejected = ApplicationPending.objects.get(pk=application_id)
 
                 # Get the record from EnrollmentForm table
                 enrollment_form = EnrollmentForm.objects.get(pk=application_rejected.enrollment_id)
@@ -430,14 +539,14 @@ class AdminApplicationReApproveView(View):
                 # Send email notificatio
                 emailNotification(enrollment_form.first_name, enrollment_form.last_name, enrollment_form.application_no, enrollment_form.user.email, "approved")
 
-                # Delete from ApplicationRejected
+                # Delete from ApplicationPending
                 application_rejected.delete()
 
             return JsonResponse(
                 {"success": True, "message": "Application re-approved successfully."}, status=200
             )
 
-        except ApplicationRejected.DoesNotExist:
+        except ApplicationPending.DoesNotExist:
             return JsonResponse(
                 {"success": False, "message": "Application not found."}, status=404
             )
@@ -451,7 +560,7 @@ class AdminApplicationReApproveView(View):
                 {"success": False, "message": "An error occurred."}, status=500
             )
 
-
+# OPTIONAL
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -460,89 +569,127 @@ class AdminApplicationBulkReApproveView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
-            application_ids = data.get("application_ids", [])
+            application_ids = data.get("application_ids")
             total = len(application_ids)
-
+            
             if not application_ids:
-                return JsonResponse({"success": False, "message": "No applications selected."}, status=400)
-
-            # Unique batch key
+                return {"success": False, "message": "No applications selected."}
+            
             batch_key = f"bulk_reapprove_{uuid.uuid4()}"
             cache.set(batch_key, {"reapproved": 0, "total": total, "skipped": []}, timeout=3600)
-
+            
             def process_bulk():
                 reapproved_count = 0
                 skipped = []
-
-                for app_id in application_ids:
+                
+                for application_id in application_ids:
                     try:
-                        # Fetch rejected application
-                        application_rejected = ApplicationRejected.objects.get(pk=app_id)
-
-                        # Fetch related enrollment
-                        enrollment_form = EnrollmentForm.objects.filter(pk=application_rejected.enrollment_id).first()
-                        if not enrollment_form:
-                            skipped.append(app_id)
+                        # Get the pending application
+                        application_pending = ApplicationPendingRepository.get_by_id(application_id)
+                        if not application_pending:
+                            skipped.append(application_id)
                             continue
-
-                        # Mark as approved
-                        enrollment_form.is_approve = True
-                        enrollment_form.save()
-
-                        # Insert into ApplicationApproved (if not exists)
-                        ApplicationApproved.objects.get_or_create(
-                            enrollment=enrollment_form,
-                            defaults={"is_assessed": False}
+                        
+                        # Get the enrollment form
+                        application = EnrollmentFormRepository.get_by_id(application_pending.enrollment_id)
+                        if not application:
+                            skipped.append(application_id)
+                            continue
+                        
+                        # Create ApplicationApproved record
+                        application_approved, _ = ApplicationApprovedRepository.create(
+                            enrollment=application,
                         )
-
-                        # Remove from rejected
-                        application_rejected.delete()
-
-                        # Send notification
-                        try:
-                            emailNotification(
-                                enrollment_form.first_name,
-                                enrollment_form.last_name,
-                                enrollment_form.application_no,
-                                enrollment_form.user.email,
-                                "approved"
+                        
+                        
+                        # Promote to student
+                        if application.grade_level != "7":
+                            application.user.user_role = "Student"
+                            # Delete ApplicantInformation
+                            ApplicantInformationRepository.delete_by_user(application.user)
+                            # Update StudentInformation
+                            student_information, _ = StudentInformationRepository.update_or_create(
+                                application_approved=application_approved,
+                                defaults={
+                                    "user": application.user,
+                                    "application_no": application.application_no,
+                                    "status": application.status,
+                                    "created_at": application.created_at,
+                                    "school_year": application.school_year,
+                                    "grade": application.grade_level,
+                                    "with_lrn": application.with_lrn,
+                                    "student_type": application.student_type,
+                                    "gen_avg": application.gen_avg,
+                                    "section": None,
+                                    "psa_no": application.psa_no,
+                                    "lrn": application.lrn,
+                                    "first_name": application.first_name,
+                                    "middle_name": application.middle_name,
+                                    "last_name": application.last_name,
+                                    "extension_name": application.extension_name, 
+                                    "birth_date": application.birth_date,
+                                    "age": application.age,
+                                    "gender": application.gender,
+                                    "place_of_birth": application.place_of_birth,
+                                    "mother_tongue": application.mother_tongue,
+                                    "early_reg": application.early_reg,
+                                    "is_approved": True,
+                                    "enrollment_type": application.enrollment_type,
+                                    "semester": application.semester,
+                                    "strand": application.strand,
+                                    "student_status": "Enrolled",
+                                },
                             )
-                        except Exception as e:
-                            logger.error(f"Email failed for {enrollment_form.application_no}: {e}")
-
+                            # Update DocumentList
+                            DocumentListRepository.get_filtered_by_enrollment(application).update(
+                                student_information=student_information,
+                                updated_at=timezone.now()
+                            )
+                            application.user.save()
+                        else:
+                            AssessmentRepository.create(
+                                application_approved=application_approved,
+                                literacy_level=None,
+                                literacy_result=None,
+                                numeracy_level=None,
+                                numeracy_result=None,
+                            )
+                        
+                        
+                        user = application.user
+                        if application.enrollment_type == "SHS":
+                            user.jhs_submitted = True
+                            user.shs_submitted = True
+                        elif application.enrollment_type == "JHS":
+                            user.jhs_submitted = True
+                        user.save()
+                        
+                        # Mark as approved
+                        application.is_approved = True
+                        application.save()
+                        
+                        # Delete from ApplicationPending
+                        ApplicationPendingRepository.delete(application_id)
+                        
                         reapproved_count += 1
-
-                    except ApplicationRejected.DoesNotExist:
-                        skipped.append(app_id)
+                        
+                        cache.set(batch_key, {"reapproved": reapproved_count, "total": total, "skipped": skipped}, timeout=3600)
+                            
+                        # Send email notification
+                        emailNotification(application.first_name, application.last_name, application.application_no, application.user.email, "approved")
+                        
+                    except EnrollmentFormRepository.DoesNotExist:
+                        skipped.append(application_id)
                         continue
-                    except Exception as e:
-                        logger.error(f"Error re-approving application {app_id}: {e}")
-                        skipped.append(app_id)
-                        continue
 
-                    # ✅ Always update cache inside loop
-                    cache.set(
-                        batch_key,
-                        {"reapproved": reapproved_count, "total": total, "skipped": skipped},
-                        timeout=3600
-                    )
-
-                # ✅ Final cache update when loop ends
-                cache.set(
-                    batch_key,
-                    {"reapproved": reapproved_count, "total": total, "skipped": skipped},
-                    timeout=3600
-                )
-
-            Thread(target=process_bulk, daemon=True).start()
+            Thread(target=process_bulk).start()
 
             return JsonResponse({"success": True, "batch_key": batch_key, "total": total})
 
         except Exception as e:
-            logger.error(f"Bulk reapprove failed: {e}")
             return JsonResponse({"success": False, "message": str(e)}, status=500)
 
-
+# BULK REAPPROVE PROGRESS VIEW
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -554,19 +701,10 @@ class BulkReApproveProgressView(View):
             return JsonResponse({"reapproved": 0, "total": 0, "skipped": []})
         return JsonResponse(progress)
     
-@method_decorator(
-    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
-    name="dispatch",
-)       
-class BulkApproveProgressView(View):
-    def get(self, request, batch_key):
-        progress = cache.get(batch_key)
-        if not progress:
-            return JsonResponse({"approved": 0, "total": 0, "skipped": []})
-
-        return JsonResponse(progress)
 
 
+
+# REPORTS
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -575,6 +713,9 @@ class AdminReportsView(View):
     def get(self, request):
         return render(request, "admin/reports.html")
 
+
+
+# CAN BE DELETED
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -706,88 +847,71 @@ class UpdateApplicationView(View):
             print("Unhandled exception:", e)
             return JsonResponse({"success": False, "message": "An error occurred."}, status=500)
         
+
+
+
+
+# USER MANAGEMENT
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
 class AllUserView(View):
     def get(self, request):
-        user_role = request.GET.get("user_role", None)
-        is_active = request.GET.get("is_active", None)
-        users = MyUser.objects.all()
-        if user_role:
-            users = MyUser.objects.filter(user_role=user_role)
-        if is_active:
-            if is_active == "Yes":
-                users = users.filter(is_active=True)
-            elif is_active == "No":
-                users = users.filter(is_active=False)
-        return render(request, "admin/all_user.html", {"users": users})
+        return render(request, "admin/all_user.html")
+
+# USER MANAGEMENT DATA API
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class GetAllUserDataAPI(View):
+    def get(self, request):
+        response_data = UserInformationService.get_user_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
 
 
+
+# ADMIN USER MANAGEMENT
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
 class AdminUserView(View):
     def get(self, request):
-        is_active = request.GET.get("is_active", None)
-        users = MyUser.objects.filter(user_role="Administrator")
-        if is_active:
-            if is_active == "Yes":
-                users = users.filter(is_active=True)
-            elif is_active == "No":
-                users = users.filter(is_active=False)
-        return render(request, "admin/admin_admins.html", {"users": users})
-
+        return render(request, "admin/admin_admins.html")
+    
+# ADMIN USER DATA API
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
-class StudentUserView(View):
+class GetAdminUserDataAPI(View):
     def get(self, request):
-        student_status = request.GET.get("student_status", None)
-        is_active = request.GET.get("is_active", None)
-        users = MyUser.objects.filter(user_role="Student")
-        if student_status:
-            users = users.filter(studentinformation__student_status=student_status)
-        if is_active:
-            if is_active == "Yes":
-                users = users.filter(is_active=True)
-            elif is_active == "No":
-                users = users.filter(is_active=False)
-        return render(request, "admin/student_user.html", {"users": users})
-
+        response_data = AdminInformationService.get_admin_information_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
+    
+# ADD ADMIN USER
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
-class TeacherUserView(View):
-    def get(self, request):
-        is_active = request.GET.get("is_active", None)
-        users = MyUser.objects.filter(user_role="Teacher")
-        if is_active:
-            if is_active == "Yes":
-                users = users.filter(is_active=True)
-            elif is_active == "No":
-                users = users.filter(is_active=False)
-        return render(request, "admin/teacher_user.html", {"users": users})
-
+class AddAdminUserView(View):
+    def post(self, request):
+        response = AdminInformationService.add_admin_user(request)
+        return JsonResponse(response, safe=False)
+    
+# EDIT ADMIN USER
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
-class CoordinatorUserView(View):
-    def get(self, request):
-        is_active = request.GET.get("is_active", None)
-        users = MyUser.objects.filter(user_role="Coordinator")
-        if is_active:
-            if is_active == "Yes":
-                users = users.filter(is_active=True)
-            elif is_active == "No":
-                users = users.filter(is_active=False)
-        return render(request, "admin/coordinator_user.html", {"users": users})
+class EditAdminUserView(View):
+    def post(self, request):
+        response = AdminInformationService.edit_admin_user(request)
+        return JsonResponse(response, safe=False)
 
+# DELETE ADMIN USER
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -807,226 +931,129 @@ class AdminDeleteUserView(View):
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
+# STUDENT USER MANAGEMENT
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
-class AddAdminUserView(View):
-    def post(self, request):
-        try:
-            data = json.loads(request.body)
-            email = data.get("email")
-            password = data.get("password")
-            first_name = data.get("first_name")
-            last_name = data.get("last_name")
-            if not email or not password or not first_name or not last_name:
-                return JsonResponse(
-                    {"status": "error", "message": "All fields are required"},
-                    status=400,
-                )
-            if "@" not in email:
-                return JsonResponse(
-                    {"status": "error", "message": "Email is invalid"}, status=400
-                )
-            user = MyUser.objects.create_superuser(
-                email=email,
-                password=password,
-            )
-            
-            AdminInformation.objects.create(
-                user=user,
-                first_name=first_name,
-                last_name=last_name,
-            )
-            return JsonResponse(
-                {"status": "success", "message": "Admin user created successfully"}
-            )
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+class StudentUserView(View):
+    def get(self, request):
+        enrollment_management = EnrollmentManagementRepository.get_by_id(1)
+        documents = DocumentRepository.get_all()
+        return render(request, "admin/student_user.html", {"documents": documents, "enrollment_management": enrollment_management})
 
+# STUDENT USER DATA API
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
-class AddCoordinatorUserView(View):
-    def post(self, request):
-        try:
-            data = json.loads(request.body)
-            email = data.get("email")
-            password = data.get("password")
-            first_name = data.get("first_name")
-            middle_name = data.get("last_name")
-            last_name = data.get("last_name")
-            position = data.get("position")
-            user_role = "Coordinator"
-            if (
-                not email
-                or not password
-                or not first_name
-                or not last_name
-                or not middle_name
-                or not position
-            ):
-                return JsonResponse(
-                    {"status": "error", "message": "All fields are required"},
-                    status=400,
-                )
-            if "@" not in email:
-                return JsonResponse(
-                    {"status": "error", "message": "Email is invalid"}, status=400
-                )
-            user = MyUser.objects.create_user(
-                email=email,
-                password=password,
-                user_role=user_role,
-            )
-            
-            CoordinatorInformation.objects.create(
-                user=user,
-                first_name=first_name,
-                middle_name=middle_name,
-                last_name=last_name,
-                position=position,
-            )
-            
-            return JsonResponse(
-                {"status": "success", "message": "Coordinator user created successfully"}
-            )
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+class GetStudentUserDataAPI(View):
+    def get(self, request):
+        response_data = StudentInformationService.get_student_information_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
 
-@method_decorator(
-    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
-    name="dispatch",
-)
-class AddTeacherUserView(View):
-    def post(self, request):
-        try:
-            data = json.loads(request.body)
-            email = data.get("email")
-            password = data.get("password")
-            first_name = data.get("first_name")
-            middle_name = data.get("last_name")
-            last_name = data.get("last_name")
-            position = data.get("position")
-            grade_level_teacher = data.get("grade_level_teacher")
-            user_role = "Teacher"
-            if (
-                not email
-                or not password
-                or not first_name
-                or not last_name
-                or not middle_name
-                or not position
-                or not grade_level_teacher
-            ):
-                return JsonResponse(
-                    {"status": "error", "message": "All fields are required"},
-                    status=400,
-                )
-            if "@" not in email:
-                return JsonResponse(
-                    {"status": "error", "message": "Email is invalid"}, status=400
-                )
-            user = MyUser.objects.create_user(
-                email=email,
-                password=password,
-                user_role=user_role,
-            )
-            
-            TeacherInformation.objects.create(
-                user=user,
-                first_name=first_name,
-                middle_name=middle_name,
-                last_name=last_name,
-                position=position,
-                grade_level=grade_level_teacher,
-            )
-            
-            return JsonResponse(
-                {"status": "success", "message": "Teacher user created successfully"}
-            )
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-
+# ADD STUDENT USER
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
 class AddStudentUserView(View):
     def post(self, request):
-        try:
-            data = json.loads(request.body)
-            form = AddStudentForm(data)
+        response = StudentInformationService.add_student_user(request)
+        return JsonResponse(response, safe=False)
 
-            if not form.is_valid():
-                return JsonResponse(
-                    {"status": "error", "errors": form.errors}, status=400
-                )
-
-            cleaned = form.cleaned_data
-
-            user = MyUser.objects.create_user(
-                email=cleaned["email"],
-                password=cleaned["password"],
-                user_role="Student",
-            )
-
-            StudentInformation.objects.create(
-                user=user,
-                lrn=cleaned["lrn"],
-                psa_no=cleaned["psa_no"],
-                first_name=cleaned["first_name"],
-                middle_name=cleaned.get("middle_name"),
-                last_name=cleaned["last_name"],
-                extension_name=cleaned.get("extension_name"),
-                enrollment_type=cleaned["enrollment_type"],
-                student_type=cleaned["student_type"],
-                school_year=cleaned["school_year"],
-                grade=cleaned["grade_level"],
-                gen_avg=cleaned["gen_avg"],
-                section=None,
-                status="Complete",
-                semester=cleaned.get("semester"),
-                strand=cleaned.get("strand"),
-                birth_date=cleaned["birth_date"],
-                age=cleaned["age"],
-                gender=cleaned["gender"],
-                place_of_birth=cleaned["place_of_birth"],
-                mother_tongue=cleaned["mother_tongue"],
-                documents_submitted=cleaned["documents_submitted"],
-                student_status="Enrolled",
-            )
-
-            return JsonResponse(
-                {"status": "success", "message": "Student user created successfully"}
-            )
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-
+# EDIT STUDENT STATUS
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
-class GetDocumentDataView(View):
-    def get(self, request, application_id):
-        application = get_object_or_404(EnrollmentForm, pk=application_id)
-        
-        raw_docs = application.documents_submitted
-        try:
-            if isinstance(raw_docs, str):
-                documents_submitted = json.loads(raw_docs)
-            elif isinstance(raw_docs, list):
-                documents_submitted = raw_docs
-            else:
-                documents_submitted = []
-        except Exception as e:
-            print("Error loading JSON from documents_submitted:", e)
-            documents_submitted = []
-
-        return JsonResponse({ "documents_submitted": documents_submitted })
+class EditStudentStatusView(View):
+    def post(self, request):
+        response = StudentInformationService.edit_student_status(request)
+        return JsonResponse(response)
 
 
+# TEACHER USER MANAGEMENT
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class TeacherUserView(View):
+    def get(self, request):
+        return render(request, "admin/teacher_user.html")
+
+# TEACHER USER DATA API
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class GetTeacherUserDataAPI(View):
+    def get(self, request):
+        response_data = TeacherInformationService.get_teacher_information_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
+
+# ADD TEACHER USER
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AddTeacherUserView(View):
+    def post(self, request):
+        response = TeacherInformationService.add_teacher_user(request)
+        return JsonResponse(response, safe=False)
+    
+# EDIT TEACHER USER
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class EditTeacherUserView(View):
+    def post(self, request):
+        response = TeacherInformationService.edit_teacher_user(request)
+        return JsonResponse(response, safe=False)
+
+# COORDINATOR USER MANAGEMENT
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class CoordinatorUserView(View):
+    def get(self, request):
+        return render(request, "admin/coordinator_user.html")
+
+# COORDINATOR USER DATA API
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class GetCoordinatorUserDataAPI(View):
+    def get(self, request):
+        response_data = CoordinatorInformationService.get_coordinator_information_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
+
+
+# ADD COORDINATOR USER
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AddCoordinatorUserView(View):
+    def post(self, request):
+        response = CoordinatorInformationService.add_coordinator_user(request)
+        return JsonResponse(response, safe=False)
+
+# EDIT COORDINATOR USER
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class EditCoordinatorUserView(View):
+    def post(self, request):
+        response = CoordinatorInformationService.edit_coordinator_user(request)
+        return JsonResponse(response, safe=False)
+
+
+# LOGOUT VIEW
 class AdminLogoutView(View):
     def get(self, request):
         if request.user.is_authenticated:
@@ -1042,105 +1069,61 @@ class AdminLogoutView(View):
         return redirect("signin")
 
 
+
+# MANAGE ANNOUNCEMENT
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
 class ManageAnnouncementView(View):
     def get(self, request):
-        announcements = Announcement.objects.all().order_by("-created_at")
-        return render(
-            request, "admin/manage_announcement.html", {"announcements": announcements}
-        )
+        return render(request, "admin/manage_announcement.html")
 
+# ANNOUNCEMENT DATA API
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class GetAnnouncementDataAPI(View):
+    def get(self, request):
+        response_data = AnnouncementService.get_announcement_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
 
+# ADD ANNOUNCEMENT
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
 class AddAnnouncementView(View):
     def post(self, request):
-        try:
-            title = request.POST.get("announcement_title")
-            content = request.POST.get("announcement_content")
-            status = request.POST.get("announcement_status")
-            image = request.FILES.get("announcement_image")
-            type_ = request.POST.get("announcement_type")
-            date = request.POST.get("announcement_date")
+        print(request.POST)
+        response = AnnouncementService.add_announcement(request)
+        return JsonResponse(response, safe=False)
 
-            announcement = Announcement(
-                title=title,
-                content=content,
-                status=status,
-                date=date,
-                type=type_,
-            )
-            if image:
-                announcement.image = image
-            announcement.save()
-
-            return JsonResponse(
-                {
-                    "status": "success",
-                    "message": "Announcement added successfully!",
-                }
-            )
-        except Exception as e:
-            logger.error(f"Error adding announcement: {e}")
-            return JsonResponse(
-                {"status": "error", "message": "Failed to add announcement."},
-                status=500,
-            )
-
-
+# UPDATE ANNOUNCEMENT
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
-class UpdateAnnouncementView(View):
-    def post(self, request, announcement_id):
-        try:
-            announcement = get_object_or_404(Announcement, id=announcement_id)
-            announcement.title = request.POST.get(
-                "announcement_title", announcement.title
-            )
-            announcement.content = request.POST.get(
-                "announcement_content", announcement.content
-            )
-            announcement.date = request.POST.get("announcement_date", announcement.date)
-            announcement.type = request.POST.get("announcement_type", announcement.type)
-            announcement.status = request.POST.get(
-                "announcement_status", announcement.status
-            )
-            if "announcement_image" in request.FILES:
-                announcement.image = request.FILES["announcement_image"]
-            announcement.save()
-            return JsonResponse(
-                {"status": "success", "message": "Announcement updated successfully!"}
-            )
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+class EditAnnouncementView(View):
+    def post(self, request):
+        response = AnnouncementService.edit_announcement(request)
+        return JsonResponse(response, safe=False)
 
-
+# DELETE ANNOUNCEMENT
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
 )
 class DeleteAnnouncementView(View):
-    def post(self, request, announcement_id):
-        try:
-            announcement = get_object_or_404(Announcement, id=announcement_id)
-            if announcement.image:
-                if default_storage.exists(announcement.image.name):
-                    default_storage.delete(announcement.image.name)
-            announcement.delete()
-            return JsonResponse(
-                {"status": "success", "message": "Announcement deleted successfully!"}
-            )
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    def post(self, request):
+        response = AnnouncementService.delete_announcement(request)
+        return JsonResponse(response, safe=False)
 
 
+
+
+# MANAGE ENROLLMENT
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",
@@ -1161,89 +1144,71 @@ class ManageEnrollmentView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
-            print(data)
             settings = EnrollmentManagement.objects.get(id=1)
+
+            # Update settings fields
             if "announcement_content" in data:
                 settings.announcement_content = data["announcement_content"]
+
             if "enrollment_active" in data:
                 settings.enrollment_active = int(data["enrollment_active"])
+
             if "early_registration_active" in data:
                 settings.early_registration_active = int(data["early_registration_active"])
+
             if "enrollment_start_date" in data:
                 settings.enrollment_start_date = parse_date(data["enrollment_start_date"]) or settings.enrollment_start_date
+
             if "enrollment_deadline_date" in data:
                 settings.enrollment_deadline_date = parse_date(data["enrollment_deadline_date"]) or settings.enrollment_deadline_date
+
             if "early_registration_start_date" in data:
                 settings.early_registration_start_date = parse_date(data["early_registration_start_date"]) or settings.early_registration_start_date
+
             if "early_registration_deadline_date" in data:
                 settings.early_registration_deadline_date = parse_date(data["early_registration_deadline_date"]) or settings.early_registration_deadline_date
+
             if "academic_year_start" in data:
                 settings.academic_year_start = data["academic_year_start"]
+
             if "academic_year_end" in data:
                 settings.academic_year_end = data["academic_year_end"]
+                
+            if data.get("academic_year_start") and data.get("academic_year_end"):
+                start = data["academic_year_start"]
+                end = data["academic_year_end"]
+
+                existing_school_year = SchoolYearRepository.filter(
+                    school_year_start=start,
+                    school_year_end=end
+                ).first()
+
+                if existing_school_year is None:
+                    # Create new school year
+                    SchoolYearRepository.create(
+                        school_year_start=start,
+                        school_year_end=end,
+                        created_at=timezone.now(),
+                        updated_at=timezone.now()
+                    )
+                else:
+                    # Update existing one (BaseRepository.update(pk, **fields))
+                    SchoolYearRepository.update(
+                        existing_school_year.id,
+                        school_year_start=start,
+                        school_year_end=end,
+                        updated_at=timezone.now()
+                    )
+
 
             settings.save()
             return JsonResponse({"status": "success", "message": "Settings updated successfully!"})
+
         except ValidationError as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=400)
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
-
-@method_decorator(
-    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
-    name="dispatch",
-)
-class AdminDashboardDataAPI(View):
-    def get(self, request):
-        approved_count = ApplicationApproved.objects.count()
-        rejected_count = ApplicationRejected.objects.count()
-        applcant_total = ApplicantInformation.objects.count()
-        application_junior_count = EnrollmentForm.objects.filter(enrollment_type="JHS", is_approved=None).count()
-        application_senior_count = EnrollmentForm.objects.filter( enrollment_type="SHS", is_approved=None).count()
-        users_count = MyUser.objects.count()
-        administrator_count = MyUser.objects.filter(user_role="Administrator").count()
-        coordinator_count = MyUser.objects.filter(user_role="Coordinator").count()
-        teacher_count = MyUser.objects.filter(user_role="Teacher").count()
-        student_count = MyUser.objects.filter(user_role="Student").count()
-        applicant_count = MyUser.objects.filter(user_role="Applicant").count()
-        student_junior_count = StudentInformation.objects.filter(enrollment_type="JHS").count()
-        student_senior_count = StudentInformation.objects.filter(enrollment_type="SHS").count()
-        male_count = StudentInformation.objects.filter(gender__iexact="MALE").count()
-        female_count = StudentInformation.objects.filter(gender__iexact="FEMALE").count()
-
-        print("student_junior_count:", student_junior_count)
-        print("student_senior_count:", student_senior_count)
-        application_report_data = [
-            {"value": approved_count, "name": "Approved"},
-            {"value": rejected_count, "name": "Rejected"},
-        ]
-
-        user_report_data = [
-            {"value": applcant_total, "name": "Applicant"},
-            {"value": student_count, "name": "Student"},
-            {"value": teacher_count, "name": "Teacher"},
-            {"value": coordinator_count, "name": "Coordinator"},
-            {"value": administrator_count, "name": "Administrator"},
-        ]
-
-        data = {
-            "approved": approved_count,
-            "rejected": rejected_count,
-            "junior": application_junior_count,
-            "senior": application_senior_count,
-            "total_applicant": application_junior_count + application_senior_count,
-            "users": users_count,
-            "application_report": application_report_data,
-            "user_report": user_report_data,
-            "male": male_count,
-            "female": female_count,
-            "student_junior": student_junior_count,
-            "student_senior": student_senior_count,
-            "all_student_count": student_count,
-        }
-
-        return JsonResponse(data)
 
 
 @method_decorator(
@@ -1252,26 +1217,8 @@ class AdminDashboardDataAPI(View):
 )
 class AdminActionUserView(View):
     def post(self, request, user_id):
-        try:
-            user = MyUser.objects.get(id=user_id)
-            if user.deactivated:
-                user.deactivated = False
-                user.save()
-                return JsonResponse(
-                    {"status": "success", "message": "User activated successfully"}
-                )
-            else:
-                user.deactivated = True
-                user.save()
-                return JsonResponse(
-                    {"status": "success", "message": "User deactivated successfully"}
-                )
-        except MyUser.DoesNotExist:
-            return JsonResponse(
-                {"status": "error", "message": "User not found"}, status=404
-            )
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+        response = UserInformationService.change_user_status(request)
+        return JsonResponse(response)
 
 
 @method_decorator(
@@ -1280,219 +1227,6 @@ class AdminActionUserView(View):
 )
 class ChangePasswordView(View):
     def post(self, request):
-        try:
-            data = json.loads(request.body)
+        response = UserInformationService.change_password(request)
+        return JsonResponse(response)
 
-            user_id = data.get("user_id")
-            current_password = data.get("current_password")
-            new_password = data.get("new_password")
-            confirm_password = data.get("confirm_password")
-
-            user = MyUser.objects.get(pk=user_id)
-
-            if not user.check_password(current_password):
-                return JsonResponse(
-                    {"status": "error", "message": "Current password is incorrect"},
-                    status=400,
-                )
-
-            if new_password != confirm_password:
-                return JsonResponse(
-                    {"status": "error", "message": "Passwords do not match"}, status=400
-                )
-
-            user.set_password(new_password)
-            user.save()
-
-            return JsonResponse(
-                {"status": "success", "message": "Password changed successfully"}
-            )
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-
-
-@method_decorator(
-    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
-    name="dispatch",
-)
-class GetUserDataView(View):
-    def get(self, request, user_id, user_role):
-        user = get_object_or_404(MyUser, pk=user_id)
-
-        if user_role == "Student":
-            student_info = user.studentinformation_set.first()
-            if not student_info:
-                return JsonResponse(
-                    {"error": "Student information not found."}, status=404
-                )
-
-            try:
-                documents_submitted = []
-                if isinstance(student_info.documents_submitted, str):
-                    documents_submitted = json.loads(
-                        student_info.documents_submitted or "[]"
-                    )
-                elif isinstance(student_info.documents_submitted, list):
-                    documents_submitted = student_info.documents_submitted
-            except json.JSONDecodeError:
-                documents_submitted = []
-
-            data = {
-                "id": student_info.id,
-                "school_year": student_info.school_year,
-                "grade": student_info.grade,
-                "with_lrn": student_info.with_lrn,
-                "status": student_info.status,
-                "student_type": student_info.student_type,
-                "gen_avg": student_info.gen_avg,
-                "semester": student_info.semester,
-                "strand": student_info.strand,
-                "psa_no": student_info.psa_no,
-                "lrn": student_info.lrn,
-                "first_name": student_info.first_name,
-                "middle_name": student_info.middle_name or "",
-                "last_name": student_info.last_name,
-                "extension_name": student_info.extension_name or "",
-                "birth_date": (
-                    student_info.birth_date.strftime("%Y-%m-%d")
-                    if student_info.birth_date
-                    else ""
-                ),
-                "age": student_info.age,
-                "gender": student_info.gender,
-                "place_of_birth": student_info.place_of_birth,
-                "mother_tongue": student_info.mother_tongue,
-                "documents_submitted": documents_submitted,
-                "early_reg": student_info.early_reg,
-                "enrollment_type": student_info.enrollment_type,
-            }
-            return JsonResponse(data)
-
-        elif user_role == "Teacher":
-            teacher_info = getattr(user, "teacherinformation", None)
-            if not teacher_info:
-                return JsonResponse(
-                    {"error": "Teacher information not found."}, status=404
-                )
-
-            data = {
-                "id": user.id,
-                "first_name": teacher_info.first_name,
-                "middle_name": teacher_info.middle_name or "",
-                "last_name": teacher_info.last_name,
-                "position": teacher_info.position,
-                "grade_level": teacher_info.grade_level,
-                "email": user.email,
-            }
-            return JsonResponse(data)
-
-        elif user_role == "Coordinator":
-            coordinator_info = getattr(user, "coordinatorinformation", None)
-            if not coordinator_info:
-                return JsonResponse(
-                    {"error": "Coordinator information not found."}, status=404
-                )
-            newdata = model_to_dict(coordinator_info)
-            print("New Data:", newdata)
-            data = {
-                "id": user.id,
-                "first_name": coordinator_info.first_name,
-                "middle_name": coordinator_info.middle_name or "",
-                "last_name": coordinator_info.last_name,
-                "position": coordinator_info.position,
-                "email": user.email,
-            }
-            return JsonResponse(data)
-
-        elif user_role == "Administrator":
-            admin_info = getattr(user, "admininformation", None)
-            print("Admin Info:", admin_info.middle_name)
-            if not admin_info:
-                return JsonResponse(
-                    {"error": "Administrator information not found."}, status=404
-                )
-
-            data = {
-                "id": user.id,
-                "first_name": admin_info.first_name,
-                "middle_name": admin_info.middle_name or "",
-                "last_name": admin_info.last_name,
-                "position": admin_info.position,
-                "email": user.email,
-            }
-            return JsonResponse(data)
-
-        else:
-            return JsonResponse({"error": "Invalid user role"}, status=400)
-
-
-@method_decorator(
-    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
-    name="dispatch",
-)
-class AdminEditStudentStatusView(View):
-    def post(self, request, student_id):
-        try:
-            # Parse JSON body
-            data = json.loads(request.body)
-            new_status = data.get("student_status")
-
-            print("New Status:", new_status)
-
-            if new_status not in ["Enrolled", "Transferred", "Dropped"]:
-                return JsonResponse(
-                    {"success": False, "message": "Invalid student status."},
-                    status=400,
-                )
-
-            student = get_object_or_404(StudentInformation, id=student_id)
-            student.student_status = new_status
-            student.save()
-
-            return JsonResponse(
-                {"success": True, "message": "Student status updated successfully."}
-            )
-        except Exception as e:
-            return JsonResponse(
-                {"success": False, "message": f"Error: {str(e)}"}, status=400
-            )
-
-
-@method_decorator(
-    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
-    name="dispatch",
-)
-class AdminEditUserView(View):
-    def post(self, request, user_id, user_role):
-        try:
-            data = json.loads(request.body)
-            user = MyUser.objects.get(id=user_id)   
-            if user_role == "Teacher":
-                teacher_info = getattr(user, "teacherinformation", None)
-                if not teacher_info:
-                    return JsonResponse({"status": "error", "message": "Teacher information not found."}, status=404)
-                teacher_info.first_name = data.get("first_name", teacher_info.first_name)
-                teacher_info.middle_name = data.get("middle_name", teacher_info.middle_name)
-                teacher_info.last_name = data.get("last_name", teacher_info.last_name)
-                teacher_info.position = data.get("position", teacher_info.position)
-                teacher_info.grade_level = data.get("grade_level", teacher_info.grade_level)
-                teacher_info.save()
-            # Update CoordinatorInformation
-            elif user_role == "Coordinator":
-                coordinator_info = getattr(user, "coordinatorinformation", None)
-                if not coordinator_info:
-                    return JsonResponse({"status": "error", "message": "Coordinator information not found."}, status=404)
-                coordinator_info.first_name = data.get("first_name", coordinator_info.first_name)
-                coordinator_info.middle_name = data.get("middle_name", coordinator_info.middle_name)
-                coordinator_info.last_name = data.get("last_name", coordinator_info.last_name)
-                coordinator_info.position = data.get("position", coordinator_info.position)
-                coordinator_info.save()
-            # Optionally update user email or other fields
-            if "email" in data:
-                user.email = data["email"]
-                user.save()
-            return JsonResponse({"status": "success", "message": "User updated successfully"})
-        except MyUser.DoesNotExist:
-            return JsonResponse({"status": "error", "message": "User not found."}, status=404)
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)

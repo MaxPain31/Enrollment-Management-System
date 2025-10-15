@@ -4,6 +4,8 @@ from django.contrib.auth import logout
 import pytz
 from django.utils import timezone
 from django.contrib import messages
+from adminside.repositories.all_repository import DocumentRepository, SchoolYearRepository, SectionRepository
+from adminside.services.all_service import SectionService, StudentListHistoryService
 from landingpage.models import StudentInformation, Section, EnrollmentManagement
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.utils.decorators import method_decorator
@@ -14,48 +16,69 @@ import openpyxl
 import os
 from django.conf import settings
 from django.http import HttpResponse
+import logging
 
-def is_coordinator(user):
+
+logger = logging.getLogger(__name__)
+
+def is_teacher(user):
     return user.is_authenticated and user.user_role in ["Teacher"]
 
 
+# STUDENT LIST VIEW FOR TEACHER
 @method_decorator(
-    [
-        login_required(login_url="/authentication/sign-in/"),
-        user_passes_test(is_coordinator),
-    ],
+    [ login_required(login_url="/authentication/sign-in/"), user_passes_test(is_teacher) ],
     name="dispatch",
 )
-class TeacherStudentList(View):
+class StudentListView(View):
+    def get(self, request):
+        # get the teacher logged in
+        teacher_info = getattr(request.user, "teacherinformation", None)
+        if not teacher_info:
+            return redirect("signin")
+        documents = DocumentRepository.get_all()
+        school_year = SchoolYearRepository.get_all().order_by("updated_at").last()
+        section = SectionRepository.filter(teacher=teacher_info, academic_year=school_year).first()
+        return render(request, "teacher/index.html", { "section": section, "school_year": school_year, "teacher_info": teacher_info, "documents": documents})
+
+# STUDENT LIST API FOR TEACHER
+@method_decorator(
+    [ login_required(login_url="/authentication/sign-in/"), user_passes_test(is_teacher) ],
+    name="dispatch",
+)
+class StudentListAPI(View):
     def get(self, request):
         teacher_info = getattr(request.user, "teacherinformation", None)
-        gender = request.GET.get("gender", None)
+        if not teacher_info:
+            return redirect("signin")
+        school_year = SchoolYearRepository.get_all().order_by("updated_at").last()
+        section = SectionRepository.filter(teacher=teacher_info, academic_year=school_year).first()
+        response_data = StudentListHistoryService.get_student_list_history_for_datatables(request, teacher_info.grade_level, school_year, section.section_name)
+        return JsonResponse(response_data, safe=False)
+    
+# INPUT FINAL AVERAGE
+@method_decorator(
+    [ login_required(login_url="/authentication/sign-in/"), user_passes_test(is_teacher) ],
+    name="dispatch",
+)
+class InputFinalAverageView(View):
+    def post(self, request):
+        response = StudentListHistoryService.input_final_average(request)
+        return JsonResponse(response, safe=False)
 
-        if teacher_info:
-            section = Section.objects.filter(teacher=teacher_info).first()
-            students_qs = StudentInformation.objects.filter(
-                section=section.section_name,
-                student_status="Enrolled",
-                user__deactivated=False,
-                school_year=section.academic_year
-            ) if section else StudentInformation.objects.none()
-            if gender:
-                students_qs = students_qs.filter(gender__iexact=gender)
-            students = students_qs
-        else:
-            section = None
-            students = []
-
-        return render(
-            request, "teacher/index.html", {"students": students, "section": section}
-        )
-
+# MARK SECTION AS COMPLETED
+@method_decorator(
+    [ login_required(login_url="/authentication/sign-in/"), user_passes_test(is_teacher) ],
+    name="dispatch",
+)
+class MarkAsCompletedSectionView(View):
+    def post(self, request):
+        school_year = SchoolYearRepository.get_all().order_by("updated_at").last()
+        response = SectionService.mark_as_completed_section(request, school_year)
+        return JsonResponse(response, safe=False)
 
 @method_decorator(
-    [
-        login_required(login_url="/authentication/sign-in/"),
-        user_passes_test(is_coordinator),
-    ],
+    [ login_required(login_url="/authentication/sign-in/"), user_passes_test(is_teacher) ],
     name="dispatch",
 )
 class InputFinalGradeView(View):
@@ -106,7 +129,7 @@ class InputFinalGradeView(View):
 @method_decorator(
     [
         login_required(login_url="/authentication/sign-in/"),
-        user_passes_test(is_coordinator),
+        user_passes_test(is_teacher),
     ],
     name="dispatch",
 )

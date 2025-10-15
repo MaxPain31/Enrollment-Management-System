@@ -7,7 +7,8 @@
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'assessment_view' %}">Home</a></li>
-            <li class="breadcrumb-item active">Grade {{ grade }} Sections</li>
+            <li class="breadcrumb-item"><a href="{% url 'grade_level_academic_year' grade %}">Grade {{ grade }}</a></li>
+            <li class="breadcrumb-item active">S.Y. {{ school_year }}</li>
         </ol>
     </nav>
 </div>
@@ -17,16 +18,16 @@
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSectionModal">Add
                 Section
             </button>
-            <button class="btn btn-primary" id="updateAcademicYearBtn" data-grade="{{ grade }}">
+            <!-- <button class="btn btn-primary" id="updateAcademicYearBtn" data-grade="{{ grade }}">
                 Update Academic Year
-            </button>
+            </button> -->
         </div>
     </div>
     <div class="row">
         {% for section in sections %}
         <div class="col-lg-4">
             <div class="card text-center">
-                <a href="{% url 'student_assigned_list' grade=grade section_id=section.section_id %}"
+                <a href="{% url 'student_assigned_list' grade=grade school_year=school_year section_name=section.section_name %}"
                     class="text-decoration-none">
                     <div class="card-body p-0">
                         <h5 class="card-title">{{ section.section_name }}</h5>
@@ -35,18 +36,29 @@
                         <p>Class Adviser: <strong>{{ section.teacher.first_name }} {{ section.teacher.last_name }}</strong></p>
                         <p>Status: 
                             <span
-                                class="badge {% if section.status == 'Active' %}bg-success{% else %}bg-danger{% endif %}">
+                                class="badge {% if section.status == 'Active' %}bg-primary{% elif section.status == 'Inactive' %}bg-danger{% elif section.status == 'Completed' %}bg-success{% endif %}">
                                 {{ section.status }}
                             </span>
                         </p>
                     </div>
                 </a>
                 <div class="card-footer text-center">
-                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#editSectionModal" onclick="editSection('{{ section.section_id }}')">
+                    <button
+                        class="btn btn-outline-secondary btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editSectionModal"
+                        onclick="editSection('{{ section.section_id }}')"
+                        {% if section.status == 'Completed' or section.academic_year|stringformat:"s" != current_school_year|stringformat:"s" %}disabled{% endif %}
+                    >
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
-                    <button class="btn btn-outline-danger btn-sm delete-btn" data-id="{{ section.section_id }}">
+                
+                    
+                    <button
+                        class="btn btn-outline-danger btn-sm delete-btn"
+                        data-id="{{ section.section_id }}"
+                        {% if section.status == 'Completed' or section.academic_year|stringformat:"s" != current_school_year|stringformat:"s" %}disabled{% endif %}
+                    >
                         <i class="bi bi-trash"></i> Delete
                     </button>
                 </div>
@@ -94,7 +106,7 @@
                             {% if teachers %}
                                 <option value="" selected disabled>Select Class Adviser</option>
                                 {% for teacher in teachers %}
-                                    <option value="{{ teacher.id }}">{{ teacher.first_name }} {{ teacher.last_name }} - Grade - {{ teacher.grade_level }}</option>
+                                    <option value="{{ teacher.id }}">{{ teacher.first_name }} {{ teacher.last_name }}</option>
                                 {% endfor %}
                             {% else %}
                                 <option value="" disabled>No available teacher</option>
@@ -104,11 +116,7 @@
 
                     <div class="mb-3">
                         <label for="academic_year" class="form-label">Academic Year</label>
-                        <select class="form-select form-control" id="academic_year" name="academic_year" required>
-                            <option value="{{ settings.academic_year_start }}-{{ settings.academic_year_end }}">
-                                {{ settings.academic_year_start }}-{{ settings.academic_year_end }}
-                            </option>
-                        </select>
+                        <input type="text" class="form-control bg-light" id="academic_year" name="academic_year" value="{{ school_year }}" readonly>
                     </div>
 
                     <div class="mb-3">

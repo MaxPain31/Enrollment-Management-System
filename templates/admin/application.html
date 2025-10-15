@@ -1,4 +1,5 @@
 {% extends 'admin/base.html' %}
+{% load static %}
 {% block content %}
 {% include 'admin/partial/side_bar.html' %}
 <div class="pagetitle">
@@ -17,7 +18,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Application Overview</h5>
                     <div class="d-flex justify-content-between mb-3">
-                        <button type="button" class="btn btn-outline-primary" onclick="toggleFilter()">
+                        <button type="button" class="btn btn-outline-primary" id="filter-container-btn">
                             <i class="bi bi-funnel"></i>
                             <span>Filter</span>
                         </button>
@@ -27,147 +28,68 @@
                         </button>
                     </div>
                     <div class="filter-container" id="filter-container" style="display: none;">
-                        <form id="application-filter-form" method="get">
-                            <div class="filter-form">
-                                <div class="filter-group">
-                                    <label for="filter-enrollment-type">Student Level</label>
-                                    <select class="form-select" id="filter-enrollment-type" name="enrollment_type">
-                                        <option value="">All</option>
-                                        <option value="JHS">Junior High School</option>
-                                        <option value="SHS">Senior High School</option>
-                                    </select>
-                                </div>
-                                <div class="filter-group">
-                                    <label for="filter-grade-level">Grade Level</label>
-                                    <select class="form-select" id="filter-grade-level" name="grade_level">
-                                        <option value="">All</option>
-                                        <option value="7">GRADE 7</option>
-                                        <option value="8">GRADE 8</option>
-                                        <option value="9">GRADE 9</option>
-                                        <option value="10">GRADE 10</option>
-                                        <option value="11">GRADE 11</option>
-                                        <option value="12">GRADE 12</option>
-                                    </select>
-                                </div>
-                                <div class="filter-group">
-                                    <label for="filter-student-type">Student Type</label>
-                                    <select class="form-select" id="filter-student-type" name="student_type">
-                                        <option value="">All</option>
-                                        <option value="new student">NEW STUDENT</option>
-                                        <option value="transferee">TRANSFEREE</option>
-                                        <option value="returning">RETURNING</option>
-                                    </select>
-                                </div>
-                                <div class="filter-group">
-                                    <label for="filter-early-reg">Early Registration</label>
-                                    <select class="form-select" id="filter-early-reg" name="early_reg">
-                                        <option value="">All</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
-                                    </select>
-                                </div>
-                                <button class="apply-filter-button" type="submit">
-                                    Apply Filters
-                                </button>
-                                <button class="clear-filter-button" type="button" onclick="clearFiltersAndSubmit('application')">
-                                    Clear Filters
-                                </button>
+                        <div class="filter-form">
+                            <div class="filter-group">
+                                <label for="filter-enrollment-type">Student Level</label>
+                                <select class="form-select" id="filter-enrollment-type" name="enrollment_type">
+                                    <option value="">All</option>
+                                    <option value="JHS">Junior High School</option>
+                                    <option value="SHS">Senior High School</option>
+                                </select>
                             </div>
-                        </form>
+                            <div class="filter-group">
+                                <label for="filter-grade-level">Grade Level</label>
+                                <select class="form-select" id="filter-grade-level" name="grade_level">
+                                    <option value="">All</option>
+                                    <option value="7">GRADE 7</option>
+                                    <option value="8">GRADE 8</option>
+                                    <option value="9">GRADE 9</option>
+                                    <option value="10">GRADE 10</option>
+                                    <option value="11">GRADE 11</option>
+                                    <option value="12">GRADE 12</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-student-type">Student Type</label>
+                                <select class="form-select" id="filter-student-type" name="student_type">
+                                    <option value="">All</option>
+                                    <option value="new student">NEW STUDENT</option>
+                                    <option value="transferee">TRANSFEREE</option>
+                                    <option value="returning">RETURNING</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-early-reg">Early Registration</label>
+                                <select class="form-select" id="filter-early-reg" name="early_reg">
+                                    <option value="">All</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+                            <button class="clear-filter-button" type="button" id="clearFilters">
+                                Clear Filters
+                            </button>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover table-bordered datatable" id="applicationTable">
-                            <thead>
-                                <tr>
-                                    <th class="align-middle text-center" data-sortable="false">
-                                        <input class="form-check-input" type="checkbox" id="checkAll">
-                                    </th>
-                                    <th class="align-middle text-center">Application ID</th>
-                                    <th class="align-middle text-center">Student Name</th>
-                                    <th data-sortable="false" class="align-middle text-center">Student Type</th>
-                                    <th class="align-middle text-center">Grade Level</th>
-                                    <th class="align-middle text-center">General Average</th>
-                                    <th class="align-middle text-center">Date</th>
-                                    <th data-sortable="false" class="align-middle text-center">Document</th>
-                                    <th data-sortable="false" class="align-middle text-center">Form</th>
-                                    <th data-sortable="false" class="align-middle text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for application in applications %}
-                                <tr id="application-row-{{ application.id }}">
-                                    <td class="align-middle text-center">
-                                        <input class="form-check-input row-check"
-                                            type="checkbox"
-                                            data-id="{{ application.id }}"
-                                            data-status="{{ application.status }}"
-                                        >
-                                    </td>
-                                    <td class="align-middle text-center">{{ application.application_no }}</td>
-                                    <td class="align-middle text-center">{{ application.first_name }} {{ application.last_name }}</td>
-                                    <td class="application-student-type align-middle text-center">{{ application.student_type }}</td>
-                                    <td class="application-grade-level align-middle text-center">{{ application.grade_level }}</td>
-                                    <td class="application-gen-avg align-middle text-center">{{ application.gen_avg }}</td>
-                                    <td class="align-middle text-center">{{ application.created_at|date:"Y-m-d" }}</td>
-                                    <td class="align-middle text-center">
-                                        {% if application.status == "Complete" %}
-                                        <span
-                                            class="badge bg-success application-status ">{{application.status|upper}}</span>
-                                        {% elif application.status == "Missing" %}
-                                        <span
-                                            class="badge bg-danger application-status">{{application.status|upper}}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="align-middle text-center">
-                                        <div>
-                                            <button type="button" class="btn btn-primary btn-sm view-btn" data-bs-toggle="modal" data-bs-target="#viewApplicationModal" data-id="{{ application.id }}" onclick="fetchData('{{ application.id }}')">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td class="align-middle text-center">
-                                        <div class="d-grid gap-2 d-md-block">
-                                            <button class="btn btn-success btn-sm"
-                                                onclick="handleAction('{{ application.id }}', 'approve')">
-                                                <i class="bi bi-check2"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-warning btn-sm view-btn"
-                                                data-bs-toggle="modal" data-bs-target="#rejectApplicationModal"
-                                                onclick="handleAction('{{ application.id }}', 'reject')">
-                                                <i class="bi bi-clock-history"></i>
-                                            </button>
-                                            <div class="modal fade" id="rejectApplicationModal" tabindex="-1">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Reason for Pending</h5>
-                                                            <button type="button" class="btn-close"
-                                                                data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <textarea id="rejectReason" class="form-control" rows="4"
-                                                                placeholder="Enter reason for pending"></textarea>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">Close</button>
-                                                            <button type="button" class="btn btn-danger"
-                                                                onclick="submitRejectReason()">Save</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="9" class="text-center">No applications found.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                    <table class="table table-striped table-hover table-bordered my-3" id="applicationTable">
+                        <thead>
+                            <tr>
+                                <th data-sortable="false" class="text-center">
+                                    <input class="form-check-input" type="checkbox" id="checkAll">
+                                </th>
+                                <th>Application ID</th>
+                                <th>Student Name</th>
+                                <th>Student Type</th>
+                                <th>Grade Level</th>
+                                <th>General Average</th>
+                                <th>Date</th>
+                                <th>Document</th>
+                                <th>Form</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody> 
+                    </table>
                 </div>
             </div>
         </div>
@@ -181,12 +103,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeButton"></button>
             </div>
             <div class="modal-body">
-                <form id="enrollmentForm" method="post" action="{% url 'junior_enrollment' %}" disabled>
+                <form id="enrollmentForm" disabled>
                     {% csrf_token %}
                     <div id="enrollemnt_jhs"></div>
                     <div id="enrollemnt_shs"></div>
                     <div class="learner_information">
                         <h5>Learner's Information</h5>
+                        <input type="hidden" id="id" name="id">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -276,9 +199,22 @@
                             </div>
                         </div>
                     </div>
-                </form>
-                <form id="documentForm">
-                    {% csrf_token %}
+                    <div id="documentForm">
+                        <h5>Document Submitted</h5>
+                        {% for document in documents %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="document-{{ document.id }}" 
+                            name="documents" value="{{ document.id }}" disabled>
+                            <label class="form-check-label" for="document-{{ document.id }}">{{ document.document_name }} 
+                                {% if document.is_required %}
+                                    <span class="text-danger">(Required)</span>
+                                {% else %}
+                                    <span>(Optional)</span>
+                                {% endif %}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -289,4 +225,28 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="pendingApplicationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="pendingApplicationForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reason for Pending</h5>
+                    <button type="button" class="btn-close"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="application_id" id="application_id">
+                    <textarea id="message_pending" class="form-control" rows="4" name="message_pending"
+                        placeholder="Enter reason for pending"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger" id="pendingButton">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/admin/application.js' %}"></script>
 {% endblock %}

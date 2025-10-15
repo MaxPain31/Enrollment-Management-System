@@ -27,7 +27,6 @@ class MyUserManager(BaseUserManager):
 
 class MyUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     deactivated = models.BooleanField(default=False)
@@ -71,7 +70,6 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         now = timezone.now().astimezone(pytz.timezone("Asia/Manila"))
         if not self.id:
             self.created_at = now
-        self.updated_at = now
         super().save(*args, **kwargs)
 
 
@@ -87,11 +85,16 @@ class TeacherInformation(models.Model):
         db_table = "teacher_information"
 
     def save(self, *args, **kwargs):
-        self.first_name = capitalize_words(self.first_name)
-        self.middle_name = capitalize_words(self.middle_name)
-        self.last_name = capitalize_words(self.last_name)
-        self.position = capitalize_words(self.position)
-        self.grade_level = capitalize_words(self.grade_level)
+        if self.first_name:
+            self.first_name = self.first_name.upper()
+        if self.middle_name:
+            self.middle_name = self.middle_name.upper()
+        if self.last_name:
+            self.last_name = self.last_name.upper()
+        if self.position:
+            self.position = self.position.upper()
+        if self.grade_level:
+            self.grade_level = self.grade_level.upper()
         super().save(*args, **kwargs)
 
 
@@ -107,9 +110,12 @@ class ApplicantInformation(models.Model):
         db_table = "applicant_information"
 
     def save(self, *args, **kwargs):
-        self.first_name = capitalize_words(self.first_name)
-        self.middle_name = capitalize_words(self.middle_name)
-        self.last_name = capitalize_words(self.last_name)
+        if self.first_name:
+            self.first_name = self.first_name.upper()
+        if self.middle_name:
+            self.middle_name = self.middle_name.upper()
+        if self.last_name:
+            self.last_name = self.last_name.upper()
         super().save(*args, **kwargs)
 
 
@@ -122,12 +128,16 @@ class AdminInformation(models.Model):
 
     class Meta:
         db_table = "admin_information"
-
+        
     def save(self, *args, **kwargs):
-        self.first_name = capitalize_words(self.first_name)
-        self.middle_name = capitalize_words(self.middle_name)
-        self.last_name = capitalize_words(self.last_name)
-        self.position = capitalize_words(self.position)
+        if self.first_name:
+            self.first_name = self.first_name.upper()
+        if self.middle_name:
+            self.middle_name = self.middle_name.upper()
+        if self.last_name:
+            self.last_name = self.last_name.upper()
+        if self.position:
+            self.position = self.position.upper()
         super().save(*args, **kwargs)
 
 
@@ -142,8 +152,12 @@ class CoordinatorInformation(models.Model):
         db_table = "coordinator_information"
 
     def save(self, *args, **kwargs):
-        self.first_name = capitalize_words(self.first_name)
-        self.middle_name = capitalize_words(self.middle_name)
-        self.last_name = capitalize_words(self.last_name)
-        self.position = capitalize_words(self.position)
+        if self.first_name:
+            self.first_name = self.first_name.upper()
+        if self.middle_name:
+            self.middle_name = self.middle_name.upper()
+        if self.last_name:
+            self.last_name = self.last_name.upper()
+        if self.position:
+            self.position = self.position.upper()
         super().save(*args, **kwargs)
