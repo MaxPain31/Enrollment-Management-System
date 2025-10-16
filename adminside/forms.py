@@ -465,3 +465,37 @@ class EditAnnouncementForm(forms.Form):
     date = forms.DateField(error_messages={"required": "Date is required."})
     image = forms.ImageField(required=False)
     
+
+class OrganizationChartForm(forms.Form):
+    name = forms.CharField(error_messages={"required": "Name is required."})
+    position = forms.CharField(error_messages={"required": "Position is required."})
+    department = forms.CharField(error_messages={"required": "Department is required."})
+    designation = forms.CharField(error_messages={"required": "Designation is required."})
+    image = forms.ImageField(required=False)
+    
+    def clean_image(self):
+        image = self.cleaned_data.get("image")
+        if image and image.size > 2 * 1024 * 1024:
+            raise ValidationError("Image must be less than 2MB.")
+        return image
+    
+class EditOrganizationChartForm(forms.Form):
+    name = forms.CharField(error_messages={"required": "Name is required."})
+    position = forms.CharField(error_messages={"required": "Position is required."})
+    department = forms.CharField(error_messages={"required": "Department is required."})
+    designation = forms.CharField(error_messages={"required": "Designation is required."})
+    image = forms.ImageField(required=False)
+    
+    def clean_image(self):
+        image = self.cleaned_data.get("image")
+        if image and image.size > 2 * 1024 * 1024:
+            raise ValidationError("Image must be less than 2MB.")
+        return image
+    
+class FAQForm(forms.Form):
+    question = forms.CharField(error_messages={"required": "Question is required."})
+    answer = forms.CharField(error_messages={"required": "Answer is required."})
+    
+class EditFAQForm(forms.Form):
+    question = forms.CharField(error_messages={"required": "Question is required."})
+    answer = forms.CharField(error_messages={"required": "Answer is required."})

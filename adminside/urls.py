@@ -49,6 +49,16 @@ from adminside.views import (
     AdminApplicationPendingActionView,
     GetApplicationPendingDataAPI,
     GetAllUserDataAPI,
+    ManageOrganizationalChartView,
+    GetOrganizationChartDataAPI,
+    AddOrganizationChartView,
+    EditOrganizationChartView,
+    DeleteOrganizationChartView,
+    ManageFAQView,
+    GetFAQDataAPI,
+    AddFAQView,
+    EditFAQView,
+    DeleteFAQView,
 )
 
 urlpatterns = [
@@ -97,6 +107,20 @@ urlpatterns = [
     path("add-announcement/", AddAnnouncementView.as_view(), name="add_announcement"),
     path("edit-announcement/", EditAnnouncementView.as_view(), name="edit_announcement"),
     path("delete-announcement/", DeleteAnnouncementView.as_view(), name="delete_announcement"),
+    
+    # ORGANIZATION CHART VIEW
+    path("manage-organizational-chart/", ManageOrganizationalChartView.as_view(), name="manage_organizational_chart"),
+    path("organization-chart-data/", GetOrganizationChartDataAPI.as_view(), name="organization_chart_data"),
+    path("add-organization-chart/", AddOrganizationChartView.as_view(), name="add_organization_chart"),
+    path("edit-organization-chart/", EditOrganizationChartView.as_view(), name="edit_organization_chart"),
+    path("delete-organization-chart/", DeleteOrganizationChartView.as_view(), name="delete_organization_chart"),
+    
+    # FAQ VIEW
+    path("manage-faq/", ManageFAQView.as_view(), name="manage_faq"),
+    path("faq-data/", GetFAQDataAPI.as_view(), name="faq_data"),
+    path("add-faq/", AddFAQView.as_view(), name="add_faq"),
+    path("edit-faq/", EditFAQView.as_view(), name="edit_faq"),
+    path("delete-faq/", DeleteFAQView.as_view(), name="delete_faq"),
     
     # --USER MANAGEMENT--
     path("users/", AllUserView.as_view(), name="admin_all_users"),

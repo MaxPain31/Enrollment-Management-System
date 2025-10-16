@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from authentication.models import MyUser, TeacherInformation
+from authentication.utils import capitalize_words
 
 class EnrollmentForm(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
@@ -330,4 +331,36 @@ class StudentListHistory(models.Model):
         db_table = "student_list_history"
         
     
+class FAQ(models.Model):
+    question = models.TextField(null=True, blank=True)
+    answer = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(null=True, blank=True)
     
+    class Meta:
+        db_table = "faq"
+        
+    def __str__(self):
+        return self.question
+    
+class OrganizationChart(models.Model):
+    name = models.CharField(max_length=191)
+    position = models.CharField(max_length=191, null=True, blank=True)
+    department = models.CharField(max_length=191, null=True, blank=True)
+    designation = models.CharField(max_length=191, null=True, blank=True)
+    image = models.ImageField(upload_to="organization_chart/", blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        db_table = "organization_chart"
+        
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        self.name = capitalize_words(self.name) if self.name else None
+        self.position = capitalize_words(self.position) if self.position else None
+        self.department = capitalize_words(self.department) if self.department else None
+        self.designation = capitalize_words(self.designation) if self.designation else None
+        super(OrganizationChart, self).save(*args, **kwargs)

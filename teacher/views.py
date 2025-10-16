@@ -83,54 +83,6 @@ class MarkAsCompletedSectionView(View):
     [ login_required(login_url="/authentication/sign-in/"), user_passes_test(is_teacher) ],
     name="dispatch",
 )
-class InputFinalGradeView(View):
-    def post(self, request, student_id):
-        try:
-            data = json.loads(request.body)
-            gen_avg = data.get("gen_avg")
-            print(gen_avg)
-            if int(gen_avg) < 75 or int(gen_avg) > 100:
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "message": "General Average must be between 75 and 100.",
-                    },
-                    status=400,
-                )
-            if not gen_avg:
-                return JsonResponse({'success': False, 'message': 'Missing final grade.'}, status=400)
-            student = StudentInformation.objects.get(id=student_id)
-            settings = EnrollmentManagement.objects.get(id=1)
-            new_academic_year = f"{settings.academic_year_start}-{settings.academic_year_end}"
-            if student.school_year == new_academic_year:
-                return JsonResponse({'success': False, 'message': 'Academic year is still ongoing.'}, status=400)
-            student.gen_avg = gen_avg
-            student.school_year = new_academic_year
-            student.section = None
-            current_grade = int(student.grade)
-            # JHS: 7-10, SHS: 11-12
-            if 7 <= current_grade < 10:
-                student.grade = str(current_grade + 1)
-            elif current_grade == 10:
-                student.jhs_completed = True
-                student.save()
-            elif current_grade == 11:
-                student.grade = '12'
-            elif current_grade == 12:
-                student.shs_completed = True
-            student.save()
-            return JsonResponse({'success': True, 'message': 'Final grade, academic year, and grade level updated successfully.'})
-        except StudentInformation.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Student not found.'}, status=404)
-        except EnrollmentManagement.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Enrollment settings not found.'}, status=404)
-        except Exception as e:
-            return JsonResponse({'success': False, 'message': str(e)}, status=500)
-
-@method_decorator(
-    [ login_required(login_url="/authentication/sign-in/"), user_passes_test(is_teacher) ],
-    name="dispatch",
-)
 class ExportExcelFile(View):
     def get(self, request):
         teacher_info = getattr(request.user, "teacherinformation", None)
@@ -149,14 +101,14 @@ class ExportExcelFile(View):
         if not section:
             return HttpResponse("No section found for this teacher.", status=404)
 
-        # === Get student list ===
+        # === Get student list ordered by last name
         student_list_history = StudentListHistoryRepository.filter(
             grade_level=teacher_info.grade_level,
             section=section,
             school_year=school_year,
             student_information__student_status="Enrolled",
             student_information__user__deactivated=False,
-        ).select_related("student_information", "section", "teacher_information")
+        ).select_related("student_information", "section", "teacher_information").order_by("student_information__last_name")
 
         # === Load Excel template ===
         template_path = os.path.join(

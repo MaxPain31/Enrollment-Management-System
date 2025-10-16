@@ -1,6 +1,6 @@
 from xml.dom.minidom import Identified
 from authentication.models import AdminInformation, ApplicantInformation, CoordinatorInformation, MyUser, TeacherInformation
-from landingpage.models import Announcement, ApplicationApproved, ApplicationPending, Assessment, Document, DocumentList, EnrollmentForm, EnrollmentManagement, SchoolYear, Section, StudentInformation, StudentListHistory
+from landingpage.models import FAQ, Announcement, ApplicationApproved, ApplicationPending, Assessment, Document, DocumentList, EnrollmentForm, EnrollmentManagement, OrganizationChart, SchoolYear, Section, StudentInformation, StudentListHistory
 from .base_repository import BaseRepository
 
 # ENROLLMENT FORM
@@ -253,4 +253,26 @@ class StudentListHistoryRepository(BaseRepository):
         return super().get_by_id(id)
     
 
+# FAQ
+class FAQRepository(BaseRepository):
+    model = FAQ
     
+    @classmethod
+    def get_all(cls):
+        return super().get_all()
+    
+    @classmethod
+    def get_by_id(cls, id: int):
+        return super().get_by_id(id)
+
+# ORGANIZATION CHART
+class OrganizationChartRepository(BaseRepository):
+    model = OrganizationChart
+    
+    @classmethod
+    def get_all(cls):
+        return super().get_all()
+    
+    @classmethod
+    def get_by_id(cls, id: int):
+        return super().get_by_id(id)

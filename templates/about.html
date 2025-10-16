@@ -1,65 +1,72 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
 <div class="about-banner banner">
     <h1>About TuloyEskwelaPDBNHS</h1>
-    <p>Learn more about TuloyEskwelaPDBNHS.</p>
+    <p>Learn more about our school's history, mission, and vision.</p>
 </div>
+
 <section class="about">
     <div class="about-container container">
         <div class="about-content">
-            <h2 class="text-center mb-4">History</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div>
-                        <img src="{% static 'img/3.jpg' %}" class="d-block w-100">
+            <div class="section-header">
+                <h2 class="section-title">Our History</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="about-card">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-6">
+                        <div class="about-image">
+                            <img src="{% static 'img/3.jpg' %}" alt="School History" class="img-fluid rounded">
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <p>
-                        History of the Establishment of School/Initial Undertakings The Local School Board of Valenzuela
-                        City recognizes the need of Public Senior High School for grade 11 and 12 students of Paso de
-                        Blas and to accommodate as well the increasing number of enrollees. The Sangguniang Barangay ng
-                        Paso de Blas after a thorough study and upon evaluation and assessment from the Division of City
-                        Schools, Valenzuela, it was found out that Barangay Paso de Blas needs the establishment of
-                        Maysan National High School-Paso de Blas Senior High School Annex that will serve not only the
-                        residents of Barangay Paso de Blas but also students from the neighboring barangays. On January
-                        2, 2015 the said Barangay Council has created a Resolution No. Series 2015. A Resolution
-                        confirming the establishment of Maysan National High School Paso de Blas Senior High School
-                        Annex. The establishment of the said school is done through the initiative of the Sanguniang
-                        Barangay of Paso de Blas headed by Barangay Captain, Fernando DS Esteban, coupled with the
-                        cooperation/support given by the officers of the Parents Teachers Association, as well as the
-                        residents of the said barangay. It has been their long dream to have senior high school within
-                        the community for their children not to be travelling from a distant place just to finish high
-                        school.
-                    </p>
+                    <div class="col-lg-6">
+                        <div class="about-text">
+                            <h3 class="about-subtitle">Establishment of School</h3>
+                            <p class="about-description">
+                                The Local School Board of Valenzuela City recognizes the need of Public Senior High School for grade 11 and 12 students of Paso de Blas and to accommodate as well the increasing number of enrollees. The Sangguniang Barangay ng Paso de Blas after a thorough study and upon evaluation and assessment from the Division of City Schools, Valenzuela, it was found out that Barangay Paso de Blas needs the establishment of Maysan National High School-Paso de Blas Senior High School Annex that will serve not only the residents of Barangay Paso de Blas but also students from the neighboring barangays.
+                            </p>
+                            <p class="about-description">
+                                On January 2, 2015 the said Barangay Council has created a Resolution No. Series 2015. A Resolution confirming the establishment of Maysan National High School Paso de Blas Senior High School Annex. The establishment of the said school is done through the initiative of the Sanguniang Barangay of Paso de Blas headed by Barangay Captain, Fernando DS Esteban, coupled with the cooperation/support given by the officers of the Parents Teachers Association, as well as the residents of the said barangay.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
 <section class="mission-vision">
     <div class="mission-vision-container container">
         <div class="mission-vision-content">
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <h2 class="text-center">MISSION</h2>
-                    <p>
-                        To protect and promote the right of every Filipino to quality, equitable,
-                        culture-based, and complete basic education where: Students learn in a child-friendly,
-                        gender-sensitive, safe, and motivating environment. Teachers facilitate learning and constantly
-                        nurture every learner. Administrators and staff, as stewards of the institution, ensure an
-                        enabling and supportive environment for effective learning to happen. Family, community, and
-                        other stakeholders are actively engaged and share responsibility for developing life-long
-                        learners.</p>
+            <div class="section-header">
+                <h2 class="section-title">Mission & Vision</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="mission-vision-card mission-card">
+                        <div class="card-icon">
+                            <i class="bi bi-bullseye"></i>
+                        </div>
+                        <h3 class="card-title">Our Mission</h3>
+                        <p class="card-description">
+                            To protect and promote the right of every Filipino to quality, equitable, culture-based, and complete basic education where: Students learn in a child-friendly, gender-sensitive, safe, and motivating environment. Teachers facilitate learning and constantly nurture every learner. Administrators and staff, as stewards of the institution, ensure an enabling and supportive environment for effective learning to happen. Family, community, and other stakeholders are actively engaged and share responsibility for developing life-long learners.
+                        </p>
+                    </div>
                 </div>
-                <div class="col-md-6 mb-4">
-                    <h2 class="text-center">VISION</h2>
-                    <p>
-                        We dream of Filipinos who passionately love their country and whose values and competencies
-                        enable them to realize their full potential and contribute meaningfully to building the nation.
-                        As a learner-centered public institution, the Department of Education continuously improves
-                        itself to better serve its stakeholders.</p>
+                <div class="col-lg-6">
+                    <div class="mission-vision-card vision-card">
+                        <div class="card-icon">
+                            <i class="bi bi-eye"></i>
+                        </div>
+                        <h3 class="card-title">Our Vision</h3>
+                        <p class="card-description">
+                            We dream of Filipinos who passionately love their country and whose values and competencies enable them to realize their full potential and contribute meaningfully to building the nation. As a learner-centered public institution, the Department of Education continuously improves itself to better serve its stakeholders.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

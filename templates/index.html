@@ -4,15 +4,15 @@
 <section class="home">
     <div class="home-container container">
         <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide-to="0"
+                    class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide-to="1"
+                    aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide-to="2"
+                    aria-label="Slide 3"></button>
+            </div>
             <div class="carousel-inner">
-                <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0"
-                        class="active" aria-current="true" aria-label="Slide 1"></button>
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
-                        aria-label="Slide 2"></button>
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
-                        aria-label="Slide 3"></button>
-                </div>
                 <div class="carousel-item active c-item">
                     <img src="{% static 'img/3.jpg' %}" class="d-block w-100 c-img" alt="Image 1">
                 </div>
@@ -34,7 +34,7 @@
                 <span class="visually-hidden">Next</span>
             </button>
         </div>
-        <div class="home-content">
+        <div class="home-content text-center">
             <h1>Welcome to TuloyEskwelaPDBNHS</h1>
             <p>Ang paaralang ito ay nagbibigay ng de-kalidad na edukasyon
                 para sa Junior High School at Senior High School. Ang aming mga programa ay dinisenyo upang palakasin
@@ -46,32 +46,448 @@
         </div>
     </div>
 </section>
-<section class="summary-announcement">
-    <div class="summary-announcement-container container">
-        <div class="summary-announcement-content">
-            <h2>Announcements</h2>
-            <div class="row">
-                {% for announcement in latest_announcements %}
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="card-title">
-                                <h4>{{ announcement.title }}</h4>
-                                <span>{{ announcement.date|date:"F d, Y" }}</span>
+<div class="announcement-banner banner-2">
+    <h1>Announcements</h1>
+    <p>Stay updated with the latest news and events at TuloyEskwelaPDBNHS.</p>
+</div>
+<section class="announcement pt-0">
+    <div class="announcement-container container">
+        <div class="announcement-content">
+            {% for announcement in latest_announcements %}
+            <div class="announcement-card card shadow-sm mb-4">
+                <div class="row g-0">
+                    <div class="col-md-3 announcement-date-column">
+                        <div class="announcement-date-wrapper">
+                            <div class="announcement-date">
+                                <div class="date-number">{{ announcement.date|date:"d" }}</div>
+                                <div class="date-month">{{ announcement.date|date:"M" }}</div>
+                                <div class="date-year">{{ announcement.date|date:"Y" }}</div>
                             </div>
-                            <p class="card-text">{{ announcement.content|truncatewords:20 }}</p>
-                            <a class="card-text" href="{% url 'announcement_detail' announcement.id %}">Read more ></a>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="announcement-body">
+                            <div class="announcement-header">
+                                <h5 class="announcement-title">{{ announcement.title }}</h5>
+                                <div class="announcement-meta">
+                                    <i class="bi bi-calendar4"></i>
+                                    <span>{{ announcement.date|date:"F d, Y" }}</span>
+                                </div>
+                            </div>
+                            <div class="announcement-excerpt">
+                                {{ announcement.content|truncatewords:30 }}
+                            </div>
+                            <div class="announcement-footer">
+                                <a href="{% url 'announcement_detail' announcement.id %}" class="btn btn-primary btn-read-more">
+                                    Read more <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-announcements">
+                <i class="bi bi-megaphone" style="font-size: 3rem; color: #94a3b8;"></i>
+                <p>No announcements available at the moment.</p>
+            </div>
+            {% endfor %}
+            <div class="text-center">
+                <a href="{% url 'announcements' %}" class="btn btn-outline-primary btn-lg mt-3">
+                    View All Announcements <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="organizational-chart-banner banner-2">
+    <h1>Organizational Chart</h1>
+    <p>Meet the dedicated team behind TuloyEskwelaPDBNHS</p>
+</div>
+<section class="organizational-chart">
+    <div class="org-chart-container container">
+        <!-- Principal -->
+        <div class="org-level principal-level">
+            <div class="org-card principal-card">
+                <div class="org-card-image">
+                    <div class="placeholder-image">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                </div>
+                <div class="org-card-content">
+                    <h4 class="org-name">Principal Name</h4>
+                    <p class="org-position">School Principal</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Administrative Staff -->
+        <div class="org-level admin-level">
+            <h3 class="org-section-title">Administrative Staff</h3>
+            <div class="org-cards-grid">
+                <div class="org-card">
+                    <div class="org-card-image">
+                        <div class="placeholder-image">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                    </div>
+                    <div class="org-card-content">
+                        <h5 class="org-name">Staff Name</h5>
+                        <p class="org-position">Head Administrator</p>
+                    </div>
+                </div>
+                <div class="org-card">
+                    <div class="org-card-image">
+                        <div class="placeholder-image">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                    </div>
+                    <div class="org-card-content">
+                        <h5 class="org-name">Staff Name</h5>
+                        <p class="org-position">Head Administrator</p>
+                    </div>
+                </div>
+                <div class="org-card">
+                    <div class="org-card-image">
+                        <div class="placeholder-image">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                    </div>
+                    <div class="org-card-content">
+                        <h5 class="org-name">Staff Name</h5>
+                        <p class="org-position">Registrar</p>
+                    </div>
+                </div>
+                <div class="org-card">
+                    <div class="org-card-image">
+                        <div class="placeholder-image">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                    </div>
+                    <div class="org-card-content">
+                        <h5 class="org-name">Staff Name</h5>
+                        <p class="org-position">Guidance Counselor</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Academic Staff Container -->
+        <div class="academic-staff-container">
+            <!-- Junior High School Faculty -->
+            <div class="org-level faculty-level">
+                <h3 class="org-section-title">Junior High School Faculty</h3>
+                
+                <!-- Mathematics Department -->
+                <div class="department-section">
+                    <h4 class="department-title"><i class="bi bi-calculator"></i> Mathematics Department</h4>
+                    <div class="org-cards-grid small-grid">
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">Math Teacher</p>
+                            </div>
+                        </div>
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">Math Teacher</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Science Department -->
+                <div class="department-section">
+                    <h4 class="department-title"><i class="bi bi-flask"></i> Science Department</h4>
+                    <div class="org-cards-grid small-grid">
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">Science Teacher</p>
+                            </div>
+                        </div>
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">Science Teacher</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- English Department -->
+                <div class="department-section">
+                    <h4 class="department-title"><i class="bi bi-book"></i> English Department</h4>
+                    <div class="org-cards-grid small-grid">
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">English Teacher</p>
+                            </div>
+                        </div>
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">English Teacher</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filipino Department -->
+                <div class="department-section">
+                    <h4 class="department-title"><i class="bi bi-translate"></i> Filipino Department</h4>
+                    <div class="org-cards-grid small-grid">
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">Filipino Teacher</p>
+                            </div>
+                        </div>
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">Filipino Teacher</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Studies Department -->
+                <div class="department-section">
+                    <h4 class="department-title"><i class="bi bi-globe"></i> Social Studies Department</h4>
+                    <div class="org-cards-grid small-grid">
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">Araling Panlipunan Teacher</p>
+                            </div>
+                        </div>
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">History Teacher</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAPEH Department -->
+                <div class="department-section">
+                    <h4 class="department-title"><i class="bi bi-music-note"></i> MAPEH Department</h4>
+                    <div class="org-cards-grid small-grid">
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">P.E. Teacher</p>
+                            </div>
+                        </div>
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">Teacher Name</h6>
+                                <p class="org-position">Arts Teacher</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Senior High School Staff -->
+            <div class="org-level faculty-level">
+                <h3 class="org-section-title">Senior High School Faculty</h3>
+                <div class="org-cards-grid medium-grid">
+                    <div class="org-card small-card">
+                        <div class="org-card-image">
+                            <div class="placeholder-image">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                        </div>
+                        <div class="org-card-content">
+                            <h6 class="org-name">Teacher Name</h6>
+                            <p class="org-position">STEM Coordinator</p>
+                        </div>
+                    </div>
+                    <div class="org-card small-card">
+                        <div class="org-card-image">
+                            <div class="placeholder-image">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                        </div>
+                        <div class="org-card-content">
+                            <h6 class="org-name">Teacher Name</h6>
+                            <p class="org-position">HUMSS Coordinator</p>
+                        </div>
+                    </div>
+                    <div class="org-card small-card">
+                        <div class="org-card-image">
+                            <div class="placeholder-image">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                        </div>
+                        <div class="org-card-content">
+                            <h6 class="org-name">Teacher Name</h6>
+                            <p class="org-position">ABM Coordinator</p>
+                        </div>
+                    </div>
+                    <div class="org-card small-card">
+                        <div class="org-card-image">
+                            <div class="placeholder-image">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                        </div>
+                        <div class="org-card-content">
+                            <h6 class="org-name">Teacher Name</h6>
+                            <p class="org-position">TVL Coordinator</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Staff -->
+        <div class="org-level support-level">
+            <h3 class="org-section-title">Support Staff</h3>
+            <div class="org-cards-grid">
+                <div class="org-card">
+                    <div class="org-card-image">
+                        <div class="placeholder-image">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                    </div>
+                    <div class="org-card-content">
+                        <h5 class="org-name">Staff Name</h5>
+                        <p class="org-position">Canteen Manager</p>
+                    </div>
+                </div>
+                <div class="org-card">
+                    <div class="org-card-image">
+                        <div class="placeholder-image">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                    </div>
+                    <div class="org-card-content">
+                        <h5 class="org-name">Staff Name</h5>
+                        <p class="org-position">Maintenance Officer</p>
+                    </div>
+                </div>
+                <div class="org-card">
+                    <div class="org-card-image">
+                        <div class="placeholder-image">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                    </div>
+                    <div class="org-card-content">
+                        <h5 class="org-name">Staff Name</h5>
+                        <p class="org-position">Security Officer</p>
+                    </div>
+                </div>
+                <div class="org-card">
+                    <div class="org-card-image">
+                        <div class="placeholder-image">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                    </div>
+                    <div class="org-card-content">
+                        <h5 class="org-name">Staff Name</h5>
+                        <p class="org-position">Security Officer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="faq-banner banner-2">
+    <h1>Frequently Asked Questions</h1>
+    <p>Find answers to common questions about TuloyEskwelaPDBNHS.</p>
+</div>
+<section class="faq">
+    <div class="faq-container container">
+        <div class="faq-content">
+            <div class="accordion" id="faqAccordion">
+                {% for faq in faqs %}
+                <div class="accordion-item faq-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ faq.id }}" aria-expanded="true" aria-controls="faq{{ faq.id }}">
+                            <i class="bi bi-question-circle-fill me-2"></i>
+                            {{ faq.question }}
+                        </button>
+                    </h2>
+                    <div id="faq{{ faq.id }}" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            {{ faq.answer }}
                         </div>
                     </div>
                 </div>
                 {% empty %}
-                <p>No announcements available.</p>
+                <p class="text-center text-muted">No FAQs available at the moment.</p>
                 {% endfor %}
             </div>
-            <button type="button" class="btn btn-light">
-                <a href="{% url 'announcements' %}" style="text-decoration: none; color: inherit;">View all announcements</a>
-            </button>
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/org-chart-scroll.js' %}"></script>
 {% endblock %}

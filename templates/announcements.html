@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="announcement-banner banner">
@@ -9,43 +10,50 @@
     <div class="announcement-container container">
         <div class="announcement-content">
             {% for announcement in announcements %}
-            <div class="card mb-3" style="width: 100%;">
+            <div class="announcement-card card shadow-sm mb-4">
                 <div class="row g-0">
-                    <div class="col-md-4">
-                        <div class="card-body">
-                            <h1 class="text-primary">{{ announcement.date|date:"d" }}</h1>
-                            <h4>{{ announcement.date|date:"F" }}</h4>
-                            <p>{{ announcement.date|date:"Y" }}</p>
+                    <div class="col-md-3 announcement-date-column">
+                        <div class="announcement-date-wrapper">
+                            <div class="announcement-date">
+                                <div class="date-number">{{ announcement.date|date:"d" }}</div>
+                                <div class="date-month">{{ announcement.date|date:"M" }}</div>
+                                <div class="date-year">{{ announcement.date|date:"Y" }}</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <div>
-                                <h5 class="card-title">{{ announcement.title }}</h5>
-                                <p class="card-text">
-                                    <small class="text-body-secondary">
-                                        <i class="bi bi-calendar4"></i>
-                                        {{ announcement.date|date:"F d, Y" }}
-                                    </small>
-                                </p>
-                                <span>{{ announcement.content }}</span>
+                    <div class="col-md-9">
+                        <div class="announcement-body">
+                            <div class="announcement-header">
+                                <h5 class="announcement-title">{{ announcement.title }}</h5>
+                                <div class="announcement-meta">
+                                    <i class="bi bi-calendar4"></i>
+                                    <span>{{ announcement.date|date:"F d, Y" }}</span>
+                                </div>
                             </div>
-                            <div>
-                                <a href="{% url 'announcement_detail' announcement.id %}" class="btn btn-primary">Read more</a>
+                            <div class="announcement-excerpt">
+                                {{ announcement.content|truncatewords:30 }}
+                            </div>
+                            <div class="announcement-footer">
+                                <a href="{% url 'announcement_detail' announcement.id %}" class="btn btn-primary btn-read-more">
+                                    Read more <i class="bi bi-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             {% empty %}
-            <p>No announcements available.</p>
+            <div class="no-announcements">
+                <i class="bi bi-megaphone" style="font-size: 3rem; color: #94a3b8;"></i>
+                <p>No announcements available at the moment.</p>
+            </div>
             {% endfor %}
+            
             <nav aria-label="Page navigation">
-                <ul class="pagination">
+                <ul class="pagination justify-content-center">
                     {% if announcements.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ announcements.previous_page_number }}"
-                            aria-label="Previous">
+                        <a class="page-link" href="?page={{ announcements.previous_page_number }}" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>

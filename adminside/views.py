@@ -41,7 +41,9 @@ from .services.all_service import (
     RequestHelper,
     TeacherInformationService,
     UserInformationService,
-    StudentInformationService
+    StudentInformationService,
+    OrganizationChartService,
+    FAQService,
 )
 from .repositories.all_repository import (
     ApplicantInformationRepository,
@@ -54,7 +56,6 @@ from .repositories.all_repository import (
     EnrollmentManagementRepository,
     SchoolYearRepository,
     StudentInformationRepository,
-    CoordinatorInformationRepository
 )
 from django.core.paginator import Paginator
 
@@ -1211,6 +1212,107 @@ class ManageEnrollmentView(View):
 
 
 
+# MANAGE ORGANIZATION CHART
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class ManageOrganizationalChartView(View):
+    def get(self, request):
+        return render(request, "admin/manage_organizational_chart.html")
+
+# ORGANIZATION CHART DATA API
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class GetOrganizationChartDataAPI(View):
+    def get(self, request):
+        response_data = OrganizationChartService.get_organization_chart_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
+
+# ADD ORGANIZATION CHART
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AddOrganizationChartView(View):
+    def post(self, request):
+        response = OrganizationChartService.add_organization_chart(request)
+        return JsonResponse(response, safe=False)
+    
+# EDIT ORGANIZATION CHART
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class EditOrganizationChartView(View):
+    def post(self, request):
+        response = OrganizationChartService.edit_organization_chart(request)
+        return JsonResponse(response, safe=False)
+    
+# DELETE ORGANIZATION CHART
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class DeleteOrganizationChartView(View):
+    def post(self, request):
+        response = OrganizationChartService.delete_organization_chart(request)
+        return JsonResponse(response, safe=False)
+    
+    
+# MANAGE FAQ
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class ManageFAQView(View):
+    def get(self, request):
+        return render(request, "admin/manage_faq.html")
+
+# FAQ DATA API
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class GetFAQDataAPI(View):
+    def get(self, request):
+        response_data = FAQService.get_faq_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
+
+# ADD FAQ
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AddFAQView(View):
+    def post(self, request):
+        response = FAQService.add_faq(request)
+        return JsonResponse(response, safe=False)
+
+# EDIT FAQ
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class EditFAQView(View):
+    def post(self, request):
+        response = FAQService.edit_faq(request)
+        return JsonResponse(response, safe=False)
+    
+# DELETE FAQ
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class DeleteFAQView(View):
+    def post(self, request):
+        response = FAQService.delete_faq(request)
+        return JsonResponse(response, safe=False)
+    
+
+# ADMIN ACTION USER
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
     name="dispatch",

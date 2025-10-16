@@ -46,11 +46,11 @@
         </li><!-- End Reports Nav -->
 
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'manage_announcement' or request.resolver_match.url_name == 'manage_enrollment' %}active{% else %}collapsed{% endif %}"
+            <a class="nav-link {% if request.resolver_match.url_name == 'manage_announcement' or request.resolver_match.url_name == 'manage_enrollment' or request.resolver_match.url_name == 'manage_faq' or request.resolver_match.url_name == 'manage_organizational_chart' %}active{% else %}collapsed{% endif %}"
                 data-bs-target="#manage-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-file-post"></i><span>Manage Pages</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-            <ul id="manage-nav" class="nav-content collapse {% if request.resolver_match.url_name == 'manage_announcement' or request.resolver_match.url_name == 'manage_enrollment' %}show{% endif %}" data-bs-parent="#sidebar-nav">
+            <ul id="manage-nav" class="nav-content collapse {% if request.resolver_match.url_name == 'manage_announcement' or request.resolver_match.url_name == 'manage_enrollment' or request.resolver_match.url_name == 'manage_faq' or request.resolver_match.url_name == 'manage_organizational_chart' %}show{% endif %}" data-bs-parent="#sidebar-nav">
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'manage_announcement' %}active{% endif %}"
                         href="{% url 'manage_announcement' %}">
@@ -61,6 +61,18 @@
                     <a class="{% if request.resolver_match.url_name == 'manage_enrollment' %}active{% endif %}"
                         href="{% url 'manage_enrollment' %}">
                         <i class="bi bi-circle"></i><span>Enrollment</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{% if request.resolver_match.url_name == 'manage_faq' %}active{% endif %}"
+                        href="{% url 'manage_faq' %}">
+                        <i class="bi bi-circle"></i><span>FAQ</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{% if request.resolver_match.url_name == 'manage_organizational_chart' %}active{% endif %}"
+                        href="{% url 'manage_organizational_chart' %}">
+                        <i class="bi bi-circle"></i><span>Organization Chart</span>
                     </a>
                 </li>
             </ul>

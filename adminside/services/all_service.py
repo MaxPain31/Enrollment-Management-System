@@ -5,8 +5,8 @@ import json
 from django.contrib.auth.base_user import password_validation
 from django.db.models import Q, F, Case, When, Value, CharField
 from django.forms import model_to_dict
-from adminside.forms import AdminForm, AnnouncementForm, CoordinatorForm, EditAdminForm, EditAnnouncementForm, EditCoordinatorForm, EditTeacherForm, StudentForm, ApplicationForm as ApplicationFormValidation, TeacherForm
-from adminside.repositories.all_repository import AdminInformationRepository, AnnouncementRepository, ApplicantInformationRepository, ApplicationApprovedRepository, ApplicationPendingRepository, AssessmentRepository, CoordinatorInformationRepository, DocumentListRepository, EnrollmentFormRepository, DocumentRepository, SectionRepository, StudentInformationRepository, StudentListHistoryRepository, TeacherInformationRepository, UserInformationRepository
+from adminside.forms import AdminForm, AnnouncementForm, CoordinatorForm, EditAdminForm, EditAnnouncementForm, EditCoordinatorForm, EditFAQForm, EditOrganizationChartForm, EditTeacherForm, FAQForm, OrganizationChartForm, StudentForm, ApplicationForm as ApplicationFormValidation, TeacherForm
+from adminside.repositories.all_repository import AdminInformationRepository, AnnouncementRepository, ApplicantInformationRepository, ApplicationApprovedRepository, ApplicationPendingRepository, AssessmentRepository, CoordinatorInformationRepository, DocumentListRepository, EnrollmentFormRepository, DocumentRepository, FAQRepository, OrganizationChartRepository, SectionRepository, StudentInformationRepository, StudentListHistoryRepository, TeacherInformationRepository, UserInformationRepository
 import logging
 from django.utils import timezone
 from django.core.cache import cache
@@ -2287,6 +2287,262 @@ class SectionService:
 
             return {"success": True, "message": "Section marked as completed successfully."}
 
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            return {"success": False, "message": f"An unexpected error occurred: {str(e)}"}
+
+class OrganizationChartService:
+    @staticmethod
+    def get_organization_chart_for_datatables(request):
+        # pagination
+        draw = int(request.GET.get("draw", 1))
+        start = int(request.GET.get("start", 0))
+        length = int(request.GET.get("length", 10))
+        
+        # searching
+        search_value = request.GET.get("search[value]", "")
+        
+        # sorting
+        order_column = request.GET.get("order[0][column]", 0)
+        order_direction = request.GET.get("order[0][dir]", "asc")
+        
+        # filtering
+        department = request.GET.get("department")
+        designation = request.GET.get("designation")
+        position = request.GET.get("position")
+        
+        # Map DataTables column index -> model field
+        column_map = {
+            1: "name",
+            2: "position",
+            3: "department",
+            4: "designation",
+            5: "image",
+            6: "created_at",
+            7: "updated_at",
+        }
+        
+        # base queryset
+        organization_chart = OrganizationChartRepository.get_all().order_by("-created_at")
+        
+        # filtering
+        if department:
+            organization_chart = organization_chart.filter(department=department)
+        if designation:
+            organization_chart = organization_chart.filter(designation=designation)
+        if position:
+            organization_chart = organization_chart.filter(position=position)
+
+        
+        # search filter
+        if search_value:
+            organization_chart = organization_chart.filter(
+                Q(name__icontains=search_value) |
+                Q(position__icontains=search_value) |
+                Q(department__icontains=search_value) |
+                Q(designation__icontains=search_value) |
+                Q(image__icontains=search_value)
+            )
+        
+        # accurate total counts
+        records_total = OrganizationChartRepository.get_all().count()
+        records_filtered = organization_chart.count()
+        
+        #Apply ordering
+        if order_column and str(order_column).isdigit():
+            col_index = int(order_column)
+            order_field = column_map.get(col_index)
+            if order_field:
+                if order_direction == "desc":
+                    order_field = f"-{order_field}"
+                organization_chart = organization_chart.order_by(order_field)
+        
+        # pagination
+        organization_chart = organization_chart[start : start + length]
+        
+        # data serialization
+        data = []
+        for oc in organization_chart:
+            image = oc.image.url if oc.image else None
+            data.append({
+                "id": oc.id,
+                "name": oc.name,
+                "position": oc.position,
+                "department": oc.department,
+                "designation": oc.designation,
+                "image": image,
+                "created_at": oc.created_at,
+                "updated_at": oc.updated_at,
+            })
+        
+        return {
+            "draw": draw,
+            "recordsTotal": records_total,
+            "recordsFiltered": records_filtered,
+            "data": data,
+        }
+        
+    @staticmethod
+    def add_organization_chart(request):
+        try:
+            form = OrganizationChartForm(request.POST, request.FILES)
+            if not form.is_valid():
+                return {"success": False, "message": form.errors}
+            cleaned = form.cleaned_data
+            organization_chart = OrganizationChartRepository.create(name=cleaned["name"], position=cleaned["position"], department=cleaned["department"], designation=cleaned["designation"], image=cleaned["image"])
+            return {"success": True, "message": "Organization chart added successfully."}
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            return {"success": False, "message": f"An unexpected error occurred: {str(e)}"}
+    
+    @staticmethod
+    def edit_organization_chart(request):
+        try:
+            form = EditOrganizationChartForm(request.POST, request.FILES)
+            if not form.is_valid():
+                return {"success": False, "message": form.errors}
+            cleaned = form.cleaned_data
+            organization_chart = OrganizationChartRepository.update(request.POST.get("id"), name=cleaned["name"], position=cleaned["position"], department=cleaned["department"], designation=cleaned["designation"], image=cleaned["image"])
+            return {"success": True, "message": "Organization chart updated successfully."}
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            return {"success": False, "message": f"An unexpected error occurred: {str(e)}"}
+    
+    @staticmethod
+    def delete_organization_chart(request):
+        try:
+            organization_chart_id = request.POST.get("id")
+            organization_chart = OrganizationChartRepository.get_by_id(organization_chart_id)
+            if not organization_chart:
+                return {"success": False, "message": "Organization chart not found."}
+            organization_chart.delete()
+            return {"success": True, "message": "Organization chart deleted successfully."}
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            return {"success": False, "message": f"An unexpected error occurred: {str(e)}"}
+    
+class FAQService:
+    @staticmethod
+    def get_faq_for_datatables(request):
+        # pagination
+        draw = int(request.GET.get("draw", 1))
+        start = int(request.GET.get("start", 0))
+        length = int(request.GET.get("length", 10))
+        
+        # searching
+        search_value = request.GET.get("search[value]", "")
+        
+        # sorting
+        order_column = request.GET.get("order[0][column]", 0)
+        order_direction = request.GET.get("order[0][dir]", "asc")
+        
+        # filtering
+        question = request.GET.get("question")
+        answer = request.GET.get("answer")
+        
+        # Map DataTables column index -> model field
+        column_map = {
+            1: "question",
+            2: "answer",
+            3: "created_at",
+            4: "updated_at",
+        }
+        
+        # base queryset
+        faq = FAQRepository.get_all().order_by("-created_at")
+        
+        # filtering
+        if question:
+            faq = faq.filter(question__icontains=question)
+        if answer:
+            faq = faq.filter(answer__icontains=answer)
+        
+        # search filter
+        if search_value:
+            faq = faq.filter(
+                Q(question__icontains=search_value) |
+                Q(answer__icontains=search_value)
+            )
+        
+        # accurate total counts
+        records_total = FAQRepository.get_all().count()
+        records_filtered = faq.count()
+        
+        #Apply ordering
+        if order_column and str(order_column).isdigit():
+            col_index = int(order_column)
+            order_field = column_map.get(col_index)
+            if order_field:
+                if order_direction == "desc":
+                    order_field = f"-{order_field}"
+                faq = faq.order_by(order_field)
+        
+        # pagination
+        faq = faq[start : start + length]
+        
+        # data serialization
+        data = []
+        for f in faq:
+            data.append({
+                "id": f.id,
+                "question": f.question,
+                "answer": f.answer,
+                "created_at": f.created_at,
+                "updated_at": f.updated_at,
+            })
+        
+        return {
+            "draw": draw,
+            "recordsTotal": records_total,
+            "recordsFiltered": records_filtered,
+            "data": data,
+        }
+    
+    @staticmethod
+    def add_faq(request):
+        try:
+            form = FAQForm(request.POST)
+            if not form.is_valid():
+                return {"success": False, "message": form.errors}
+            cleaned = form.cleaned_data
+            faq = FAQRepository.create(question=cleaned["question"], answer=cleaned["answer"])
+            return {"success": True, "message": "FAQ added successfully."}
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            return {"success": False, "message": f"An unexpected error occurred: {str(e)}"}
+    
+    @staticmethod
+    def edit_faq(request):
+        try:
+            data = request.POST
+            faq_id = data.get("faq_id")
+            if not faq_id:
+                return {"success": False, "message": "FAQ ID is required."}
+            form = EditFAQForm(data)
+            if not form.is_valid():
+                return {"success": False, "message": form.errors}
+            cleaned = form.cleaned_data
+            faq = FAQRepository.update(faq_id, question=cleaned["question"], answer=cleaned["answer"], updated_at=timezone.now())
+            return {"success": True, "message": "FAQ updated successfully."}
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            return {"success": False, "message": f"An unexpected error occurred: {str(e)}"}
+    
+    @staticmethod
+    def delete_faq(request):
+        try:
+            faq_id = request.POST.get("faq_id")
+            faq = FAQRepository.get_by_id(faq_id)
+            if not faq:
+                return {"success": False, "message": "FAQ not found."}
+            faq.delete()
+            return {"success": True, "message": "FAQ deleted successfully."}
         except Exception as e:
             import traceback
             print(traceback.format_exc())

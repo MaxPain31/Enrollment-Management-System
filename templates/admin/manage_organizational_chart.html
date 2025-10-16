@@ -1,0 +1,177 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block content %}
+<div class="pagetitle">
+    <h1>Organization Chart</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item active">Organization Chart</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Organization Chart</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <button type="button" class="btn btn-outline-primary" id="filter-container-btn">
+                            <i class="bi bi-funnel"></i>
+                            <span>Filter</span>
+                        </button>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationChartModal">
+                            <i class="bi bi-plus-lg"></i>
+                            Organization Chart
+                        </button>
+                    </div>
+                    <!-- <div class="filter-container" id="filter-container" style="display: none;">
+                        <div class="filter-form">
+                            <div class="filter-group">
+                                <label for="filter-announcement-status">Organization Chart Status</label>
+                                <select class="form-select" id="filter-announcement-status" name="announcement_status">
+                                    <option value="">All</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <button class="clear-filter-button" type="button" id="clearFilters">
+                                Clear Filters
+                            </button>
+                        </div>
+                    </div> -->
+                    <table class="table table-striped table-hover table-bordered my-3" id="organizationChartTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Title</th>
+                                <th>Position</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Image</th>
+                                <th>Created At</th>
+                                <th>Updated At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add Announcement Modal -->
+<div class="modal fade" id="addOrganizationChartModal" tabindex="-1" aria-labelledby="addOrganizationChartModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="addOrganizationChartForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addOrganizationChartModal">Add Organization Chart</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" placeholder="Your name here">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="position" class="form-label">Position</label>
+                        <textarea class="form-control" name="position" rows="3" placeholder="Your position here"></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="department" class="form-label">Department</label>
+                        <textarea class="form-control" name="department" rows="3" placeholder="Your department here"></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="designation" class="form-label">Designation</label>
+                        <textarea class="form-control" name="designation" rows="3" placeholder="Your designation here"></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Image</label>
+                        <input type="file" class="form-control" name="image" accept="image/*">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="d-flex justify-content-center mb-3">
+                        <button type="submit" class="btn btn-outline-primary" style="width: 30%;" id="saveButton">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Announcement Modal -->
+<div class="modal fade" id="editOrganizationChartModal" tabindex="-1" aria-labelledby="editOrganizationChartModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <form id="editOrganizationChartForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Organization Chart</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" id="name">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="position" class="form-label">Position</label>
+                        <input type="text" class="form-control" name="position" id="position">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="department" class="form-label">Department</label>
+                                <input type="text" class="form-control" name="department" id="department">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="designation" class="form-label">Designation</label>
+                                <input type="text" class="form-control" name="designation" id="designation">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3 d-flex flex-column">
+                        <label class="form-label">Current Image</label>
+                        <div class="d-flex flex-row justify-content-center align-items-center">
+                            <img id="currentImage" alt="Current Image" class="img-fluid preview-image" style="width: 300px; cursor: pointer;">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">New Image</label>
+                        <input type="file" class="form-control" name="image" accept="image/*" id="image">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" id="editOrganizationChartButton">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Image viewer modal for image in organization chart -->
+<div id="image-viewer">
+    <span class="close">&times;</span>
+    <div class="d-flex flex-column justify-content-center align-items-center h-100 w-100">
+        <img class="modal-image" id="imageViewer" src="" alt="Full Image">
+    </div>
+</div>
+  
+<script src="{% static 'js/admin/organizational-chart-manager.js' %}"></script>
+{% endblock %}

@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
+
+from adminside.repositories.all_repository import AnnouncementRepository, FAQRepository
 from .models import EnrollmentForm, Announcement, EnrollmentManagement, StudentInformation
 from authentication.models import ApplicantInformation
 from django.utils import timezone
@@ -12,8 +14,9 @@ from .utils import emailNotification
 
 class HomeView(View):
     def get(self, request):
-        latest_announcements = Announcement.objects.filter(status="active").order_by("-date")[:2]
-        return render(request, "index.html", {"latest_announcements": latest_announcements})
+        faqs = FAQRepository.get_all().order_by("-created_at")
+        latest_announcements = AnnouncementRepository.get_all().filter(status="active").order_by("-date")[:2]
+        return render(request, "index.html", {"latest_announcements": latest_announcements, "faqs": faqs})
 
 
 class AboutView(View):

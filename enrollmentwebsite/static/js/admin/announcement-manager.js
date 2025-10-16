@@ -79,8 +79,9 @@ $(document).ready(function() {
                 searchable: false,
                 className: "align-middle text-center",
                 render: function (data, type, row) {
+                    const encodedInfo = btoa(JSON.stringify(row));
                     return `
-                        <button type="button" class="btn btn-info btn-sm edit-announcement-btn" data-bs-toggle="modal" data-bs-target="#editAnnouncementModal" data-bs-toggle-second="tooltip" data-bs-placement="top" data-bs-title="Edit" data-info='${JSON.stringify(row)}'>
+                        <button type="button" class="btn btn-info btn-sm edit-announcement-btn" data-bs-toggle="modal" data-bs-target="#editAnnouncementModal" data-bs-toggle-second="tooltip" data-bs-placement="top" data-bs-title="Edit" data-info='${encodedInfo}'>
                             <i class="bi bi-pencil-square"></i>
                         </button>
                         <button type="button" class="btn btn-danger btn-sm delete-btn" data-id="${row.id}" data-bs-toggle-second="tooltip" data-bs-placement="top" data-bs-title="Delete">
@@ -195,8 +196,8 @@ $(document).ready(function() {
     // Edit Announcement
     $(document).on('click', '.edit-announcement-btn', function () {
         const info = $(this).data('info');
-        const announcementId = info.id;
-
+        const decodedInfo = JSON.parse(atob(info));
+        const announcementId = decodedInfo.id;
         const setValue = (id, value) => {
             const el = document.getElementById(id);
             if (el) el.value = value ?? '';
@@ -204,13 +205,12 @@ $(document).ready(function() {
                 document.getElementById("currentImage").src = value;
             }
         };
-
-        setValue("title", info.title);
-        setValue("content", info.content);
-        setValue("type", info.type);
-        setValue("status", info.status);
-        setValue("date", info.date);
-        setValue("currentImage", info.image);
+        setValue("title", decodedInfo.title);
+        setValue("content", decodedInfo.content);
+        setValue("type", decodedInfo.type);
+        setValue("status", decodedInfo.status);
+        setValue("date", decodedInfo.date);
+        setValue("currentImage", decodedInfo.image);
         $("#editAnnouncementForm").off("submit").on("submit", function (e) {
             e.preventDefault();
 
