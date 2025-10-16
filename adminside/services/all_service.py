@@ -735,6 +735,7 @@ class RequestHelper:
         return data
 
 
+
 class DocumentListService:
     @staticmethod
     def get_documents_for_enrollment(enrollment_id: int):
@@ -2129,7 +2130,30 @@ class StudentListHistoryService:
             "haveAllFinalAverageTotal": have_all_final_average_total,
             "section_status": section_status,
         }
-    
+
+    # grade from teacher.grade_level, latest schoo_year, section 
+    @staticmethod
+    def get_student_list_history(grade, school_year, section_name=None):
+        # get section by name
+        section = SectionRepository.filter(
+            section_name=section_name,
+            academic_year=school_year,
+            grade_level=grade
+        ).first()
+
+        # get student list history
+        student_list_history = StudentListHistoryRepository.filter(
+            grade_level=grade,
+            section=section,
+            school_year=school_year,
+            student_information__student_status="Enrolled",
+            student_information__user__deactivated=False,
+        ).select_related(
+            "student_information", "section", "teacher_information"
+        )
+        
+        pass
+        
     @staticmethod
     def move_student(request):
         try:

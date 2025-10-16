@@ -49,10 +49,10 @@
                                 <i class="bi bi-check-circle"></i>
                                 <span>Completed</span>
                             </button>
-                            <button type="button" class="btn btn-outline-success" id="exportAsExcelBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export as Excel">
+                            <a class="btn btn-outline-success" id="exportAsExcelBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export as Excel" href="{% url 'export_excel' %}">
                                 <i class="bi bi-file-earmark-excel"></i>
                                 <span>Export</span>
-                            </button>
+                            </a>
                         </div>
                     </div>
                     <div class="filter-container" id="filter-container" style="display: none;">

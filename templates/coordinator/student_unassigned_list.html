@@ -14,6 +14,12 @@
 
 <section class="section">
     <div class="row">
+        {% if school_year is empty %}
+        <div class="d-flex flex-column justify-content-center align-items-center" style="height: 100%;">
+            <img src="{% static 'img/not_assigned.png' %}" alt="No Section" class="img-fluid">
+            <h5 class="card-title text-center">School Year is not assigned.</h5>
+        </div>
+        {% else %}
         <div class="col-lg-12">
             <div class="card card-3">
                 <div class="card-body">
@@ -74,6 +80,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
     </div>
 </section>
 

@@ -175,7 +175,9 @@ $(document).ready(function() {
         );
     
         const saveBtn = $(`.save-assessment-btn[data-id="${currentId}"]`);
-        saveBtn.prop('disabled', !allFilled);
+        const markAllasDoneBtn = $('#markAllAsDoneBtn')
+        saveBtn.prop('disabled', false);
+        markAllasDoneBtn.prop('disabled', !false);
     }
     
     // Run check when input or select changes

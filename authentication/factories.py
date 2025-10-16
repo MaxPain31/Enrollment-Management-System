@@ -28,9 +28,9 @@ class EnrollmentFormFactory(factory.django.DjangoModelFactory):
     created_at = factory.LazyFunction(timezone.now)
     status = "Missing"
     school_year = "2025-2026"
-    grade_level = "11"
-    strand = random.choice(["ABM", "STEM"])
-    semester = "1st"
+    grade_level = "7"
+    # strand = random.choice(["ABM", "STEM"])
+    # semester = "1st"
     student_type = "NEW STUDENT"
     gen_avg = factory.LazyFunction(lambda: random.randint(75, 100))
 
@@ -46,7 +46,7 @@ class EnrollmentFormFactory(factory.django.DjangoModelFactory):
 
     # LRN 12 digits
     lrn = factory.LazyFunction(lambda: f"{random.randint(10**11, 10**12-1)}")
-    enrollment_type = "SHS"
+    enrollment_type = "JHS"
 
     first_name = factory.LazyAttribute(lambda _: fake.first_name())
     middle_name = factory.LazyAttribute(lambda _: fake.first_name())

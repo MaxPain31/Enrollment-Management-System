@@ -93,12 +93,10 @@ class StudentUnassignedListView(View):
         if grade not in [7, 8, 9, 10, 11, 12]:
             raise Http404("Grade not found")
         school_year = SchoolYearRepository.get_all().order_by("updated_at").last()
-        if school_year is None:
-            raise Http404("School year not found")
         print(f"Grade: {grade}")
         documents = DocumentRepository.get_all()
         sections = Section.objects.filter(grade_level=grade, academic_year=school_year)
-        return render( request, "coordinator/student_unassigned_list.html",{"grade": grade, "documents": documents, "sections": sections})
+        return render( request, "coordinator/student_unassigned_list.html",{"grade": grade, "documents": documents, "sections": sections, "school_year": school_year})
 
 # GET STUDENT UNASSIGNED LIST API
 @method_decorator(
@@ -112,9 +110,6 @@ class GetStudentUnassignedListViewAPI(View):
         # get the latest school year
         school_year = SchoolYearRepository.get_all().order_by("updated_at").last()
         logger.info(f"School years: {school_year}")
-        if school_year is None:
-            raise Http404("School year not found")
-        
         response_data = StudentInformationService.get_student_unassigned_list_for_datatables(request, grade, school_year)
         return JsonResponse(response_data, safe=False)
 
@@ -152,17 +147,17 @@ class GradeLevelView(View):
         # Get all sections for the grade and this school year
         sections = Section.objects.filter(grade_level=grade, academic_year=school_year_obj.name)
 
-        # 🧠 Step 1: Get all teachers assigned to *this* school year
+        # Get all teachers assigned to *this* school year
         assigned_teacher_ids_this_year = Section.objects.filter(
             academic_year=school_year_obj.name
         ).exclude(teacher__isnull=True).values_list("teacher_id", flat=True)
 
-        # 🧠 Step 2: Get all teachers assigned in *other* school years (we’ll exclude them later)
+        # Get all teachers assigned in *other* school years (we’ll exclude them later)
         assigned_teacher_ids_other_years = Section.objects.exclude(
             academic_year=school_year_obj.name
         ).exclude(teacher__isnull=True).values_list("teacher_id", flat=True)
 
-        # 🧠 Step 3: Determine teacher availability logic
+        # Determine teacher availability logic
         if assigned_teacher_ids_this_year.exists():
             # If there are already teachers assigned in this year → only show unassigned ones
             teachers = TeacherInformation.objects.exclude(
@@ -252,6 +247,15 @@ class AddSectionView(View):
         )
         return JsonResponse({"success": True, "message": "Section added successfully."})
 
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_coordinator)],
+    name="dispatch",
+)
+class MoveUnassigendStudent(View):
+    def post(self, request):
+        result = StudentListHistoryRepository.move_unassigned_student(request)
+        return JsonResponse(result, safe=False)
+
 
 @method_decorator(
     [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_coordinator)],
@@ -267,7 +271,7 @@ class AutoSectionView(View):
                 "message": "Invalid grade level."
             }, status=400)
 
-        # ✅ 1. Get current school year
+        # Get current school year
         current_academic_year = SchoolYearRepository.get_all().order_by("updated_at").last()
         if not current_academic_year:
             return JsonResponse({
@@ -278,7 +282,7 @@ class AutoSectionView(View):
         current_school_year_name = current_academic_year.name
         logger.info(f"Current school year: {current_school_year_name}")
 
-        # ✅ 2. Fetch sections for this grade & current school year only
+        # Fetch sections for this grade & current school year only
         sections = Section.objects.filter(
             grade_level=grade_level,
             academic_year=current_school_year_name,
@@ -292,7 +296,7 @@ class AutoSectionView(View):
                 "message": f"No available sections for Grade {grade_level} in S.Y. {current_school_year_name}. Please create sections first."
             }, status=400)
             
-        # ✅ 3. Fetch students for same grade & school year
+        # Fetch students for same grade & school year
         students = StudentInformation.objects.filter(
             grade=grade_level,
             school_year=current_school_year_name,
@@ -314,7 +318,7 @@ class AutoSectionView(View):
 
         assigned_count = 0
 
-        # ✅ 4. Assign per strand (for SHS)
+        # Assign per strand (for SHS)
         if grade_level in [11, 12]:
             strand_students = defaultdict(list)
             for s in students:
@@ -365,7 +369,7 @@ class AutoSectionView(View):
                     section_slots[target_id] -= 1
                     assigned_count += 1
         else:
-            # ✅ Grades 7–10
+            # Grades 7–10
             male_students = [s for s in students if s.gender.lower() == "male"]
             female_students = [s for s in students if s.gender.lower() == "female"]
             distributed = male_students + female_students
