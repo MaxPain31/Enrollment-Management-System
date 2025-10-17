@@ -104,9 +104,6 @@ class AdminDashboardDataAPI(View):
         student_senior_count = StudentInformation.objects.filter(enrollment_type="SHS").count()
         male_count = StudentInformation.objects.filter(gender__iexact="MALE").count()
         female_count = StudentInformation.objects.filter(gender__iexact="FEMALE").count()
-
-        print("student_junior_count:", student_junior_count)
-        print("student_senior_count:", student_senior_count)
         application_report_data = [
             {"value": approved_count, "name": "Approved"},
             {"value": rejected_count, "name": "Rejected"},
@@ -496,6 +493,16 @@ class AdminApplicationPendingView(View):
 class GetApplicationPendingDataAPI(View):
     def get(self, request):
         response_data = ApplicationPendingService.get_application_data_for_datatables(request)
+        return JsonResponse(response_data, safe=False)
+
+#MESSAGE PENDING UPDATE
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class MessagePendingReasonUpdate(View):
+    def post(self, request):
+        response_data = ApplicationPendingService.update_message_pending(request)
         return JsonResponse(response_data, safe=False)
 
 # CAN BE DELETED

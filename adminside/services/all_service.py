@@ -1,4 +1,6 @@
 # services/enrollment_form_service.py
+from asyncio.windows_events import NULL
+from email import message
 from email.mime import application
 import json
 
@@ -313,6 +315,7 @@ class ApplicationApprovedService:
                         "semester": application.semester,
                         "strand": application.strand,
                         "student_status": "Enrolled",
+                        "enrollment_status": "PASSED",
                     },
                 )
                 DocumentListRepository.get_filtered_by_enrollment(application).update(
@@ -411,6 +414,7 @@ class ApplicationApprovedService:
                                     "semester": application.semester,
                                     "strand": application.strand,
                                     "student_status": "Enrolled",
+                                    "enrollment_status": "PASSED",
                                 },
                             )
                             DocumentListRepository.get_filtered_by_enrollment(application).update(
@@ -489,7 +493,11 @@ class ApplicationPendingService:
             6: "enrollment__created_at",
         }
         
-        applications = ApplicationPendingRepository.get_all_with_enrollment().prefetch_related("enrollment__documents")
+        applications = (
+            ApplicationPendingRepository.get_all_with_enrollment()
+            .filter(Q(is_reapproved=False) | Q(is_reapproved__isnull=True))
+            .prefetch_related("enrollment__documents")
+        )
         
         # Filtering
         if grade_level:
@@ -592,7 +600,7 @@ class ApplicationPendingService:
                 return {"success": False, "message": "Enrollment form not found."}
             
             # Create ApplicationApproved record
-            application_approved, _ = ApplicationApprovedRepository.create(
+            application_approved = ApplicationApprovedRepository.create(
                 enrollment=application,
             )
             
@@ -633,6 +641,8 @@ class ApplicationPendingService:
                         "semester": application.semester,
                         "strand": application.strand,
                         "student_status": "Enrolled",
+                        "submission_remarks": application_pending.message_pending,
+                        "enrollment_status": "PASSED",
                     },
                 )
                 # Update DocumentList
@@ -649,7 +659,6 @@ class ApplicationPendingService:
                     numeracy_level=None,
                     numeracy_result=None,
                 )
-            
             
             user = application.user
             if application.enrollment_type == "SHS":
@@ -672,8 +681,9 @@ class ApplicationPendingService:
                 "approved"
             )
             
-            # Delete from ApplicationPending
-            ApplicationPendingRepository.delete(application_id)
+            application_pending.is_reapproved = True
+            application_pending.updated_at = timezone.now()
+            application_pending.save()
             
             return {
                 "success": True,
@@ -683,6 +693,20 @@ class ApplicationPendingService:
         except Exception as e:
             logger.error(f"Error re-approving application: {e}")
             return {"success": False, "message": "An error occurred while re-approving the application."}
+    
+    @staticmethod
+    def update_message_pending(request):
+        try:
+            data = request.POST
+            id = data.get("id")
+            applicationPending = ApplicationPendingRepository.get_by_id(id)
+            if data.get("message_pending"):
+                applicationPending.message_pending = data.get("message_pending")
+            applicationPending.updated_at = timezone.now()
+            applicationPending.save()
+            return {"success": True, "message": "Pending reason updated successfully."}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
         
 
 class RequestHelper:
@@ -1866,6 +1890,10 @@ class AssessmentService:
             data = request.POST
             assessment_id = data.get("assessment_id")
             assessment = AssessmentRepository.get_by_id(assessment_id)
+            application_id = assessment.application_approved.enrollment
+            application_pending = ApplicationPendingRepository.filter(enrollment_id=application_id).first()
+            message_pending = application_pending.message_pending
+            logger.info(f"message_pending: {message_pending}")
             # check if assessment is already done
             if assessment.is_assessed:
                 return {"success": False, "message": "Assessment already marked as done."}
@@ -1908,6 +1936,8 @@ class AssessmentService:
                     "strand": assessment.application_approved.enrollment.strand,
                     "student_status": "Enrolled",
                     "assessment": assessment,
+                    "submission_remarks": application_pending.message_pending if application_pending else None,
+                    "enrollment_status": "PASSED",
                 }
             )
             # update document list and student information

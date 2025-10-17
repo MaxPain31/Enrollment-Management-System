@@ -90,50 +90,7 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <!-- {% for application in application_rejected %}
-                            <tr id="application-row-{{ application.enrollment.id }}">
-                                <td class="align-middle text-center">
-                                    <input class="form-check-input row-check"
-                                        type="checkbox"
-                                        data-id="{{ application.id }}"
-                                        data-status="{{ application.enrollment.status }}"
-                                    >
-                                </td>
-                                <td class="align-middle text-center">{{ application.enrollment.application_no }}</td>
-                                <td class="align-middle text-center">{{ application.enrollment.first_name }} {{ application.enrollment.last_name }}
-                                </td>
-                                <td class="application-grade-level align-middle text-center">{{ application.enrollment.grade_level }}</td>
-                                <td class="align-middle text-center">
-                                    {% if application.enrollment.status == "Complete" %}
-                                    <span
-                                        class="badge bg-success application-status">{{application.enrollment.status|upper}}</span>
-                                    {% elif application.enrollment.status == "Missing" %}
-                                    <span
-                                        class="badge bg-danger application-status">{{application.enrollment.status|upper}}</span>
-                                    {% endif %}
-                                </td>
-                                <td class="application-student-type text-danger align-middle text-center">{{ application.message_rejected }}</td>
-                                <td class="align-middle text-center">{{ application.enrollment.created_at|date:"Y-m-d" }}</td>
-                                <td class="align-middle text-center">
-                                    <button type="button" class="btn btn-primary btn-sm view-btn" data-bs-toggle="modal"
-                                        data-bs-target="#viewApplicationModal" data-type="{{ application.enrollment.enrollment_type }}"
-                                        data-id="{{ application.enrollment.id }}" onclick="fetchData('{{ application.enrollment.id }}')" >
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                </td>
-                                <td class="align-middle text-center">
-                                    <button class="btn btn-success btn-sm" id="reApproveBtn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Re-Approve" data-id="{{ application.id }}" >
-                                        <i class="bi bi-check2"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="9" class="text-center">No applications found.</td>
-                            </tr>
-                            {% endfor %} -->
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -268,6 +225,30 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeButton">Close</button>
                 <button type="button" class="btn btn-success" id="saveButton" style="display: none;">Save changes</button>
             </div>
+        </div>
+    </div>
+</div>
+<!-- Message Pending Modal -->
+<div class="modal fade" id="messagePendingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="messagePendingForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Pending Reason</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="message_pending" class="form-label">Pending Reason</label>
+                        <textarea class="form-control" id="message_pending" name="message_pending" rows="5" style="resize: none;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success save-message-pending-btn">Save</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

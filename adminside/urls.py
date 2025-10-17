@@ -59,6 +59,7 @@ from adminside.views import (
     AddFAQView,
     EditFAQView,
     DeleteFAQView,
+    MessagePendingReasonUpdate,
 )
 
 urlpatterns = [
@@ -87,6 +88,7 @@ urlpatterns = [
     path("bulk_reapprove/", AdminApplicationBulkReApproveView.as_view(), name="bulk_reapprove"),
     path('bulk-reapprove-progress/<str:batch_key>/', BulkReApproveProgressView.as_view(), name='bulk-reapprove-progress'),
     path("applications/reapprove/action/", AdminApplicationReapproveActionView.as_view(), name="applications-reapprove-action"),
+    path("message-pending/update/", MessagePendingReasonUpdate.as_view(), name="message-pending-update"),
     
     # --REPORTS--
     path("reports/", AdminReportsView.as_view(), name="reports"),

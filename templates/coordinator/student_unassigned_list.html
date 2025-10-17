@@ -191,7 +191,10 @@
                             </div>
                         </div>
                         <div id="documentForm">
-                            <h5>Document Submitted</h5>
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="mt-2">Document Submitted</h5>
+                                <span class="badge bg-danger">Missing</span>
+                            </div>
                             {% for document in documents %}
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="document-{{ document.id }}" 
@@ -205,6 +208,19 @@
                                 </label>
                             </div>
                             {% endfor %}
+                        </div>
+                        <div id="submissionRemarksForm" class="mt-3">
+                            <div class="d-flex align-items-center gap-2 my-2">
+                                <h5 class="mt-2">Submission Remarks</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <textarea class="form-control" id="submission_remarks" name="submission_remarks" rows="5" style="resize: none;" disabled></textarea>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>

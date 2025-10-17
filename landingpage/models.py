@@ -1,3 +1,5 @@
+from encodings.punycode import T
+from MySQLdb import Time
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -9,6 +11,7 @@ class EnrollmentForm(models.Model):
     application_no = models.CharField(max_length=50)
     status = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
     school_year = models.CharField(max_length=50)
     grade_level = models.CharField(max_length=50)
     with_lrn = models.BooleanField(null=True, blank=True)
@@ -82,7 +85,9 @@ class ApplicationPending(models.Model):
     enrollment = models.OneToOneField(
         EnrollmentForm, on_delete=models.CASCADE, null=True, blank=True
     )
+    is_reapproved = models.BooleanField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(null=True, blank=True)
     message_pending = models.TextField(null=True, blank=True)
     class Meta:
         db_table = "application_pending"
@@ -112,6 +117,7 @@ class StudentInformation(models.Model):
     application_no = models.CharField(max_length=191)
     status = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
     school_year = models.CharField(max_length=191)
     grade = models.CharField(max_length=191)
     with_lrn = models.BooleanField(null=True, blank=True)
@@ -132,6 +138,12 @@ class StudentInformation(models.Model):
     documents_submitted = models.TextField(null=True, blank=True)
     early_reg = models.BooleanField(null=True, blank=True)
     is_approved = models.BooleanField(null=True, blank=True)
+    submission_remarks = models.TextField(null=True, blank=True)
+    enrollment_status = models.CharField(max_length=10, 
+        choices=[("PASSED", "PASSED"), ("FAILED", "FAILED")],
+        null=True,
+        blank=True
+    )
     enrollment_type = models.CharField(
         max_length=3,
         choices=[("JHS", "Junior High School"), ("SHS", "Senior High School")],

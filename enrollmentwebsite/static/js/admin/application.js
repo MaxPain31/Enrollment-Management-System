@@ -147,7 +147,16 @@ $(document).ready(function () {
             },
             { data: "enrollment.grade_level" },
             { data: "enrollment.gen_avg" },
-            { data: "message_pending"},
+            { 
+                data: "message_pending",
+                orderable: false,
+                searchable: false,
+                render: function (data, type, row) {
+                    return `
+                        <input type="text" data-bs-toggle="modal" data-bs-target="#messagePendingModal" data-id="${row.id}" class="form-control" name="message_pending" value="${row.message_pending || ""}" style="min-width: 100%; cursor: pointer" readonly>
+                    `;
+                }
+            },
             {
                 data: "enrollment.created_at",
                 searchable: false,
@@ -335,6 +344,64 @@ $(document).ready(function () {
             '</div>'
         },
     })
+    // Message Pending Open
+    $('#messagePendingModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        applicaionPendingId = button.data('id');
+        const currentValue = button.val() === '--' ? '' : button.val();
+        $('#message_pending').val(currentValue);
+    });
+    
+    // Message Pending Open Closes — reset ID and form
+    $('#messagePendingModal').on('hidden.bs.modal', function () {
+        $('#message_pending').val('');
+        applicaionPendingId = null;
+    });
+
+    // Message Pending Form is Submitted
+    $('#messagePendingForm').off('submit').on('submit', function (e) {
+        e.preventDefault();
+        if (!applicaionPendingId) return;
+        const btn = $('.save-message-pending-btn');
+        btn.prop('disabled', true).html(
+            `<span class="spinner-border spinner-border-sm me-1" role="status"></span>`
+        );
+
+        const messagePending = $('#message_pending').val().trim() || '--';
+        const rowInput = $(`#applicationRejectedTable input[name="message_pending"][data-id="${applicaionPendingId}"]`);
+        rowInput.val(messagePending).trigger('change');
+        setTimeout(function() {
+            $.ajax({
+                url: '/admin/message-pending/update/',
+                type: 'POST',
+                data: {
+                    id: applicaionPendingId,
+                    message_pending: messagePending
+                },
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                success: function (response) {
+                    if (!response.success) {
+                        console.error(`Update failed for message pending:`, response.message);
+                        btn.prop('disabled', false).html('Save');
+                    } else {
+                        $('#messagePendingModal').modal('hide');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(`AJAX error updating message pending:`, error);
+                    btn.prop('disabled', false).html('Save');
+                },
+                complete: function () {
+                    btn.prop('disabled', false).html('Save');
+                }
+            });
+        }, 300);
+    });
+
 
     // Show & Hide Filter
     $('#filter-container-btn').on('click', function () {
@@ -362,6 +429,13 @@ $(document).ready(function () {
         applicationTable.ajax.reload();
         applicationApprovedTable.ajax.reload();
         applicationPendingTable.ajax.reload();
+    });
+
+    $('#numeracyResultModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        currentNumeracyId = button.data('id');
+        const currentValue = button.val() === '--' ? '' : button.val();
+        $('#numeracy_result').val(currentValue);
     });
 
     // View Application
