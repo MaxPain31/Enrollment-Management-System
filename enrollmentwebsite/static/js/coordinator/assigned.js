@@ -240,6 +240,11 @@ $(document).ready(function () {
         setValue("gender", app.student_information.gender);
         setValue("place_of_birth", app.student_information.place_of_birth);
         setValue("mother_tongue", app.student_information.mother_tongue);
+        if (app.student_information.status === "Complete") {
+            $("#document-status").html(`<span class="badge bg-success">Complete</span>`);
+        } else {
+            $("#document-status").html(`<span class="badge bg-danger">Missing</span>`);
+        }
         $("#documentForm input[type=checkbox]").prop("checked", false);
         if (!app.documents) {
             const documents = $(this).data('documents');
@@ -353,6 +358,23 @@ $(document).ready(function () {
                 </div>
             </div>
         `;
+        const submissionRemarksHtml = `
+            <div class="d-flex align-items-center gap-2 my-2">
+                <h5 class="mt-2">Submission Remarks</h5>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <textarea class="form-control" id="submission_remarks" name="submission_remarks" rows="5" style="resize: none;" disabled>${app.student_information.submission_remarks}</textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        if (app.student_information.status === "Missing" || app.submission_remarks !== null) {
+            $("#submissionRemarksForm").html(submissionRemarksHtml);
+        }
 
         if (app.student_information.enrollment_type === "JHS") {
             $("#enrollemnt_jhs").html(jhsHtml);

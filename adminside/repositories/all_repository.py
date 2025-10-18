@@ -106,6 +106,14 @@ class DocumentListRepository(BaseRepository):
     def get_by_student(cls, student_id: int):
         return super().filter(student_information=student_id).select_related("document")
     
+    @classmethod
+    def get_document_ids_by_student(cls, student_id: int):
+        return super().filter(student_information=student_id).values_list("document_id", flat=True)
+    
+    @classmethod
+    def delete_by_student_and_document(cls, student_id: int, document_id: int):
+        return super().filter(student_information=student_id, document_id=document_id).delete()
+    
     
 #USER INFORMATION
 class UserInformationRepository(BaseRepository):

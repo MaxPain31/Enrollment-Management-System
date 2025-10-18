@@ -32,7 +32,7 @@ class EnrollmentFormService:
         )
     
     @staticmethod
-    def get_application_data_for_datatables(request):
+    def get_application_data_for_datatables(request, current_academic_year):
         #pagination
         draw = int(request.GET.get("draw", 1))
         start = int(request.GET.get("start", 0))
@@ -61,7 +61,7 @@ class EnrollmentFormService:
             6: "created_at",
         }
         
-        applications = EnrollmentFormService.get_all_with_documents()
+        applications = EnrollmentFormService.get_all_with_documents().filter(school_year=current_academic_year.name)
         
         # Filtering
         if grade_level:
@@ -186,7 +186,7 @@ class EnrollmentFormService:
 class ApplicationApprovedService:
     
     @staticmethod
-    def get_application_data_for_datatables(request):
+    def get_application_data_for_datatables(request, current_academic_year):
         #pagination
         draw = int(request.GET.get("draw", 1))
         start = int(request.GET.get("start", 0))
@@ -215,7 +215,7 @@ class ApplicationApprovedService:
             6: "enrollment__created_at",
         }
         
-        applications = ApplicationApprovedRepository.get_all_with_enrollment().prefetch_related("enrollment__documents")
+        applications = ApplicationApprovedRepository.get_all_with_enrollment().filter(enrollment__school_year=current_academic_year.name).prefetch_related("enrollment__documents")
         
         # Filtering
         if grade_level:
@@ -464,7 +464,7 @@ class ApplicationApprovedService:
 
 class ApplicationPendingService:
     @staticmethod
-    def get_application_data_for_datatables(request):
+    def get_application_data_for_datatables(request, current_academic_year):
         #pagination
         draw = int(request.GET.get("draw", 1))
         start = int(request.GET.get("start", 0))
@@ -494,7 +494,7 @@ class ApplicationPendingService:
         }
         
         applications = (
-            ApplicationPendingRepository.get_all_with_enrollment()
+            ApplicationPendingRepository.get_all_with_enrollment().filter(enrollment__school_year=current_academic_year.name)
             .filter(Q(is_reapproved=False) | Q(is_reapproved__isnull=True))
             .prefetch_related("enrollment__documents")
         )
@@ -1109,6 +1109,87 @@ class StudentInformationService:
                 student.status = "Missing"
             student.save()
             return {"success": True, "message": "Student user created successfully."}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+    
+    @staticmethod
+    def update_student_information(request):
+        try:
+            student_id = request.POST.get("id")
+            if not student_id:
+                return {"success": False, "message": "Missing student ID."}
+            
+            student = StudentInformationRepository.get_by_id(student_id)
+            if not student:
+                return {"success": False, "message": "Student not found."}
+            
+            form_data = request.POST.copy()
+            
+            form_data.update({
+                "enrollment_type": student.enrollment_type,
+                "user_id": student.user.id,
+                "user_role": student.user.user_role,
+                "application_no": student.application_no if student.application_no else "",
+                "status": student.status,
+                "early_reg": student.early_reg,
+            })
+            
+            # Create a form similar to ApplicationForm but for student updates
+            form = ApplicationFormValidation(form_data)
+            if not form.is_valid():
+                return {"success": False, "errors": form.errors}
+            
+            cleaned_data = form.cleaned_data
+
+            # Update student information
+            student.school_year = cleaned_data["school_year"]
+            student.grade = cleaned_data["grade_level"]
+            student.student_type = cleaned_data["student_type"]
+            student.semester = cleaned_data.get("semester")
+            student.strand = cleaned_data.get("strand")
+            student.gen_avg = cleaned_data["gen_avg"]
+            student.psa_no = cleaned_data["psa_no"]
+            student.lrn = cleaned_data["lrn"]
+            student.first_name = cleaned_data["first_name"]
+            student.middle_name = cleaned_data.get("middle_name")
+            student.last_name = cleaned_data["last_name"]
+            student.extension_name = cleaned_data.get("extension_name")
+            student.birth_date = cleaned_data["birth_date"]
+            student.age = cleaned_data["age"]
+            student.gender = cleaned_data["gender"]
+            student.place_of_birth = cleaned_data["place_of_birth"]
+            student.mother_tongue = cleaned_data["mother_tongue"]
+            
+            # Update submission remarks if provided
+            submission_remarks = request.POST.get("submission_remarks")
+            if submission_remarks:
+                student.submission_remarks = submission_remarks
+            
+            student.save()
+
+            # Handle documents
+            documents = request.POST.getlist("documents")
+            submitted_ids = set(int(doc_id) for doc_id in documents)
+            existing_docs = set(DocumentListRepository.get_document_ids_by_student(student.id))
+            for doc_id in existing_docs - submitted_ids:
+                DocumentListRepository.delete_by_student_and_document(student.id, doc_id)
+            for doc_id in submitted_ids - existing_docs:
+                DocumentListRepository.create(document_id=doc_id, student_information=student)
+            current_docs = set(DocumentListRepository.get_document_ids_by_student(student.id))
+
+            required_ids = set(DocumentRepository.get_required_ids())
+            if required_ids.issubset(current_docs):
+                student.status = "Complete"
+            else:
+                student.status = "Missing"
+            student.save()
+
+            return {
+                "success": True,
+                "message": "Student information updated successfully.",
+                "status": student.status,
+            }
+
         except Exception as e:
             return {"success": False, "message": str(e)}
     
@@ -1785,12 +1866,16 @@ class AnnouncementService:
         except Exception as e:
             return {"success": False, "message": str(e)}
 
-        
     @staticmethod
     def delete_announcement(request):
         try:
             announcement_id = request.POST.get("announcement_id")
             announcement = AnnouncementRepository.get_by_id(announcement_id)
+            # delete the associated image file if it exists on disk
+            if getattr(announcement, "image", None) and getattr(announcement.image, "name", None):
+                old_image_path = announcement.image.path
+                if os.path.isfile(old_image_path):
+                    os.remove(old_image_path)
             announcement.delete()
             return {"success": True, "message": "Announcement deleted successfully."}
         except Exception as e:
@@ -1892,7 +1977,7 @@ class AssessmentService:
             assessment = AssessmentRepository.get_by_id(assessment_id)
             application_id = assessment.application_approved.enrollment
             application_pending = ApplicationPendingRepository.filter(enrollment_id=application_id).first()
-            message_pending = application_pending.message_pending
+            message_pending = application_pending.message_pending if application_pending else None
             logger.info(f"message_pending: {message_pending}")
             # check if assessment is already done
             if assessment.is_assessed:
@@ -1936,7 +2021,7 @@ class AssessmentService:
                     "strand": assessment.application_approved.enrollment.strand,
                     "student_status": "Enrolled",
                     "assessment": assessment,
-                    "submission_remarks": application_pending.message_pending if application_pending else None,
+                    "submission_remarks": message_pending,
                     "enrollment_status": "PASSED",
                 }
             )
@@ -2394,14 +2479,16 @@ class OrganizationChartService:
         # data serialization
         data = []
         for oc in organization_chart:
-            image = oc.image.url if oc.image else None
+            image_url = ""
+            if oc.image:
+                image_url = oc.image.url if hasattr(oc.image, 'url') else f"{settings.MEDIA_URL}{oc.image}"
             data.append({
                 "id": oc.id,
                 "name": oc.name,
                 "position": oc.position,
                 "department": oc.department,
                 "designation": oc.designation,
-                "image": image,
+                "image": image_url,
                 "created_at": oc.created_at,
                 "updated_at": oc.updated_at,
             })
@@ -2430,11 +2517,28 @@ class OrganizationChartService:
     @staticmethod
     def edit_organization_chart(request):
         try:
-            form = EditOrganizationChartForm(request.POST, request.FILES)
+            data = request.POST
+            files = request.FILES
+            id = data.get("id")
+            organizational = OrganizationChartRepository.get_by_id(id)
+            form = EditOrganizationChartForm(data, files)
             if not form.is_valid():
                 return {"success": False, "message": form.errors}
             cleaned = form.cleaned_data
-            organization_chart = OrganizationChartRepository.update(request.POST.get("id"), name=cleaned["name"], position=cleaned["position"], department=cleaned["department"], designation=cleaned["designation"], image=cleaned["image"])
+            organizational.name = cleaned["name"]
+            organizational.position = cleaned["position"]
+            organizational.department = cleaned["department"]
+            organizational.designation = cleaned["designation"]
+
+            if cleaned.get("image"):
+                if organizational.image and organizational.image.name:
+                    old_image_path = organizational.image.path
+                    if os.path.isfile(old_image_path):
+                        os.remove(old_image_path)
+                        
+                organizational.image = cleaned["image"]
+            organizational.updated_at = timezone.now()
+            organizational.save()
             return {"success": True, "message": "Organization chart updated successfully."}
         except Exception as e:
             import traceback
@@ -2448,6 +2552,11 @@ class OrganizationChartService:
             organization_chart = OrganizationChartRepository.get_by_id(organization_chart_id)
             if not organization_chart:
                 return {"success": False, "message": "Organization chart not found."}
+            # delete the associated image file if it exists on disk
+            if getattr(organization_chart, "image", None) and getattr(organization_chart.image, "name", None):
+                old_image_path = organization_chart.image.path
+                if os.path.isfile(old_image_path):
+                    os.remove(old_image_path)
             organization_chart.delete()
             return {"success": True, "message": "Organization chart deleted successfully."}
         except Exception as e:

@@ -110,13 +110,17 @@
         <div class="org-level principal-level">
             <div class="org-card principal-card">
                 <div class="org-card-image">
+                    {% if principal and principal.image %}
+                    <img src="{{ principal.image.url }}" alt="{{ principal.name }}" class="img-fluid">
+                    {% else %}
                     <div class="placeholder-image">
                         <i class="bi bi-person-circle"></i>
                     </div>
+                    {% endif %}
                 </div>
                 <div class="org-card-content">
-                    <h4 class="org-name">Principal Name</h4>
-                    <p class="org-position">School Principal</p>
+                    <h4 class="org-name">{{ principal.name|default:'Principal' }}</h4>
+                    <p class="org-position">{{ principal.position|default:'School Principal' }}</p>
                 </div>
             </div>
         </div>
@@ -125,50 +129,25 @@
         <div class="org-level admin-level">
             <h3 class="org-section-title">Administrative Staff</h3>
             <div class="org-cards-grid">
+                {% for staff in admin_staff %}
                 <div class="org-card">
                     <div class="org-card-image">
+                        {% if staff.image %}
+                        <img src="{{ staff.image.url }}" alt="{{ staff.name }}" class="img-fluid">
+                        {% else %}
                         <div class="placeholder-image">
                             <i class="bi bi-person-circle"></i>
                         </div>
+                        {% endif %}
                     </div>
                     <div class="org-card-content">
-                        <h5 class="org-name">Staff Name</h5>
-                        <p class="org-position">Head Administrator</p>
+                        <h5 class="org-name">{{ staff.name }}</h5>
+                        <p class="org-position">{{ staff.position }}</p>
                     </div>
                 </div>
-                <div class="org-card">
-                    <div class="org-card-image">
-                        <div class="placeholder-image">
-                            <i class="bi bi-person-circle"></i>
-                        </div>
-                    </div>
-                    <div class="org-card-content">
-                        <h5 class="org-name">Staff Name</h5>
-                        <p class="org-position">Head Administrator</p>
-                    </div>
-                </div>
-                <div class="org-card">
-                    <div class="org-card-image">
-                        <div class="placeholder-image">
-                            <i class="bi bi-person-circle"></i>
-                        </div>
-                    </div>
-                    <div class="org-card-content">
-                        <h5 class="org-name">Staff Name</h5>
-                        <p class="org-position">Registrar</p>
-                    </div>
-                </div>
-                <div class="org-card">
-                    <div class="org-card-image">
-                        <div class="placeholder-image">
-                            <i class="bi bi-person-circle"></i>
-                        </div>
-                    </div>
-                    <div class="org-card-content">
-                        <h5 class="org-name">Staff Name</h5>
-                        <p class="org-position">Guidance Counselor</p>
-                    </div>
-                </div>
+                {% empty %}
+                <p class="text-muted">No administrative staff found.</p>
+                {% endfor %}
             </div>
         </div>
 
@@ -177,231 +156,58 @@
             <!-- Junior High School Faculty -->
             <div class="org-level faculty-level">
                 <h3 class="org-section-title">Junior High School Faculty</h3>
-                
-                <!-- Mathematics Department -->
+                {% for dept, members in jhs_grouped %}
                 <div class="department-section">
-                    <h4 class="department-title">Mathematics Department</h4>
+                    <h4 class="department-title">{{ dept }}</h4>
                     <div class="org-cards-grid small-grid">
+                        {% for member in members %}
                         <div class="org-card small-card">
                             <div class="org-card-image">
+                                {% if member.image %}
+                                <img src="{{ member.image.url }}" alt="{{ member.name }}" class="img-fluid">
+                                {% else %}
                                 <div class="placeholder-image">
                                     <i class="bi bi-person-circle"></i>
                                 </div>
+                                {% endif %}
                             </div>
                             <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">Math Teacher</p>
+                                <h6 class="org-name">{{ member.name }}</h6>
+                                <p class="org-position">{{ member.position }}</p>
                             </div>
                         </div>
-                        <div class="org-card small-card">
-                            <div class="org-card-image">
-                                <div class="placeholder-image">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                            <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">Math Teacher</p>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-
-                <!-- Science Department -->
-                <div class="department-section">
-                    <h4 class="department-title">Science Department</h4>
-                    <div class="org-cards-grid small-grid">
-                        <div class="org-card small-card">
-                            <div class="org-card-image">
-                                <div class="placeholder-image">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                            <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">Science Teacher</p>
-                            </div>
-                        </div>
-                        <div class="org-card small-card">
-                            <div class="org-card-image">
-                                <div class="placeholder-image">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                            <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">Science Teacher</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- English Department -->
-                <div class="department-section">
-                    <h4 class="department-title">English Department</h4>
-                    <div class="org-cards-grid small-grid">
-                        <div class="org-card small-card">
-                            <div class="org-card-image">
-                                <div class="placeholder-image">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                            <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">English Teacher</p>
-                            </div>
-                        </div>
-                        <div class="org-card small-card">
-                            <div class="org-card-image">
-                                <div class="placeholder-image">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                            <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">English Teacher</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filipino Department -->
-                <div class="department-section">
-                    <h4 class="department-title">Filipino Department</h4>
-                    <div class="org-cards-grid small-grid">
-                        <div class="org-card small-card">
-                            <div class="org-card-image">
-                                <div class="placeholder-image">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                            <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">Filipino Teacher</p>
-                            </div>
-                        </div>
-                        <div class="org-card small-card">
-                            <div class="org-card-image">
-                                <div class="placeholder-image">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                            <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">Filipino Teacher</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Social Studies Department -->
-                <div class="department-section">
-                    <h4 class="department-title">Social Studies Department</h4>
-                    <div class="org-cards-grid small-grid">
-                        <div class="org-card small-card">
-                            <div class="org-card-image">
-                                <div class="placeholder-image">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                            <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">Araling Panlipunan Teacher</p>
-                            </div>
-                        </div>
-                        <div class="org-card small-card">
-                            <div class="org-card-image">
-                                <div class="placeholder-image">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                            <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">History Teacher</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- MAPEH Department -->
-                <div class="department-section">
-                    <h4 class="department-title">MAPEH Department</h4>
-                    <div class="org-cards-grid small-grid">
-                        <div class="org-card small-card">
-                            <div class="org-card-image">
-                                <div class="placeholder-image">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                            <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">P.E. Teacher</p>
-                            </div>
-                        </div>
-                        <div class="org-card small-card">
-                            <div class="org-card-image">
-                                <div class="placeholder-image">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                            <div class="org-card-content">
-                                <h6 class="org-name">Teacher Name</h6>
-                                <p class="org-position">Arts Teacher</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
-
             <!-- Senior High School Staff -->
             <div class="org-level faculty-level">
                 <h3 class="org-section-title">Senior High School Faculty</h3>
-                <div class="org-cards-grid medium-grid">
-                    <div class="org-card small-card">
-                        <div class="org-card-image">
-                            <div class="placeholder-image">
-                                <i class="bi bi-person-circle"></i>
+                {% for dept, members in shs_grouped %}
+                <div class="department-section">
+                    <h4 class="department-title">{{ dept }}</h4>
+                    <div class="org-cards-grid medium-grid">
+                        {% for member in members %}
+                        <div class="org-card small-card">
+                            <div class="org-card-image">
+                                {% if member.image %}
+                                <img src="{{ member.image.url }}" alt="{{ member.name }}" class="img-fluid">
+                                {% else %}
+                                <div class="placeholder-image">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="org-card-content">
+                                <h6 class="org-name">{{ member.name }}</h6>
+                                <p class="org-position">{{ member.position }}</p>
                             </div>
                         </div>
-                        <div class="org-card-content">
-                            <h6 class="org-name">Teacher Name</h6>
-                            <p class="org-position">STEM Coordinator</p>
-                        </div>
-                    </div>
-                    <div class="org-card small-card">
-                        <div class="org-card-image">
-                            <div class="placeholder-image">
-                                <i class="bi bi-person-circle"></i>
-                            </div>
-                        </div>
-                        <div class="org-card-content">
-                            <h6 class="org-name">Teacher Name</h6>
-                            <p class="org-position">HUMSS Coordinator</p>
-                        </div>
-                    </div>
-                    <div class="org-card small-card">
-                        <div class="org-card-image">
-                            <div class="placeholder-image">
-                                <i class="bi bi-person-circle"></i>
-                            </div>
-                        </div>
-                        <div class="org-card-content">
-                            <h6 class="org-name">Teacher Name</h6>
-                            <p class="org-position">ABM Coordinator</p>
-                        </div>
-                    </div>
-                    <div class="org-card small-card">
-                        <div class="org-card-image">
-                            <div class="placeholder-image">
-                                <i class="bi bi-person-circle"></i>
-                            </div>
-                        </div>
-                        <div class="org-card-content">
-                            <h6 class="org-name">Teacher Name</h6>
-                            <p class="org-position">TVL Coordinator</p>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
 
@@ -409,50 +215,25 @@
         <div class="org-level support-level">
             <h3 class="org-section-title">Support Staff</h3>
             <div class="org-cards-grid">
+                {% for staff in support_staff %}
                 <div class="org-card">
                     <div class="org-card-image">
+                        {% if staff.image %}
+                        <img src="{{ staff.image.url }}" alt="{{ staff.name }}" class="img-fluid">
+                        {% else %}
                         <div class="placeholder-image">
                             <i class="bi bi-person-circle"></i>
                         </div>
+                        {% endif %}
                     </div>
                     <div class="org-card-content">
-                        <h5 class="org-name">Staff Name</h5>
-                        <p class="org-position">Canteen Manager</p>
+                        <h5 class="org-name">{{ staff.name }}</h5>
+                        <p class="org-position">{{ staff.position }}</p>
                     </div>
                 </div>
-                <div class="org-card">
-                    <div class="org-card-image">
-                        <div class="placeholder-image">
-                            <i class="bi bi-person-circle"></i>
-                        </div>
-                    </div>
-                    <div class="org-card-content">
-                        <h5 class="org-name">Staff Name</h5>
-                        <p class="org-position">Maintenance Officer</p>
-                    </div>
-                </div>
-                <div class="org-card">
-                    <div class="org-card-image">
-                        <div class="placeholder-image">
-                            <i class="bi bi-person-circle"></i>
-                        </div>
-                    </div>
-                    <div class="org-card-content">
-                        <h5 class="org-name">Staff Name</h5>
-                        <p class="org-position">Security Officer</p>
-                    </div>
-                </div>
-                <div class="org-card">
-                    <div class="org-card-image">
-                        <div class="placeholder-image">
-                            <i class="bi bi-person-circle"></i>
-                        </div>
-                    </div>
-                    <div class="org-card-content">
-                        <h5 class="org-name">Staff Name</h5>
-                        <p class="org-position">Security Officer</p>
-                    </div>
-                </div>
+                {% empty %}
+                <p class="text-muted">No support staff found.</p>
+                {% endfor %}
             </div>
         </div>
     </div>

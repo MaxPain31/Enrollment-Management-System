@@ -518,6 +518,14 @@ footer {
 
 .principal-card .org-card-image {
   border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+}
+
+.principal-card .org-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .principal-card .placeholder-image {
@@ -554,6 +562,14 @@ footer {
   justify-content: center;
   background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
   border-bottom: 2px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.org-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .placeholder-image {
@@ -630,27 +646,75 @@ footer {
   min-width: 0;
 }
 
+/* Admin and Support - horizontal scroll */
+.admin-level .org-cards-grid,
+.support-level .org-cards-grid {
+  display: flex !important;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  gap: 1.5rem;
+  padding: 0.5rem 0 1.5rem 0;
+  margin-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+  width: 100%;
+  min-width: 0;
+}
+
 .department-section .org-cards-grid::-webkit-scrollbar,
-.faculty-level > .org-cards-grid::-webkit-scrollbar {
-  height: 8px;
+.faculty-level > .org-cards-grid::-webkit-scrollbar,
+.admin-level .org-cards-grid::-webkit-scrollbar,
+.support-level .org-cards-grid::-webkit-scrollbar {
+  height: 0; /* hidden by default */
 }
 
 .department-section .org-cards-grid::-webkit-scrollbar-track,
-.faculty-level > .org-cards-grid::-webkit-scrollbar-track {
+.faculty-level > .org-cards-grid::-webkit-scrollbar-track,
+.admin-level .org-cards-grid::-webkit-scrollbar-track,
+.support-level .org-cards-grid::-webkit-scrollbar-track {
   background: #f1f5f9;
   border-radius: 10px;
 }
 
 .department-section .org-cards-grid::-webkit-scrollbar-thumb,
-.faculty-level > .org-cards-grid::-webkit-scrollbar-thumb {
+.faculty-level > .org-cards-grid::-webkit-scrollbar-thumb,
+.admin-level .org-cards-grid::-webkit-scrollbar-thumb,
+.support-level .org-cards-grid::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 10px;
   transition: background 0.3s ease;
 }
 
 .department-section .org-cards-grid::-webkit-scrollbar-thumb:hover,
-.faculty-level > .org-cards-grid::-webkit-scrollbar-thumb:hover {
+.faculty-level > .org-cards-grid::-webkit-scrollbar-thumb:hover,
+.admin-level .org-cards-grid::-webkit-scrollbar-thumb:hover,
+.support-level .org-cards-grid::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Hide scrollbar by default (Firefox) */
+.department-section .org-cards-grid,
+.faculty-level > .org-cards-grid,
+.admin-level .org-cards-grid,
+.support-level .org-cards-grid {
+  scrollbar-width: none; /* hidden */
+}
+
+/* Show scrollbar on container hover */
+.department-section:hover .org-cards-grid,
+.faculty-level:hover > .org-cards-grid,
+.admin-level:hover .org-cards-grid,
+.support-level:hover .org-cards-grid {
+  scrollbar-width: thin; /* show on hover (Firefox) */
+}
+
+/* WebKit: show scrollbar on hover */
+.department-section:hover .org-cards-grid::-webkit-scrollbar,
+.faculty-level:hover > .org-cards-grid::-webkit-scrollbar,
+.admin-level:hover .org-cards-grid::-webkit-scrollbar,
+.support-level:hover .org-cards-grid::-webkit-scrollbar {
+  height: 8px;
 }
 
 .small-grid {
@@ -671,6 +735,13 @@ footer {
 
 .small-card .org-card-image {
   height: 200px;
+}
+
+.small-card .org-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .small-card .placeholder-image {
@@ -753,6 +824,8 @@ footer {
 .admin-level,
 .support-level {
   padding: 2rem 0;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Announcement Detail Page Styles */
@@ -1743,5 +1816,99 @@ footer {
     width: 60px;
     height: 60px;
     font-size: 1.5rem;
+  }
+}
+
+/* Normalize org-card sizing across all sections */
+/* Base (desktop) */
+.org-card {
+  width: 280px;
+}
+.org-cards-grid .org-card,
+.department-section .org-card,
+.faculty-level .org-card,
+.admin-level .org-card,
+.support-level .org-card {
+  flex: 0 0 280px;
+  min-width: 280px;
+  max-width: 280px;
+}
+.org-card .org-card-image {
+  height: 250px;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .org-card {
+    width: 230px;
+  }
+  .org-cards-grid .org-card,
+  .department-section .org-card,
+  .faculty-level .org-card,
+  .admin-level .org-card,
+  .support-level .org-card {
+    flex: 0 0 230px;
+    min-width: 230px;
+    max-width: 230px;
+  }
+  .org-card .org-card-image {
+    height: 180px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .org-card {
+    width: 220px;
+  }
+  .org-cards-grid .org-card,
+  .department-section .org-card,
+  .faculty-level .org-card,
+  .admin-level .org-card,
+  .support-level .org-card {
+    flex: 0 0 220px;
+    min-width: 220px;
+    max-width: 220px;
+  }
+  .org-card .org-card-image {
+    height: 180px;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1200px) and (max-width: 1439px) {
+  .org-card {
+    width: 300px;
+  }
+  .org-cards-grid .org-card,
+  .department-section .org-card,
+  .faculty-level .org-card,
+  .admin-level .org-card,
+  .support-level .org-card {
+    flex: 0 0 300px;
+    min-width: 300px;
+    max-width: 300px;
+  }
+  .org-card .org-card-image {
+    height: 240px;
+  }
+}
+
+/* Extra large desktop */
+@media (min-width: 1440px) {
+  .org-card {
+    width: 340px;
+  }
+  .org-cards-grid .org-card,
+  .department-section .org-card,
+  .faculty-level .org-card,
+  .admin-level .org-card,
+  .support-level .org-card {
+    flex: 0 0 340px;
+    min-width: 340px;
+    max-width: 340px;
+  }
+  .org-card .org-card-image {
+    height: 320px;
   }
 }

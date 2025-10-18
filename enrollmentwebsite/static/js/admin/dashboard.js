@@ -11,9 +11,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const femaleCountElem = document.getElementById("femaleCount");
     const maleCountElem = document.getElementById("maleCount");
 
-    const fetchData = async () => {
+    const fetchData = async (filterType = 'all') => {
         try {
-            const response = await fetch("/admin/dashboard-data/");
+            const url = filterType === 'all' ? "/admin/dashboard-data/" : `/admin/dashboard-data/?filter=${filterType}`;
+            const response = await fetch(url);
             const data = await response.json();
             console.log(data);
 
@@ -38,18 +39,37 @@ document.addEventListener("DOMContentLoaded", function () {
     const fetchApplicationReportData = (data) => {
         try {
             const applicationReportData = data.application_report;
+            const filterType = data.filter_type || 'all';
+            const filterText = filterType === 'today' ? 'Today' : 
+                              filterType === 'month' ? 'This Month' : 
+                              filterType === 'year' ? 'This Year' : 'All Time';
 
             echarts.init(document.querySelector("#trafficChart")).setOption({
+                backgroundColor: '#ffffff',
                 color: ['rgb(0, 227, 150)', 'rgb(255, 69, 96)'],
                 tooltip: {
-                    trigger: 'item'
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    textStyle: { color: '#fff' }
                 },
                 legend: {
                     top: '5%',
-                    left: 'center'
+                    left: 'center',
+                    textStyle: { color: '#333' }
+                },
+                title: {
+                    text: `Application Report | ${filterText}`,
+                    left: 'center',
+                    top: '2%',
+                    textStyle: { 
+                        color: '#333',
+                        fontSize: 14,
+                        fontWeight: 'bold'
+                    }
                 },
                 series: [{
-                    name: 'Access From',
+                    name: 'Application Status',
                     type: 'pie',
                     radius: ['40%', '70%'],
                     avoidLabelOverlap: false,
@@ -61,7 +81,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         label: {
                             show: true,
                             fontSize: '18',
-                            fontWeight: 'bold'
+                            fontWeight: 'bold',
+                            color: '#333'
                         }
                     },
                     labelLine: {
@@ -78,6 +99,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const fetchUserReportData = (data) => {
         try {
             const userReportData = data.user_report;
+            const filterType = data.filter_type || 'all';
+            const filterText = filterType === 'today' ? 'Today' : 
+                              filterType === 'month' ? 'This Month' : 
+                              filterType === 'year' ? 'This Year' : 'All Time';
             const labels = userReportData.map(item => item.name);
             const values = userReportData.map(item => item.value);
 
@@ -93,11 +118,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         label: "User Roles",
                         data: values,
                         backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(255, 159, 64, 0.2)',
-                            'rgba(255, 205, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(54, 162, 235, 0.2)'
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(255, 205, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(54, 162, 235, 0.7)'
                         ],
                         borderColor: [
                             'rgb(255, 99, 132)',
@@ -106,19 +131,61 @@ document.addEventListener("DOMContentLoaded", function () {
                             'rgb(75, 192, 192)',
                             'rgb(54, 162, 235)'
                         ],
-                        borderWidth: 1
+                        borderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
+                        title: {
+                            display: true,
+                            text: `User Report | ${filterText}`,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#333'
+                        },
                         legend: {
-                            display: true
+                            display: true,
+                            labels: {
+                                color: '#333',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: '#333',
+                            borderWidth: 1
                         }
                     },
                     scales: {
+                        x: {
+                            ticks: {
+                                color: '#333',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#333',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
                         }
                     }
                 },
@@ -132,6 +199,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const ctx = document.getElementById('genderChart');
         if (!ctx) return;
         if (window.genderChartInstance) window.genderChartInstance.destroy();
+        
+        const filterType = data.filter_type || 'all';
+        const filterText = filterType === 'today' ? 'Today' : 
+                          filterType === 'month' ? 'This Month' : 
+                          filterType === 'year' ? 'This Year' : 'All Time';
+        
         window.genderChartInstance = new Chart(ctx, {
             type: 'pie',
             data: {
@@ -139,20 +212,44 @@ document.addEventListener("DOMContentLoaded", function () {
                 datasets: [{
                     data: [data.male || 0, data.female || 0],
                     backgroundColor: [
-                        'rgba(54, 162, 235, 0.7)',
-                        'rgba(255, 99, 132, 0.7)'
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 99, 132, 0.8)'
                     ],
                     borderColor: [
                         'rgb(54, 162, 235)',
                         'rgb(255, 99, 132)'
                     ],
-                    borderWidth: 1
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { display: true }
+                    title: {
+                        display: true,
+                        text: `Gender Distribution | ${filterText}`,
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        color: '#333'
+                    },
+                    legend: { 
+                        display: true,
+                        labels: {
+                            color: '#333',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#333',
+                        borderWidth: 1
+                    }
                 }
             }
         });
@@ -162,6 +259,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const ctx = document.getElementById('studentTypeChart');
         if (!ctx) return;
         if (window.studentTypeChartInstance) window.studentTypeChartInstance.destroy();
+        
+        const filterType = data.filter_type || 'all';
+        const filterText = filterType === 'today' ? 'Today' : 
+                          filterType === 'month' ? 'This Month' : 
+                          filterType === 'year' ? 'This Year' : 'All Time';
+        
         // Try to use student_junior and student_senior if available, else fallback
         const labels = ['Junior', 'Senior'];
         const values = [data.student_junior || data.junior || 0, data.student_senior || data.senior || 0];
@@ -172,20 +275,44 @@ document.addEventListener("DOMContentLoaded", function () {
                 datasets: [{
                     data: values,
                     backgroundColor: [
-                        'rgba(255, 205, 86, 0.7)',
-                        'rgba(75, 192, 192, 0.7)'
+                        'rgba(255, 205, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)'
                     ],
                     borderColor: [
                         'rgb(255, 205, 86)',
                         'rgb(75, 192, 192)'
                     ],
-                    borderWidth: 1
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { display: true }
+                    title: {
+                        display: true,
+                        text: `Student Type Distribution | ${filterText}`,
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        color: '#333'
+                    },
+                    legend: { 
+                        display: true,
+                        labels: {
+                            color: '#333',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#333',
+                        borderWidth: 1
+                    }
                 }
             }
         });
@@ -267,6 +394,57 @@ document.addEventListener("DOMContentLoaded", function () {
         if (lastDashboardData) exportAsCSV(lastDashboardData);
     });
 
+    // Add filter functionality
+    const setupFilterListeners = () => {
+        // Add event listeners to all filter dropdown items
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const filterText = item.textContent.trim().toLowerCase();
+                let filterType = 'all';
+                
+                // Map text to filter types
+                if (filterText === 'today') {
+                    filterType = 'today';
+                } else if (filterText === 'this month') {
+                    filterType = 'month';
+                } else if (filterText === 'this year') {
+                    filterType = 'year';
+                } else if (filterText === 'all time') {
+                    filterType = 'all';
+                }
+                
+                // Update the dropdown text to show current filter
+                const parentCard = item.closest('.card');
+                const cardTitle = parentCard.querySelector('.card-title');
+                
+                if (cardTitle) {
+                    const originalTitle = cardTitle.textContent.split(' | ')[0];
+                    cardTitle.textContent = `${originalTitle} | ${item.textContent.trim()}`;
+                }
+                
+                // Show loading state
+                const allCards = document.querySelectorAll('.info-card');
+                allCards.forEach(card => {
+                    const countElement = card.querySelector('h6');
+                    if (countElement) {
+                        countElement.textContent = '...';
+                    }
+                });
+                
+                // Fetch data with filter
+                const data = await fetchData(filterType);
+                if (data) {
+                    lastDashboardData = data;
+                    fetchUserReportData(data);
+                    fetchApplicationReportData(data);
+                    renderGenderChart(data);
+                    renderStudentTypeChart(data);
+                }
+            });
+        });
+    };
+
     const initDashboard = async () => {
         const data = await fetchData();
         if (data) {
@@ -276,6 +454,9 @@ document.addEventListener("DOMContentLoaded", function () {
             renderGenderChart(data);
             renderStudentTypeChart(data);
         }
+        
+        // Setup filter listeners
+        setupFilterListeners();
     };
 
     initDashboard();

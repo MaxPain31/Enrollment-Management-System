@@ -469,7 +469,7 @@ class EditAnnouncementForm(forms.Form):
 class OrganizationChartForm(forms.Form):
     name = forms.CharField(error_messages={"required": "Name is required."})
     position = forms.CharField(error_messages={"required": "Position is required."})
-    department = forms.CharField(error_messages={"required": "Department is required."})
+    department = forms.CharField(required=False)
     designation = forms.CharField(error_messages={"required": "Designation is required."})
     image = forms.ImageField(required=False)
     
@@ -482,7 +482,7 @@ class OrganizationChartForm(forms.Form):
 class EditOrganizationChartForm(forms.Form):
     name = forms.CharField(error_messages={"required": "Name is required."})
     position = forms.CharField(error_messages={"required": "Position is required."})
-    department = forms.CharField(error_messages={"required": "Department is required."})
+    department = forms.CharField(required=False)
     designation = forms.CharField(error_messages={"required": "Designation is required."})
     image = forms.ImageField(required=False)
     

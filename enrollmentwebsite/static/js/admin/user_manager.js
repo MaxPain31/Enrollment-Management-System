@@ -1029,6 +1029,7 @@ $(document).ready(function () {
             if (el) el.value = value ?? '';
         };
         setValue("id", app.id);
+        console.log(app.id);
         setValue("psa_no", app.psa_no);
         setValue("lrn", app.lrn);
         setValue("first_name", app.first_name);
@@ -1040,6 +1041,11 @@ $(document).ready(function () {
         setValue("gender", app.gender);
         setValue("place_of_birth", app.place_of_birth);
         setValue("mother_tongue", app.mother_tongue);
+        if (app.status === "Complete") {
+            $("#document-status").html(`<span class="badge bg-success">Complete</span>`);
+        } else {
+            $("#document-status").html(`<span class="badge bg-danger">Missing</span>`);
+        }
         $("#documentForm input[type=checkbox]").prop("checked", false);
         if (!app.documents) {
             const documents = $(this).data('documents');
@@ -1155,6 +1161,24 @@ $(document).ready(function () {
             </div>
         `;
 
+        const submissionRemarksHtml = `
+            <div class="d-flex align-items-center gap-2 my-2">
+                <h5 class="mt-2">Submission Remarks</h5>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <textarea class="form-control" id="submission_remarks" name="submission_remarks" rows="5" style="resize: none;" disabled>${app.submission_remarks !== null ? app.submission_remarks : ""}</textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        if (app.status === "Missing" || app.submission_remarks !== null) {
+            $("#submissionRemarksForm").html(submissionRemarksHtml);
+        }
+
         if (app.enrollment_type === "JHS") {
             $("#enrollemnt_jhs").html(jhsHtml);
             $("#enrollemnt_shs").empty();
@@ -1231,6 +1255,78 @@ $(document).ready(function () {
         })
     });
 
+    // Edit Button functionality for View User Modal
+    $("#editButton").on("click", function () {
+        enableEditForm();
+    });
+
+    $("#closeButton").on("click", function () {
+        disableEditForm();
+    });
+
+    $("#viewUserModal").on("hidden.bs.modal", function () {
+        disableEditForm();
+    });
+
+    // Save Student Information
+    $("#saveButton").on("click", function () {
+        const $form = $("#enrollmentForm");
+        let formData = $form.serialize();
+        const $button = $(this);
+        $button.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
+        setTimeout(function() {
+            $.ajax({
+                url: "/admin/update_student_information/", 
+                type: "POST",
+                data: formData,
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                success: function (response) {
+                    $button.prop("disabled", false).html("Save changes");
+                    if (response.success) {
+                        Swal.fire({
+                            title: "Saved!",
+                            text: response.message,
+                            icon: "success",
+                            confirmButtonText: "OK",
+                            showConfirmButton: true,
+                        }).then(() => {
+                            $("#viewUserModal").modal("hide");
+                            studentUsersTable.ajax.reload();
+                        });
+                    } else {
+                        if (response.errors) {
+                            Object.keys(response.errors).forEach(function (field) {
+                                const input = $(`[name="${field}"]`);
+                                input.addClass("is-invalid");
+                                input.siblings(".invalid-feedback").text(response.errors[field][0]);
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "Error!",
+                                text: response.message,
+                                icon: "error",
+                                confirmButtonText: "OK",
+                                showConfirmButton: true,
+                            });
+                        }
+                    }
+                },
+                error: function (xhr, status, error) {
+                    $button.prop("disabled", false).html("Save changes");
+                    Swal.fire({
+                        title: "Error!",
+                        text: "An error occurred while saving the student information.",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                        showConfirmButton: true,
+                    });
+                }
+            });
+        }, 500);
+    });
 
     // Add Student User Modal
     $("#addStudentUserModal").on("show.bs.modal", function () {
@@ -1778,4 +1874,16 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+function enableEditForm() {
+    $("#enrollmentForm input, #enrollmentForm select, #documentForm input, #submissionRemarksForm textarea").prop("disabled", false);
+    $("#saveButton").show();
+    $("#editButton").hide();
+}
+
+function disableEditForm() {
+    $("#enrollmentForm input, #enrollmentForm select, #documentForm input").prop("disabled", true);
+    $("#editButton").show();
+    $("#saveButton").hide();
 }

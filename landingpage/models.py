@@ -11,7 +11,7 @@ class EnrollmentForm(models.Model):
     application_no = models.CharField(max_length=50)
     status = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(null=True, blank=True)
     school_year = models.CharField(max_length=50)
     grade_level = models.CharField(max_length=50)
     with_lrn = models.BooleanField(null=True, blank=True)
@@ -117,7 +117,7 @@ class StudentInformation(models.Model):
     application_no = models.CharField(max_length=191)
     status = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(null=True, blank=True)
     school_year = models.CharField(max_length=191)
     grade = models.CharField(max_length=191)
     with_lrn = models.BooleanField(null=True, blank=True)
@@ -372,7 +372,5 @@ class OrganizationChart(models.Model):
     
     def save(self, *args, **kwargs):
         self.name = capitalize_words(self.name) if self.name else None
-        self.position = capitalize_words(self.position) if self.position else None
-        self.department = capitalize_words(self.department) if self.department else None
         self.designation = capitalize_words(self.designation) if self.designation else None
         super(OrganizationChart, self).save(*args, **kwargs)

@@ -3,7 +3,7 @@ from django.views import View
 from django.contrib import messages
 
 from adminside.repositories.all_repository import AnnouncementRepository, FAQRepository
-from .models import EnrollmentForm, Announcement, EnrollmentManagement, StudentInformation
+from .models import EnrollmentForm, Announcement, EnrollmentManagement, StudentInformation, OrganizationChart
 from authentication.models import ApplicantInformation
 from django.utils import timezone
 from django.http import JsonResponse
@@ -16,7 +16,39 @@ class HomeView(View):
     def get(self, request):
         faqs = FAQRepository.get_all().order_by("-created_at")
         latest_announcements = AnnouncementRepository.get_all().filter(status="active").order_by("-date")[:2]
-        return render(request, "index.html", {"latest_announcements": latest_announcements, "faqs": faqs})
+
+        # Organizational chart data
+        org_all = OrganizationChart.objects.all()
+
+        principal = (
+            org_all.filter(position__icontains="Principal").first()
+            or org_all.filter(designation__iexact="Principal").first()
+        )
+
+        admin_staff = org_all.filter(designation__iexact="Administrative Staff").order_by("department", "name")
+        support_staff = org_all.filter(designation__iexact="Support Staff").order_by("department", "name")
+        jhs_faculty = org_all.filter(designation__iexact="Junior High School Faculty").order_by("department", "name")
+        shs_faculty = org_all.filter(designation__iexact="Senior High School Faculty").order_by("department", "name")
+
+        def group_by_department(qs):
+            grouped = {}
+            for item in qs:
+                dept = item.department or "General"
+                grouped.setdefault(dept, []).append(item)
+            # return as list of tuples for template stable order
+            return [(dept, members) for dept, members in grouped.items()]
+
+        context = {
+            "latest_announcements": latest_announcements,
+            "faqs": faqs,
+            "principal": principal,
+            "admin_staff": admin_staff,
+            "support_staff": support_staff,
+            "jhs_grouped": group_by_department(jhs_faculty),
+            "shs_grouped": group_by_department(shs_faculty),
+        }
+
+        return render(request, "index.html", context)
 
 
 class AboutView(View):

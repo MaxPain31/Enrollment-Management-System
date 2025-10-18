@@ -7,6 +7,7 @@ from adminside.views import (
     AdminDashboardView,
     AdminApplicationView,
     AdminReportsView,
+    AdminReportsDataAPI,
     BulkApproveProgressView,
     BulkReApproveProgressView,
     EditAdminUserView,
@@ -60,6 +61,7 @@ from adminside.views import (
     EditFAQView,
     DeleteFAQView,
     MessagePendingReasonUpdate,
+    UpdateStudentInformationView,
 )
 
 urlpatterns = [
@@ -92,6 +94,7 @@ urlpatterns = [
     
     # --REPORTS--
     path("reports/", AdminReportsView.as_view(), name="reports"),
+    path("reports-data/", AdminReportsDataAPI.as_view(), name="reports_data"),
     
     # CAN BE DELETED THIS FUNCTION
     path("get_application/<int:application_id>/", GetApplicationDataView.as_view(), name="get_application"),
@@ -141,7 +144,7 @@ urlpatterns = [
     path("add_student/", AddStudentUserView.as_view(), name="add_student_user"),
     path("student-users/data/", GetStudentUserDataAPI.as_view(), name="student_users_data"),
     path("edit_student_status/", EditStudentStatusView.as_view(), name="admin_edit_student_status"),
-    
+    path("update_student_information/", UpdateStudentInformationView.as_view(), name="update_student_information"),
     
     # TEACHER USER MANAGEMENT VIEW
     path("teacher-users/", TeacherUserView.as_view(), name="teacher_users"),

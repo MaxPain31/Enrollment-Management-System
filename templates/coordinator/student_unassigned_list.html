@@ -87,7 +87,7 @@
 <!-- View Student Modal-->
 <div class="d-grid gap-2 d-md-block">
     <div class="modal fade" id="viewStudentModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Student Information</h5>
@@ -193,7 +193,7 @@
                         <div id="documentForm">
                             <div class="d-flex align-items-center gap-2">
                                 <h5 class="mt-2">Document Submitted</h5>
-                                <span class="badge bg-danger">Missing</span>
+                                <div id="document-status"></div>
                             </div>
                             {% for document in documents %}
                             <div class="form-check">
@@ -210,17 +210,6 @@
                             {% endfor %}
                         </div>
                         <div id="submissionRemarksForm" class="mt-3">
-                            <div class="d-flex align-items-center gap-2 my-2">
-                                <h5 class="mt-2">Submission Remarks</h5>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <textarea class="form-control" id="submission_remarks" name="submission_remarks" rows="5" style="resize: none;" disabled></textarea>
-                                        <div class="invalid-feedback"></div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </form>
                 </div>

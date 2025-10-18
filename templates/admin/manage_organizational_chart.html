@@ -17,11 +17,11 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Manage Organization Chart</h5>
-                    <div class="d-flex justify-content-between mb-3">
-                        <button type="button" class="btn btn-outline-primary" id="filter-container-btn">
+                    <div class="d-flex justify-content-end mb-3">
+                        <!-- <button type="button" class="btn btn-outline-primary" id="filter-container-btn">
                             <i class="bi bi-funnel"></i>
                             <span>Filter</span>
-                        </button>
+                        </button> -->
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationChartModal">
                             <i class="bi bi-plus-lg"></i>
                             Organization Chart
@@ -42,7 +42,7 @@
                             </button>
                         </div>
                     </div> -->
-                    <table class="table table-striped table-hover table-bordered my-3" id="organizationChartTable">
+                    <table class="table table-striped table-hover table-bordered my-3" id="organizationalChartTable">
                         <thead>
                             <tr>
                                 <th></th>
@@ -82,17 +82,17 @@
                     </div>
                     <div class="mb-3">
                         <label for="position" class="form-label">Position</label>
-                        <textarea class="form-control" name="position" rows="3" placeholder="Your position here"></textarea>
+                        <input type="text" class="form-control" name="position" placeholder="Your position here">
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
                         <label for="department" class="form-label">Department</label>
-                        <textarea class="form-control" name="department" rows="3" placeholder="Your department here"></textarea>
+                        <input type="text" class="form-control" name="department" placeholder="Your department here">
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
                         <label for="designation" class="form-label">Designation</label>
-                        <textarea class="form-control" name="designation" rows="3" placeholder="Your designation here"></textarea>
+                        <input type="text" class="form-control" name="designation" placeholder="Your designation here"></textarea>
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
@@ -110,7 +110,7 @@
 </div>
 
 <!-- Edit Announcement Modal -->
-<div class="modal fade" id="editOrganizationChartModal" tabindex="-1" aria-labelledby="editOrganizationChartModal" aria-hidden="true">
+<div class="modal fade" id="editOrganizationalChartModal" tabindex="-1" aria-labelledby="editOrganizationalChartModal" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <form id="editOrganizationChartForm">
@@ -130,26 +130,20 @@
                         <input type="text" class="form-control" name="position" id="position">
                         <div class="invalid-feedback"></div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="department" class="form-label">Department</label>
-                                <input type="text" class="form-control" name="department" id="department">
-                                <div class="invalid-feedback"></div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="designation" class="form-label">Designation</label>
-                                <input type="text" class="form-control" name="designation" id="designation">
-                                <div class="invalid-feedback"></div>
-                            </div>
-                        </div>
+                    <div class="mb-3">
+                        <label for="department" class="form-label">Department</label>
+                        <input type="text" class="form-control" name="department" id="department">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="designation" class="form-label">Designation</label>
+                        <input type="text" class="form-control" name="designation" id="designation">
+                        <div class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3 d-flex flex-column">
                         <label class="form-label">Current Image</label>
                         <div class="d-flex flex-row justify-content-center align-items-center">
-                            <img id="currentImage" alt="Current Image" class="img-fluid preview-image" style="width: 300px; cursor: pointer;">
+                            <img id="currentImage" alt="Current Image" name="image" class="img-fluid preview-image" style="width: 300px; cursor: pointer;">
                         </div>
                     </div>
                     <div class="mb-3">
