@@ -124,14 +124,28 @@ class AdminDashboardDataAPI(View):
                 created_at__gte=start_date,
                 created_at__lte=end_date
             ).count()
-            rejected_count = EnrollmentForm.objects.filter(
+            pending_count = EnrollmentForm.objects.filter(
                 applicationpending__isnull=False,
+                created_at__gte=start_date,
+                created_at__lte=end_date
+            ).count()
+            # Count applications that are neither approved nor pending (in review)
+            in_review_count = EnrollmentForm.objects.filter(
+                is_approved=None,
+                applicationapproved__isnull=True,
+                applicationpending__isnull=True,
                 created_at__gte=start_date,
                 created_at__lte=end_date
             ).count()
         else:
             approved_count = ApplicationApproved.objects.count()
-            rejected_count = ApplicationPending.objects.count()
+            pending_count = ApplicationPending.objects.count()
+            # Count applications that are neither approved nor pending (in review)
+            in_review_count = EnrollmentForm.objects.filter(
+                is_approved=None,
+                applicationapproved__isnull=True,
+                applicationpending__isnull=True
+            ).count()
         
         # ApplicantInformation doesn't have created_at, use user's created_at
         applcant_total = apply_date_filter(ApplicantInformation.objects.all(), 'user__created_at').count()
@@ -150,7 +164,8 @@ class AdminDashboardDataAPI(View):
         
         application_report_data = [
             {"value": approved_count, "name": "Approved"},
-            {"value": rejected_count, "name": "Rejected"},
+            {"value": pending_count, "name": "Pending"},
+            {"value": in_review_count, "name": "In Review"},
         ]
 
         user_report_data = [
@@ -161,9 +176,14 @@ class AdminDashboardDataAPI(View):
             {"value": administrator_count, "name": "Administrator"},
         ]
 
+        # Calculate total applications
+        total_applications = approved_count + pending_count + in_review_count
+        
         data = {
             "approved": approved_count,
-            "rejected": rejected_count,
+            "pending": pending_count,
+            "in_review": in_review_count,
+            "total_applications": total_applications,
             "junior": application_junior_count,
             "senior": application_senior_count,
             "total_applicant": application_junior_count + application_senior_count,

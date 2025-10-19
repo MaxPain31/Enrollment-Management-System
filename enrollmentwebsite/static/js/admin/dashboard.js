@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     const approvedCountElem = document.getElementById("approvedCount");
-    const rejectedCountElem = document.getElementById("rejectedCount");
+    const pendingCountElem = document.getElementById("pendingCount");
+    const inReviewCountElem = document.getElementById("inReviewCount");
+    const totalApplicationsElem = document.getElementById("totalApplications");
     const juniorCountElem = document.getElementById("juniorCount");
     const seniorCountElem = document.getElementById("seniorCount");
     const usersCountElem = document.getElementById("usersCount");
@@ -19,7 +21,9 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log(data);
 
             if (approvedCountElem) approvedCountElem.textContent = data.approved;
-            if (rejectedCountElem) rejectedCountElem.textContent = data.rejected;
+            if (pendingCountElem) pendingCountElem.textContent = data.pending;
+            if (inReviewCountElem) inReviewCountElem.textContent = data.in_review;
+            if (totalApplicationsElem) totalApplicationsElem.textContent = data.total_applications;
             if (juniorCountElem) juniorCountElem.textContent = data.junior;
             if (seniorCountElem) seniorCountElem.textContent = data.senior;
             if (usersCountElem) usersCountElem.textContent = data.users;
@@ -46,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             echarts.init(document.querySelector("#trafficChart")).setOption({
                 backgroundColor: '#ffffff',
-                color: ['rgb(0, 227, 150)', 'rgb(255, 69, 96)'],
+                color: ['rgb(0, 227, 150)', 'rgb(255, 193, 7)', 'rgb(108, 117, 125)'],
                 tooltip: {
                     trigger: 'item',
                     formatter: '{a} <br/>{b}: {c} ({d}%)',
@@ -327,7 +331,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const wsData = [
             ['Metric', 'Value'],
             ['Approved', data.approved],
-            ['Rejected', data.rejected],
+            ['Pending', data.pending],
+            ['In Review', data.in_review],
+            ['Total Applications', data.total_applications],
             ['Junior', data.junior],
             ['Senior', data.senior],
             ['Users', data.users],
@@ -366,7 +372,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const rows = [
             ['Metric', 'Value'],
             ['Approved', data.approved],
-            ['Rejected', data.rejected],
+            ['Pending', data.pending],
+            ['In Review', data.in_review],
+            ['Total Applications', data.total_applications],
             ['Junior', data.junior],
             ['Senior', data.senior],
             ['Users', data.users],
