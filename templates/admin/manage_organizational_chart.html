@@ -2,11 +2,11 @@
 {% load static %}
 {% block content %}
 <div class="pagetitle">
-    <h1>Organization Chart</h1>
+    <h1>Organizational Chart</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Home</a></li>
-            <li class="breadcrumb-item active">Organization Chart</li>
+            <li class="breadcrumb-item active">Organizational Chart</li>
         </ol>
     </nav>
 </div><!-- End Page Title -->
@@ -16,7 +16,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Manage Organization Chart</h5>
+                    <h5 class="card-title">Manage Organizational Chart</h5>
                     <div class="d-flex justify-content-end mb-3">
                         <!-- <button type="button" class="btn btn-outline-primary" id="filter-container-btn">
                             <i class="bi bi-funnel"></i>
@@ -24,7 +24,7 @@
                         </button> -->
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationChartModal">
                             <i class="bi bi-plus-lg"></i>
-                            Organization Chart
+                            Person
                         </button>
                     </div>
                     <!-- <div class="filter-container" id="filter-container" style="display: none;">
@@ -71,7 +71,7 @@
             <form id="addOrganizationChartForm">
                 {% csrf_token %}
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addOrganizationChartModal">Add Organization Chart</h5>
+                    <h5 class="modal-title" id="addOrganizationChartModal">Add Organizational Chart</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

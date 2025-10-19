@@ -56,8 +56,13 @@
 
                                         <div class="col-12">
                                             <label for="yourPassword" class="form-label">Password</label>
-                                            <input type="password" name="password" class="form-control"
-                                                id="yourPassword" required>
+                                            <div class="input-group">
+                                                <input type="password" name="password" class="form-control"
+                                                    id="yourPassword" required>
+                                                <button class="btn hide-password" type="button" id="togglePassword">
+                                                    <i class="bi bi-eye" id="toggleIcon"></i>
+                                                </button>
+                                            </div>
                                             <div class="invalid-feedback">Please enter your password!</div>
                                         </div>
 
@@ -97,6 +102,55 @@
             const loginForm = document.getElementById("loginForm");
             const loginButton = document.querySelector("button[type='submit']");
             const csrfToken = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+            const emailInput = document.getElementById("yourUsername");
+            const passwordInput = document.getElementById("yourPassword");
+            const rememberMeCheckbox = document.getElementById("rememberMe");
+            const togglePasswordBtn = document.getElementById("togglePassword");
+            const toggleIcon = document.getElementById("toggleIcon");
+
+            // Password visibility toggle functionality
+            togglePasswordBtn.addEventListener("click", function() {
+                const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+                passwordInput.setAttribute("type", type);
+                
+                // Toggle the eye icon
+                if (type === "text") {
+                    toggleIcon.classList.remove("bi-eye");
+                    toggleIcon.classList.add("bi-eye-slash");
+                } else {
+                    toggleIcon.classList.remove("bi-eye-slash");
+                    toggleIcon.classList.add("bi-eye");
+                }
+            });
+
+            // Load saved credentials if Remember Me was checked
+            function loadSavedCredentials() {
+                const savedEmail = localStorage.getItem("rememberedEmail");
+                const savedPassword = localStorage.getItem("rememberedPassword");
+                const rememberMe = localStorage.getItem("rememberMe") === "true";
+                
+                if (savedEmail && rememberMe) {
+                    emailInput.value = savedEmail;
+                    passwordInput.value = savedPassword;
+                    rememberMeCheckbox.checked = true;
+                }
+            }
+
+            // Save credentials if Remember Me is checked
+            function saveCredentials(email, password, remember) {
+                if (remember) {
+                    localStorage.setItem("rememberedEmail", email);
+                    localStorage.setItem("rememberedPassword", password);
+                    localStorage.setItem("rememberMe", "true");
+                } else {
+                    localStorage.removeItem("rememberedEmail");
+                    localStorage.removeItem("rememberedPassword");
+                    localStorage.removeItem("rememberMe");
+                }
+            }
+
+            // Load saved credentials on page load
+            loadSavedCredentials();
 
             loginForm.addEventListener("submit", function (event) {
                 event.preventDefault();
@@ -108,7 +162,9 @@
                 `;
 
                 const formData = new FormData(loginForm);
-
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                const remember = rememberMeCheckbox.checked;
 
                 fetch("/authentication/sign-in/", {
                     method: "POST",
@@ -124,6 +180,8 @@
                         loginButton.innerHTML = "Login";
 
                         if (data.success) {
+                            // Save credentials if Remember Me is checked
+                            saveCredentials(email, password, remember);
                             window.location.href = data.redirect_url;
                         } else {
                             Swal.fire({

@@ -1269,7 +1269,7 @@ $(document).ready(function () {
     });
 
     // Save Student Information
-    $("#saveButton").on("click", function () {
+    $("#editStudentUserButton").on("click", function () {
         const $form = $("#enrollmentForm");
         let formData = $form.serialize();
         const $button = $(this);
