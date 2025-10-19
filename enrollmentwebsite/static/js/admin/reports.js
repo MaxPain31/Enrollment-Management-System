@@ -291,6 +291,15 @@ class ReportsManager {
                 type: 'pie',
                 radius: '50%',
                 data: this.data.user_roles,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        return `${params.name}: ${params.value}`;
+                    },
+                    fontSize: 12,
+                    color: '#333',
+                    fontWeight: 'bold'
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -384,6 +393,15 @@ class ReportsManager {
                 type: 'pie',
                 radius: '50%',
                 data: this.data.gender_distribution,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        return `${params.name}: ${params.value}`;
+                    },
+                    fontSize: 12,
+                    color: '#333',
+                    fontWeight: 'bold'
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -420,6 +438,15 @@ class ReportsManager {
                 type: 'pie',
                 radius: '50%',
                 data: this.data.enrollment_types,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        return `${params.name}: ${params.value}`;
+                    },
+                    fontSize: 12,
+                    color: '#333',
+                    fontWeight: 'bold'
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -456,6 +483,15 @@ class ReportsManager {
                 type: 'pie',
                 radius: '50%',
                 data: this.data.student_types,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        return `${params.name}: ${params.value}`;
+                    },
+                    fontSize: 12,
+                    color: '#333',
+                    fontWeight: 'bold'
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -540,6 +576,15 @@ class ReportsManager {
                 type: 'pie',
                 radius: '50%',
                 data: this.data.registration_types,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        return `${params.name}: ${params.value}`;
+                    },
+                    fontSize: 12,
+                    color: '#333',
+                    fontWeight: 'bold'
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -576,6 +621,15 @@ class ReportsManager {
                 type: 'pie',
                 radius: '50%',
                 data: this.data.document_status,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        return `${params.name}: ${params.value}`;
+                    },
+                    fontSize: 12,
+                    color: '#333',
+                    fontWeight: 'bold'
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -898,6 +952,15 @@ class ReportsManager {
                 type: 'pie',
                 radius: '50%',
                 data: this.data.student_status,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        return `${params.name}: ${params.value}`;
+                    },
+                    fontSize: 12,
+                    color: '#333',
+                    fontWeight: 'bold'
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -934,6 +997,15 @@ class ReportsManager {
                 type: 'pie',
                 radius: '50%',
                 data: this.data.age_groups,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        return `${params.name}: ${params.value}`;
+                    },
+                    fontSize: 12,
+                    color: '#333',
+                    fontWeight: 'bold'
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -970,6 +1042,15 @@ class ReportsManager {
                 type: 'pie',
                 radius: '50%',
                 data: this.data.semester_distribution,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        return `${params.name}: ${params.value}`;
+                    },
+                    fontSize: 12,
+                    color: '#333',
+                    fontWeight: 'bold'
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -1011,6 +1092,15 @@ class ReportsManager {
                 type: 'pie',
                 radius: '50%',
                 data: assessmentData,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        return `${params.name}: ${params.value}`;
+                    },
+                    fontSize: 12,
+                    color: '#333',
+                    fontWeight: 'bold'
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -1053,6 +1143,15 @@ class ReportsManager {
                 type: 'pie',
                 radius: '50%',
                 data: contentData,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        return `${params.name}: ${params.value}`;
+                    },
+                    fontSize: 12,
+                    color: '#333',
+                    fontWeight: 'bold'
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
