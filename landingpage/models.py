@@ -31,6 +31,7 @@ class EnrollmentForm(models.Model):
     documents_submitted = models.TextField(null=True, blank=True)
     early_reg = models.BooleanField(null=True, blank=True)
     is_approved = models.BooleanField(null=True, blank=True)
+    submission_remarks = models.TextField(null=True, blank=True)
     accept_term = models.BooleanField(default=False)
     enrollment_type = models.CharField(
         max_length=3,

@@ -101,8 +101,17 @@ class EnrollmentForm(forms.Form):
     def clean_age(self):
         age = self.cleaned_data.get("age")
         birth_date = self.cleaned_data.get("birth_date")
-        if not age or age <= 11:
+        grade_level = self.cleaned_data.get("grade_level")
+        if grade_level == "7" and (not age or age <= 11):
             raise ValidationError("Age must be greater than 11.")
+        if grade_level == "8" and (not age or age <= 13):
+            raise ValidationError("Age must be greater than 13.")
+        if grade_level == "9" and (not age or age <= 14):
+            raise ValidationError("Age must be greater than 14.")
+        if grade_level == "10" and (not age or age <= 16):
+            raise ValidationError("Age must be greater than 16.")
+        if grade_level == "11" and (not age or age <= 17):
+            raise ValidationError("Age must be greater than 17.")
         if birth_date:
             today = date.today()
             expected_age = today.year - birth_date.year - (

@@ -230,6 +230,15 @@
                         </div>
                         {% endfor %}
                     </div>
+                    <div id="submissionRemarksForm" class="mt-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <h5 class="m-0">Submission Remarks</h5>
+                            <input class="form-check-input m-0" type="checkbox" id="submission_remarks_check" name="submission_remarks_check" disabled>
+                        </div>
+                        <div class="mb-3" id="submission_remarks_textarea" style="display: none;">
+                            <textarea class="form-control" id="submission_remarks" name="submission_remarks" rows="4" style="resize: none;" disabled></textarea>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">

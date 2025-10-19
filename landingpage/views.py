@@ -121,14 +121,31 @@ class ProfileView(View):
     def get(self, request):
         context = {}
         if request.user.is_authenticated:
-            if request.user.user_role == "Student":
+            user_role = request.user.user_role
+            
+            if user_role == "Student":
                 student_info = StudentInformation.objects.filter(user=request.user).first()
                 context["info"] = student_info
                 context["info_type"] = "student"
-            else:
+            elif user_role == "Applicant":
                 applicant_info = ApplicantInformation.objects.filter(user=request.user).first()
                 context["info"] = applicant_info
                 context["info_type"] = "applicant"
+            elif user_role == "Administrator":
+                from authentication.models import AdminInformation
+                admin_info = AdminInformation.objects.filter(user=request.user).first()
+                context["info"] = admin_info
+                context["info_type"] = "administrator"
+            elif user_role == "Coordinator":
+                from authentication.models import CoordinatorInformation
+                coordinator_info = CoordinatorInformation.objects.filter(user=request.user).first()
+                context["info"] = coordinator_info
+                context["info_type"] = "coordinator"
+            elif user_role == "Teacher":
+                from authentication.models import TeacherInformation
+                teacher_info = TeacherInformation.objects.filter(user=request.user).first()
+                context["info"] = teacher_info
+                context["info_type"] = "teacher"
         return render(request, "profile.html", context)
 
 

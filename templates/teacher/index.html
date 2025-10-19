@@ -235,7 +235,10 @@
                             </div>
                         </div>
                         <div id="documentForm">
-                            <h5>Document Submitted</h5>
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="mt-2">Document Submitted</h5>
+                                <div id="document-status"></div>
+                            </div>
                             {% for document in documents %}
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="document-{{ document.id }}" 
@@ -250,6 +253,7 @@
                             </div>
                             {% endfor %}
                         </div>
+                        <div id="submissionRemarksForm"></div>
                     </form>
                 </div>
             </div>

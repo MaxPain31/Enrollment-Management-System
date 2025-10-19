@@ -160,6 +160,7 @@ class EnrollmentFormService:
             enrollment.gender = cleaned_data["gender"]
             enrollment.place_of_birth = cleaned_data["place_of_birth"]
             enrollment.mother_tongue = cleaned_data["mother_tongue"]
+            enrollment.submission_remarks = cleaned_data.get("submission_remarks")
             enrollment.save()
 
             documents = request.POST.getlist("documents")
@@ -605,6 +606,7 @@ class ApplicationPendingService:
     def reapprove_application(request):
         try:
             application_id = request.POST.get("application_id")
+            submission_remarks = request.POST.get("submission_remarks")
             if not application_id:
                 return {"success": False, "message": "Application ID is required."}
             
@@ -660,7 +662,7 @@ class ApplicationPendingService:
                         "semester": application.semester,
                         "strand": application.strand,
                         "student_status": "Enrolled",
-                        "submission_remarks": application_pending.message_pending,
+                        "submission_remarks": application.submission_remarks if application.submission_remarks else None,
                         "enrollment_status": "PASSED",
                     },
                 )
@@ -701,6 +703,7 @@ class ApplicationPendingService:
             )
             
             application_pending.is_reapproved = True
+            application_pending.submission_remarks = submission_remarks
             application_pending.updated_at = timezone.now()
             application_pending.save()
             
@@ -1994,10 +1997,6 @@ class AssessmentService:
             data = request.POST
             assessment_id = data.get("assessment_id")
             assessment = AssessmentRepository.get_by_id(assessment_id)
-            application_id = assessment.application_approved.enrollment
-            application_pending = ApplicationPendingRepository.filter(enrollment_id=application_id).first()
-            message_pending = application_pending.message_pending if application_pending else None
-            logger.info(f"message_pending: {message_pending}")
             # check if assessment is already done
             if assessment.is_assessed:
                 return {"success": False, "message": "Assessment already marked as done."}
@@ -2014,7 +2013,7 @@ class AssessmentService:
                     "user": assessment.application_approved.enrollment.user,
                     "application_no": assessment.application_approved.enrollment.application_no,
                     "status": assessment.application_approved.enrollment.status,
-                    "created_at": assessment.application_approved.enrollment.created_at,
+                    "created_at": timezone.now(),
                     "school_year": assessment.application_approved.enrollment.school_year,
                     "grade": assessment.application_approved.enrollment.grade_level,
                     "with_lrn": assessment.application_approved.enrollment.with_lrn,
@@ -2040,7 +2039,7 @@ class AssessmentService:
                     "strand": assessment.application_approved.enrollment.strand,
                     "student_status": "Enrolled",
                     "assessment": assessment,
-                    "submission_remarks": message_pending,
+                    "submission_remarks": assessment.application_approved.enrollment.submission_remarks if assessment.application_approved.enrollment.submission_remarks else None,
                     "enrollment_status": "PASSED",
                 }
             )
@@ -2294,6 +2293,8 @@ class StudentListHistoryService:
             data = request.POST
             student_history_id = data.get("student_history_id")
             section_id = data.get("section_id")
+            if section_id == "" or section_id is None:
+                return {"success": False, "message": "Please select a section."}
 
             # Get target section
             section = SectionRepository.filter(section_id=section_id).first()

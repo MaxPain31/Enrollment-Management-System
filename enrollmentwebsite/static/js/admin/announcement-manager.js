@@ -79,9 +79,9 @@ $(document).ready(function() {
                 searchable: false,
                 className: "align-middle text-center",
                 render: function (data, type, row) {
-                    const encodedInfo = btoa(JSON.stringify(row));
+                    const rowData = JSON.stringify(row).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
                     return `
-                        <button type="button" class="btn btn-info btn-sm edit-announcement-btn" data-bs-toggle="modal" data-bs-target="#editAnnouncementModal" data-bs-toggle-second="tooltip" data-bs-placement="top" data-bs-title="Edit" data-info='${encodedInfo}'>
+                        <button type="button" class="btn btn-info btn-sm edit-announcement-btn" data-bs-toggle="modal" data-bs-target="#editAnnouncementModal" data-bs-toggle-second="tooltip" data-bs-placement="top" data-bs-title="Edit" data-info='${rowData}'>
                             <i class="bi bi-pencil-square"></i>
                         </button>
                         <button type="button" class="btn btn-danger btn-sm delete-btn" data-id="${row.id}" data-bs-toggle-second="tooltip" data-bs-placement="top" data-bs-title="Delete">
@@ -196,21 +196,27 @@ $(document).ready(function() {
     // Edit Announcement
     $(document).on('click', '.edit-announcement-btn', function () {
         const info = $(this).data('info');
-        const decodedInfo = JSON.parse(atob(info));
-        const announcementId = decodedInfo.id;
+        populateEditForm(info);
+    });
+    
+    function populateEditForm(info) {
+        const announcementId = info.id;
         const setValue = (id, value) => {
             const el = document.getElementById(id);
-            if (el) el.value = value ?? '';
+            if (!el) return;
             if (id === "currentImage") {
-                document.getElementById("currentImage").src = value;
+                el.src = value || '';
+            } else {
+                el.value = value ?? '';
             }
         };
-        setValue("title", decodedInfo.title);
-        setValue("content", decodedInfo.content);
-        setValue("type", decodedInfo.type);
-        setValue("status", decodedInfo.status);
-        setValue("date", decodedInfo.date);
-        setValue("currentImage", decodedInfo.image);
+        setValue("title", info.title);
+        setValue("content", info.content);
+        setValue("type", info.type);
+        setValue("status", info.status);
+        setValue("date", info.date);
+        setValue("currentImage", info.image);
+        
         $("#editAnnouncementForm").off("submit").on("submit", function (e) {
             e.preventDefault();
 
@@ -269,7 +275,7 @@ $(document).ready(function() {
                 });
             }, 500);
         });
-    });
+    }
 
 
     // Delete Announcement
@@ -331,6 +337,16 @@ $(document).ready(function() {
         });
     });
     
+    // Show the viewer
+    $("#currentImage").click(function() {
+        $("#imageViewer").attr("src", $(this).attr("src"));
+        $("#image-viewer").fadeIn();
+    });
+
+    // Close the viewer
+    $("#image-viewer .close").click(function() {
+        $("#image-viewer").fadeOut();
+    });
 });
 
 function getCookie(name) {
@@ -347,14 +363,3 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
-// Show the viewer
-$("#currentImage").click(function() {
-    $("#imageViewer").attr("src", $(this).attr("src"));
-    $("#image-viewer").fadeIn();
-});
-
-// Close the viewer
-$("#image-viewer .close").click(function() {
-    $("#image-viewer").fadeOut();
-});

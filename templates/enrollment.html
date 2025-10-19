@@ -12,83 +12,118 @@
 <section class="enrollment">
     <div class="enrollment-container container">
         {% if user.is_authenticated %}
-        <div class="col-lg-8 col-md-8 col-sm-12">
-            <div class="card mb-4 p-3">
-                <div class="card-body">
-                    <h4 class="card-title"><i class="bi bi-megaphone"></i> Announcement</h4>
-                    <p id="announcementText" class="card-text pt-3"></p>
-                    <p id="enrollment_date"></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-12">
-            <div class="card p-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="card-body">
-                            <p class="card-text">Please select the appropriate enrollment category below. You will
-                                be directed to the specific application form based on your selection.</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6 col-md-12 col-sm-12 mb-3">
-                            <div class="card">
-                                <div class="card-body" style="background: #f4f7fe;">
-                                    <h5 class="m-0 text-center"><strong>Early Registration</strong></h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="img-form mb-3">
-                                        <img src="{% static 'img/online-registration.png' %}" class="card-img-top"
-                                            style="width: 100px;" alt="Enrollment Image">
-                                    </div>
-                                    <div class="form-group">
-                                        <select id="earlyRegType" class="form-select form-control">
-                                            <option value="junior" {% if info and info.jhs_completed %} disabled {% elif user.jhs_submitted %} disabled {% endif %}>Junior High School</option>
-                                            <option value="senior" {% if info and info.shs_completed %} disabled {% elif user.shs_submitted %} disabled {% endif %}>Senior High School</option>                               
-                                        </select>
-                                    </div>
-                                    <div class="d-grid mb-2">
-                                        <button type="button" id="earlyRegButton" class="btn btn-primary mt-3"
-                                            disabled>Apply
-                                        </button>
-                                    </div>
-                                    <p class="card-text text-center">
-                                        <small class="text-body-secondary">Redirects to Enrollment Form</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-12 col-sm-12 mb-3">
-                            <div class="card">
-                                <div class="card-body" style="background: #f4f7fe;">
-                                    <h5 class="m-0 text-center"><strong>Enrollment</strong></h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="img-form mb-3">
-                                        <img src="{% static 'img/account.png' %}" class="card-img-top"
-                                            style="width: 100px;" alt="Enrollment Image">
-                                    </div>
-                                    <div class="form-group">
-                                        <select id="enrollmentType" class="form-select form-control">
-                                            <option value="junior" {% if info and info.jhs_completed %} disabled {% elif user.jhs_submitted %} disabled {% endif %}>Junior High School</option>
-                                            <option value="senior" {% if info and info.shs_completed %} disabled {% elif user.shs_submitted %} disabled {% endif %}>Senior High School</option>
-                                        </select>
-                                    </div>
-                                    <div class="d-grid mb-2">
-                                        <button type="button" id="enrollmentButton" class="btn btn-primary mt-3"
-                                            disabled>Apply
-                                        </button>
-                                    </div>
-                                    <p class="card-text text-center">
-                                        <small class="text-body-secondary">Redirects to Early Registration Form</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+            {% if user.user_role == "Student" or user.user_role == "Applicant" %}
+            <div class="col-lg-8 col-md-8 col-sm-12">
+                <div class="card mb-4 p-3">
+                    <div class="card-body">
+                        <h4 class="card-title"><i class="bi bi-megaphone"></i> Announcement</h4>
+                        <p id="announcementText" class="card-text pt-3"></p>
+                        <p id="enrollment_date"></p>
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="col-lg-8 col-md-8 col-sm-12">
+                <div class="card p-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="card-body">
+                                <p class="card-text">Please select the appropriate enrollment category below. You will
+                                    be directed to the specific application form based on your selection.</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12 col-sm-12 mb-3">
+                                <div class="card">
+                                    <div class="card-body" style="background: #f4f7fe;">
+                                        <h5 class="m-0 text-center"><strong>Early Registration</strong></h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="img-form mb-3">
+                                            <img src="{% static 'img/online-registration.png' %}" class="card-img-top"
+                                                style="width: 100px;" alt="Enrollment Image">
+                                        </div>
+                                        <div class="form-group">
+                                            <select id="earlyRegType" class="form-select form-control">
+                                                <option value="junior" {% if info and info.jhs_completed %} disabled {% elif user.jhs_submitted %} disabled {% endif %}>Junior High School</option>
+                                                <option value="senior" {% if info and info.shs_completed %} disabled {% elif user.shs_submitted %} disabled {% endif %}>Senior High School</option>                               
+                                            </select>
+                                        </div>
+                                        <div class="d-grid mb-2">
+                                            <button type="button" id="earlyRegButton" class="btn btn-primary mt-3"
+                                                disabled>Apply
+                                            </button>
+                                        </div>
+                                        <p class="card-text text-center">
+                                            <small class="text-body-secondary">Redirects to Enrollment Form</small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12 col-sm-12 mb-3">
+                                <div class="card">
+                                    <div class="card-body" style="background: #f4f7fe;">
+                                        <h5 class="m-0 text-center"><strong>Enrollment</strong></h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="img-form mb-3">
+                                            <img src="{% static 'img/account.png' %}" class="card-img-top"
+                                                style="width: 100px;" alt="Enrollment Image">
+                                        </div>
+                                        <div class="form-group">
+                                            <select id="enrollmentType" class="form-select form-control">
+                                                <option value="junior" {% if info and info.jhs_completed %} disabled {% elif user.jhs_submitted %} disabled {% endif %}>Junior High School</option>
+                                                <option value="senior" {% if info and info.shs_completed %} disabled {% elif user.shs_submitted %} disabled {% endif %}>Senior High School</option>
+                                            </select>
+                                        </div>
+                                        <div class="d-grid mb-2">
+                                            <button type="button" id="enrollmentButton" class="btn btn-primary mt-3"
+                                                disabled>Apply
+                                            </button>
+                                        </div>
+                                        <p class="card-text text-center">
+                                            <small class="text-body-secondary">Redirects to Early Registration Form</small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-lg-8 col-md-8 col-sm-12">
+                <div class="card mb-4 p-3">
+                    <div class="card-body text-center">
+                        <div class="mb-4">
+                            <i class="bi bi-shield-exclamation text-warning" style="font-size: 4rem;"></i>
+                        </div>
+                        <h4 class="card-title text-warning"><i class="bi bi-exclamation-triangle"></i> Access Restricted</h4>
+                        <p class="card-text text-muted">
+                            Enrollment is only available for Students and Applicants. 
+                            <br>As a <strong>{{ user.user_role }}</strong>, you do not have access to the enrollment system.
+                        </p>
+                        <div class="mt-4">
+                            <a href="{% url 'profile' %}" class="btn btn-primary">
+                                <i class="bi bi-person-circle"></i> View Profile
+                            </a>
+                            {% if user.user_role == "Administrator" %}
+                            <a href="{% url 'admin_dashboard' %}" class="btn btn-success">
+                                <i class="bi bi-speedometer2"></i> Admin Dashboard
+                            </a>
+                            {% elif user.user_role == "Coordinator" %}
+                            <a href="{% url 'assessment_view' %}" class="btn btn-warning">
+                                <i class="bi bi-speedometer2"></i> Coordinator Dashboard
+                            </a>
+                            {% elif user.user_role == "Teacher" %}
+                            <a href="{% url 'student_list' %}" class="btn btn-info">
+                                <i class="bi bi-speedometer2"></i> Teacher Dashboard
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         {% else %}
         <p>You need to log in to view this page.</p>
         {% endif %}
@@ -106,17 +141,69 @@
                 const enrollmentEnd = new Date(settings.enrollment_deadline_date);
                 const earlyRegStart = new Date(settings.early_registration_start_date);
                 const earlyRegEnd = new Date(settings.early_registration_deadline_date);
+                
+                // Debug information
+                console.log('Current date:', now);
+                console.log('Enrollment start:', enrollmentStart);
+                console.log('Enrollment end:', enrollmentEnd);
+                console.log('Early reg start:', earlyRegStart);
+                console.log('Early reg end:', earlyRegEnd);
+                console.log('Enrollment active:', settings.enrollment_active);
+                console.log('Early reg active:', settings.early_registration_active);
+                
+                // Debug date comparisons
+                console.log('Now >= enrollmentStart:', now >= enrollmentStart);
+                console.log('Now <= enrollmentEnd:', now <= enrollmentEnd);
+                console.log('Enrollment date range valid:', (now >= enrollmentStart && now <= enrollmentEnd));
+                
+                console.log('Now >= earlyRegStart:', now >= earlyRegStart);
+                console.log('Now <= earlyRegEnd:', now <= earlyRegEnd);
+                console.log('Early reg date range valid:', (now >= earlyRegStart && now <= earlyRegEnd));
                 document.getElementById('announcementText').innerText = settings.announcement_content;
                 if (settings.announcement_content === null || settings.announcement_content === 'None') {
                     document.getElementById('announcementText').innerText = 'No announcements for this academic year.';
                 }
-                if (settings.enrollment_active && now >= enrollmentStart && now <= enrollmentEnd) {
-                    document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Enrollment Date: </strong>' + enrollmentStart.toDateString() + ' - ' + enrollmentEnd.toDateString();
-                    document.getElementById('enrollmentButton').removeAttribute('disabled');
+                // Helper function to compare dates (ignoring time)
+                function isDateInRange(currentDate, startDate, endDate) {
+                    // Set time to start of day for accurate comparison
+                    const current = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+                    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+                    const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+                    
+                    console.log('Date comparison - Current:', current, 'Start:', start, 'End:', end);
+                    console.log('Current >= Start:', current >= start, 'Current <= End:', current <= end);
+                    
+                    return current >= start && current <= end;
                 }
-                if (settings.early_registration_active && now >= earlyRegStart && now <= earlyRegEnd) {
-                    document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Early Registration Date: </strong>' + earlyRegStart.toDateString() + ' - ' + earlyRegEnd.toDateString();
-                    document.getElementById('earlyRegButton').removeAttribute('disabled');
+                
+                // Check if enrollment is active and within date range
+                if (settings.enrollment_active) {
+                    if (isDateInRange(now, enrollmentStart, enrollmentEnd)) {
+                        document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Enrollment Date: </strong>' + enrollmentStart.toDateString() + ' - ' + enrollmentEnd.toDateString();
+                        document.getElementById('enrollmentButton').removeAttribute('disabled');
+                        console.log('Enrollment button enabled');
+                    } else {
+                        document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Enrollment Date: </strong>' + enrollmentStart.toDateString() + ' - ' + enrollmentEnd.toDateString() + ' <span class="text-muted">(Not yet active or expired)</span>';
+                        console.log('Enrollment button disabled - date range issue');
+                    }
+                } else {
+                    document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Enrollment is currently inactive</strong>';
+                    console.log('Enrollment button disabled - not active');
+                }
+                
+                // Check if early registration is active and within date range
+                if (settings.early_registration_active) {
+                    if (isDateInRange(now, earlyRegStart, earlyRegEnd)) {
+                        document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Early Registration Date: </strong>' + earlyRegStart.toDateString() + ' - ' + earlyRegEnd.toDateString();
+                        document.getElementById('earlyRegButton').removeAttribute('disabled');
+                        console.log('Early registration button enabled');
+                    } else {
+                        document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Early Registration Date: </strong>' + earlyRegStart.toDateString() + ' - ' + earlyRegEnd.toDateString() + ' <span class="text-muted">(Not yet active or expired)</span>';
+                        console.log('Early registration button disabled - date range issue');
+                    }
+                } else {
+                    document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Early Registration is currently inactive</strong>';
+                    console.log('Early registration button disabled - not active');
                 }
             }
         })

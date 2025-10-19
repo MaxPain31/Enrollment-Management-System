@@ -205,6 +205,7 @@ class ApplicationForm(forms.Form):
     place_of_birth = forms.CharField(error_messages={"required": "Place of birth is required."})
     mother_tongue = forms.CharField(error_messages={"required": "Mother tongue is required."})
     documents_submitted = forms.JSONField(required=False)
+    submission_remarks = forms.CharField(required=False)
 
     # --- Custom Validators ---
     def clean_gen_avg(self):

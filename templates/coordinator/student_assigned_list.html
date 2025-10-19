@@ -256,7 +256,7 @@
                     <div class="form-group">
                         <label for="section_id">Section</label>
                         <select class="form-select" id="section_id" name="section_id">
-                            <option selected>--</option>
+                            <option selected disabled>--</option>
                             {% for section in sections %}
                                 <option value="{{ section.section_id }}">{{ section.section_name }}</option>
                             {% endfor %}

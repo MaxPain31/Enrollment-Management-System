@@ -465,6 +465,22 @@ $(document).ready(function () {
         setValue("gender", app.gender);
         setValue("place_of_birth", app.place_of_birth);
         setValue("mother_tongue", app.mother_tongue);
+        if (app.submission_remarks !== null) {
+            $("#submission_remarks_check").prop("checked", true);
+            $("#submission_remarks_textarea").show();
+            $("#submission_remarks").prop("disabled", false).val(app.submission_remarks);
+        }
+        //if checkbox is clicked show the textarea and the data
+        $("#submission_remarks_check").on("click", function () {
+            if ($(this).is(":checked")) {
+                $("#submission_remarks_textarea").show();
+                $("#submission_remarks").prop("disabled", false).val(app.submission_remarks);
+            } else {
+                $("#submission_remarks_textarea").hide();
+                $("#submission_remarks").prop("disabled", true).val("");
+            }
+        });
+        
         $("#documentForm input[type=checkbox]").prop("checked", false);
         if (!app.documents) {
             const documents = $(this).data('documents');
@@ -875,6 +891,21 @@ $(document).ready(function () {
 
     $("#viewApplicationModal").on("hidden.bs.modal", function () {
         disableEditForm();
+    });
+
+    // Submission Remarks Checkbox Toggle
+    $(document).on('change', '#submission_remarks_check', function() {
+        const isChecked = $(this).is(':checked');
+        const textarea = $('#submission_remarks_textarea');
+        const textareaInput = $('#submission_remarks');
+        
+        if (isChecked) {
+            textarea.show();
+            textareaInput.prop('disabled', false);
+        } else {
+            textarea.hide();
+            textareaInput.prop('disabled', true).val('');
+        }
     });
 
     $("#checkAll").on("change", function () {

@@ -162,6 +162,7 @@ $(document).ready(function () {
         setValue("gender", app.gender);
         setValue("place_of_birth", app.place_of_birth);
         setValue("mother_tongue", app.mother_tongue);
+        console.log(app.submission_remarks);
         if (app.status === "Complete") {
             $("#document-status").html(`<span class="badge bg-success">Complete</span>`);
         } else {
@@ -177,8 +178,7 @@ $(document).ready(function () {
             app.documents.forEach(function(doc) {
                 $("#document-" + doc.document_id).prop("checked", true);
             });
-        }
-        
+        }        
 
         const jhsHtml = `
             <div class="enrollment_information">
@@ -282,21 +282,24 @@ $(document).ready(function () {
             </div>
         `;
 
-        const submissionRemarksHtml = `
-            <div class="d-flex align-items-center gap-2 my-2">
-                <h5 class="mt-2">Submission Remarks</h5>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="mb-3">
-                        <textarea class="form-control" id="submission_remarks" name="submission_remarks" rows="5" style="resize: none;" disabled>${app.submission_remarks}</textarea>
-                        <div class="invalid-feedback"></div>
+        // Always clear the submission remarks form first
+        $("#submissionRemarksForm").empty();
+
+        // Only show submission remarks if status is Missing or if there are actual remarks
+        if (app.status === "Missing" || (app.submission_remarks && app.submission_remarks.trim() !== "")) {
+            const submissionRemarksHtml = `
+                <div class="d-flex align-items-center gap-2 my-2">
+                    <h5 class="mt-2">Submission Remarks</h5>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <textarea class="form-control" id="submission_remarks" name="submission_remarks" rows="5" style="resize: none;" disabled>${app.submission_remarks || ''}</textarea>
+                            <div class="invalid-feedback"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-
-        if (app.status === "Missing" || app.submission_remarks !== null) {
+            `;
             $("#submissionRemarksForm").html(submissionRemarksHtml);
         }
 
