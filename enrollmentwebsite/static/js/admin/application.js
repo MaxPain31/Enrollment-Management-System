@@ -9,6 +9,7 @@ $(document).ready(function () {
             data.student_type = $('#filter-student-type').val();
             data.enrollment_type = $('#filter-enrollment-type').val();
             data.early_reg = $('#filter-early-reg').val();
+            data.school_year = $('#filter-school-year').val();
             $.ajax({
                 url: "/admin/applications/approved/data/",
                 type: "GET",
@@ -98,6 +99,7 @@ $(document).ready(function () {
             data.student_type = $('#filter-student-type').val();
             data.enrollment_type = $('#filter-enrollment-type').val();
             data.early_reg = $('#filter-early-reg').val();
+            data.school_year = $('#filter-school-year').val();
             $.ajax({
                 url: "/admin/applications/pending/data/",
                 type: "GET",
@@ -229,6 +231,7 @@ $(document).ready(function () {
             data.student_type = $('#filter-student-type').val();
             data.enrollment_type = $('#filter-enrollment-type').val();
             data.early_reg = $('#filter-early-reg').val();
+            data.school_year = $('#filter-school-year').val();
             $.ajax({
                 url: "/admin/applications/data/",
                 type: "GET",
@@ -413,7 +416,7 @@ $(document).ready(function () {
     });
 
     // Trigger filter
-    $('#filter-grade-level, #filter-student-type, #filter-enrollment-type, #filter-early-reg')
+    $('#filter-grade-level, #filter-student-type, #filter-enrollment-type, #filter-early-reg, #filter-school-year')
     .on('change', function () {
         applicationTable.ajax.reload();
         applicationApprovedTable.ajax.reload();
@@ -426,6 +429,7 @@ $(document).ready(function () {
         $('#filter-student-type').val('');
         $('#filter-enrollment-type').val('');
         $('#filter-early-reg').val('');
+        $('#filter-school-year').val('');
         applicationTable.ajax.reload();
         applicationApprovedTable.ajax.reload();
         applicationPendingTable.ajax.reload();

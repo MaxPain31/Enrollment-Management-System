@@ -1,10 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
+import json
 
 from adminside.repositories.all_repository import AnnouncementRepository, FAQRepository
 from .models import EnrollmentForm, Announcement, EnrollmentManagement, StudentInformation, OrganizationChart
 from authentication.models import ApplicantInformation
+from django.db.models import Count
+from django.utils import timezone
+from datetime import datetime, timedelta
 from django.utils import timezone
 from django.http import JsonResponse
 from django.core.paginator import Paginator
@@ -38,6 +42,9 @@ class HomeView(View):
             # return as list of tuples for template stable order
             return [(dept, members) for dept, members in grouped.items()]
 
+        # Enrollment analytics data
+        enrollment_analytics = get_enrollment_analytics()
+
         context = {
             "latest_announcements": latest_announcements,
             "faqs": faqs,
@@ -46,6 +53,7 @@ class HomeView(View):
             "support_staff": support_staff,
             "jhs_grouped": group_by_department(jhs_faculty),
             "shs_grouped": group_by_department(shs_faculty),
+            "enrollment_analytics": enrollment_analytics,
         }
 
         return render(request, "index.html", context)
@@ -312,4 +320,60 @@ class AnnouncementDetailView(View):
     def get(self, request, announcement_id):
         announcement = get_object_or_404(Announcement, id=announcement_id, status="active")
         return render(request, "announcement_detail.html", {"announcement": announcement})
+
+
+def get_enrollment_analytics():
+    try:
+        all_school_years = StudentInformation.objects.values_list('school_year', flat=True).distinct().order_by('-school_year')
+        years = list(all_school_years)
+        
+        # Get JHS enrollment data by grade and year
+        jhs_data = {}
+        for grade in range(7, 11):  # Grades 7-10
+            jhs_data[f"Grade {grade}"] = []
+            for year in years:
+                count = StudentInformation.objects.filter(
+                    grade=str(grade),
+                    enrollment_type="JHS",
+                    school_year=year
+                ).count()
+                jhs_data[f"Grade {grade}"].append(count)
+        
+        # Get SHS enrollment data by strand and year
+        shs_data = {}
+        strands = ["ABM", "STEM"]
+        for strand in strands:
+            shs_data[f"Grade 11 {strand}"] = []
+            shs_data[f"Grade 12 {strand}"] = []
+            for year in years:
+                # Grade 11
+                count_11 = StudentInformation.objects.filter(
+                    grade="11",
+                    enrollment_type="SHS",
+                    strand=strand,
+                    school_year=year
+                ).count()
+                shs_data[f"Grade 11 {strand}"].append(count_11)
+                
+                # Grade 12
+                count_12 = StudentInformation.objects.filter(
+                    grade="12",
+                    enrollment_type="SHS",
+                    strand=strand,
+                    school_year=year
+                ).count()
+                shs_data[f"Grade 12 {strand}"].append(count_12)
+        
+        return json.dumps({
+            "years": years,
+            "jhs_data": jhs_data,
+            "shs_data": shs_data,
+        })
+    except Exception as e:
+        # Return empty data if there's an error
+        return json.dumps({
+            "years": [],
+            "jhs_data": {},
+            "shs_data": {},
+        })
 

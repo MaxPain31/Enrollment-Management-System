@@ -234,6 +234,10 @@ class SchoolYearRepository(BaseRepository):
     @classmethod
     def get_by_id(cls, id: int):
         return super().get_by_id(id)
+    
+    @classmethod
+    def get_available_school_years(cls):
+        return super().get_all().values_list('name', flat=True).distinct().order_by('-name')
 
 # SECTION
 class SectionRepository(BaseRepository):

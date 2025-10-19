@@ -170,25 +170,7 @@ class ReportsManager {
         
         // Ensure data exists and has values
         const chartData = this.data.application_status || [];
-        const hasData = chartData.some(item => item.value > 0);
-        
-        if (!hasData) {
-            // Show message when no data
-            const option = {
-                backgroundColor: '#ffffff',
-                title: {
-                    text: 'No Application Data Available',
-                    left: 'center',
-                    top: 'center',
-                    textStyle: {
-                        color: '#999',
-                        fontSize: 16
-                    }
-                }
-            };
-            this.charts.applicationStatus.setOption(option);
-            return;
-        }
+
         
         const option = {
             backgroundColor: '#ffffff',
@@ -611,7 +593,10 @@ class ReportsManager {
      * Strand Chart (SHS only)
      */
     initStrandChart() {
-        if (!this.data.strands || this.data.strands.length === 0) {
+        // Use shs_strand_distribution data from backend
+        const strandData = this.data.shs_strand_distribution || [];
+        
+        if (!strandData || strandData.length === 0) {
             return;
         }
 
@@ -634,7 +619,7 @@ class ReportsManager {
             },
             xAxis: {
                 type: 'category',
-                data: this.data.strands.map(item => item.strand),
+                data: strandData.map(item => item.name),
                 axisLabel: {
                     interval: 0,
                     rotate: 45
@@ -647,7 +632,7 @@ class ReportsManager {
             series: [{
                 name: 'Students',
                 type: 'bar',
-                data: this.data.strands.map(item => item.count),
+                data: strandData.map(item => item.value),
                 itemStyle: {
                     color: {
                         type: 'linear',
@@ -718,7 +703,7 @@ class ReportsManager {
             
             const url = schoolYear === 'all' 
                 ? '/admin/reports-data/' 
-                : `/admin/reports-data/?school_year=${schoolYear}`;
+                : `/admin/reports-data/?school_year=${encodeURIComponent(schoolYear)}`;
                 
             const response = await fetch(url);
             
@@ -728,9 +713,20 @@ class ReportsManager {
             
             this.data = await response.json();
             this.hideLoadingSpinner();
-            this.updateSummaryCards();
-            this.loadSchoolYears();
-            this.initializeCharts();
+            
+            // Debug: Log the data to console
+            console.log('Reports data received:', this.data);
+            console.log('Application status data:', this.data.application_status);
+            console.log('SHS strand data:', this.data.shs_strand_distribution);
+            
+            // Check if there's data for the selected school year
+            if (this.hasDataForSchoolYear()) {
+                this.updateSummaryCards();
+                this.loadSchoolYears();
+                this.initializeCharts();
+            } else {
+                this.showNoDataMessage(schoolYear);
+            }
             
         } catch (error) {
             console.error('Error filtering reports data:', error);
@@ -740,11 +736,68 @@ class ReportsManager {
     }
     
     /**
+     * Check if there's data available for the selected school year
+     */
+    hasDataForSchoolYear() {
+        if (!this.data) return false;
+        
+        // Check application status data
+        const applicationStatusData = this.data.application_status || [];
+        const hasApplicationData = applicationStatusData.some(item => item.value > 0);
+        
+        // Check SHS strand data
+        const shsStrandData = this.data.shs_strand_distribution || [];
+        const hasSHSData = shsStrandData.some(item => item.value > 0);
+        
+        // Check summary data
+        const totalApplications = this.data.summary?.total_applications || 0;
+        const totalStudents = this.data.summary?.total_students || 0;
+        const approvedApplications = this.data.summary?.approved_applications || 0;
+        
+        return hasApplicationData || hasSHSData || totalApplications > 0 || totalStudents > 0 || approvedApplications > 0;
+    }
+    
+    /**
+     * Show no data message for selected school year
+     */
+    showNoDataMessage(schoolYear) {
+        // Clear all charts
+        Object.values(this.charts).forEach(chart => {
+            if (chart) {
+                chart.dispose();
+            }
+        });
+        this.charts = {};
+        
+        // Update summary cards to show 0
+        this.updateSummaryCards();
+        
+        // Show no data message in charts
+        const chartContainers = document.querySelectorAll('.chart-container');
+        chartContainers.forEach(container => {
+            container.innerHTML = `
+                <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+                    <i class="bi bi-inbox display-1 mb-3"></i>
+                    <h5>No Data Available</h5>
+                    <p class="text-center">No data found for school year <strong>${schoolYear}</strong></p>
+                    <small>Try selecting a different school year or check back later.</small>
+                </div>
+            `;
+        });
+        
+        // Still load school years dropdown
+        this.loadSchoolYears();
+    }
+    
+    /**
      * Load school years for filter
      */
     loadSchoolYears() {
         const schoolYearFilter = document.getElementById('schoolYearFilter');
         if (schoolYearFilter && this.data && this.data.available_school_years) {
+            // Store current selection before clearing
+            const currentSelection = schoolYearFilter.value;
+            
             // Clear existing options except "All School Years"
             schoolYearFilter.innerHTML = '<option value="all">All School Years</option>';
             
@@ -755,6 +808,18 @@ class ReportsManager {
                 option.textContent = year;
                 schoolYearFilter.appendChild(option);
             });
+            
+            // Restore selection or set default
+            if (currentSelection && currentSelection !== 'all') {
+                // Keep the user's selection if it exists
+                schoolYearFilter.value = currentSelection;
+            } else if (this.data.selected_school_year) {
+                // Use the selected school year from API
+                schoolYearFilter.value = this.data.selected_school_year;
+            } else if (this.data.current_school_year) {
+                // Fall back to current school year
+                schoolYearFilter.value = this.data.current_school_year;
+            }
         }
     }
 

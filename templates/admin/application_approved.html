@@ -1,5 +1,8 @@
 {% extends 'admin/base.html' %}
 {% load static %}
+
+{% block title %}Admin - Approved Applications - TuloyEskwelaPDBNHS{% endblock %}
+
 {% block content %}
 {% include 'admin/partial/side_bar.html' %}
 <div class="pagetitle">
@@ -62,6 +65,15 @@
                                     <option value="">All</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-school-year">School Year</label>
+                                <select class="form-select" id="filter-school-year" name="school_year">
+                                    <option value="">All</option>
+                                    {% for year in school_years %}
+                                        <option value="{{ year }}" {% if year == current_academic_year.name %}selected{% endif %}>{{ year }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <button class="clear-filter-button" type="button" id="clearFilters">

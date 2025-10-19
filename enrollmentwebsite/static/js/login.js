@@ -1,10 +1,67 @@
 $(document).ready(function () {
+    // Wait for modal to be ready and bind password toggle
+    function bindPasswordToggle() {
+        // Password visibility toggle
+        $("#togglePassword").off("click").on("click", function(e) {
+            e.preventDefault();
+            const passwordInput = $("#password");
+            const toggleIcon = $("#toggleIcon");
+            if (passwordInput.attr("type") === "password") {
+                passwordInput.attr("type", "text");
+                toggleIcon.removeClass("bi-eye").addClass("bi-eye-slash");
+            } else {
+                passwordInput.attr("type", "password");
+                toggleIcon.removeClass("bi-eye-slash").addClass("bi-eye");
+            }
+        });
+    }
+    
+    // Bind immediately
+    bindPasswordToggle();
+    
+    // Also bind when modal is shown
+    $("#loginModalToggle").on("shown.bs.modal", function() {
+        bindPasswordToggle();
+    });
+
+    // Load saved credentials if Remember Me was checked
+    function loadSavedCredentials() {
+        const savedLRN = localStorage.getItem("rememberedLRN");
+        const savedPassword = localStorage.getItem("rememberedPassword");
+        const rememberMe = localStorage.getItem("rememberMe") === "true";
+        
+        if (savedLRN && rememberMe) {
+            $("#lrn").val(savedLRN);
+            $("#password").val(savedPassword);
+            $("#rememberMe").prop("checked", true);
+        }
+    }
+
+    // Save credentials if Remember Me is checked
+    function saveCredentials(lrn, password, remember) {
+        if (remember) {
+            localStorage.setItem("rememberedLRN", lrn);
+            localStorage.setItem("rememberedPassword", password);
+            localStorage.setItem("rememberMe", "true");
+        } else {
+            localStorage.removeItem("rememberedLRN");
+            localStorage.removeItem("rememberedPassword");
+            localStorage.removeItem("rememberMe");
+        }
+    }
+
+    // Load saved credentials on page load
+    loadSavedCredentials();
+
     $("#loginForm").on("submit", function (e) {
         e.preventDefault();
 
         let $form = $(this);
         let $button = $("#loginButton");
         let $messages = $("#loginMessages");
+        const lrn = $("#lrn").val();
+        const password = $("#password").val();
+        const remember = $("#rememberMe").is(":checked");
 
         $form.find(".form-control").removeClass("is-invalid");
         $form.find(".login-error").text("");
@@ -23,6 +80,8 @@ $(document).ready(function () {
                     $button.prop("disabled", false).text("Login");
 
                     if (data.success) {
+                        // Save credentials if Remember Me is checked
+                        saveCredentials(lrn, password, remember);
                         window.location.href = data.redirect_url;
                     } else if (data.errors) {
                         $.each(data.errors, function (field, messages) {

@@ -143,9 +143,9 @@ class ApplicationForm(forms.Form):
     enrollment_type = forms.CharField(widget=forms.HiddenInput())
     user_id = forms.IntegerField(widget=forms.HiddenInput())
     user_role = forms.CharField(widget=forms.HiddenInput())
-    application_no = forms.CharField(widget=forms.HiddenInput())
+    application_no = forms.CharField(widget=forms.HiddenInput(), required=False)
     status = forms.CharField(widget=forms.HiddenInput())
-    early_reg = forms.CharField(widget=forms.HiddenInput())
+    early_reg = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     # Enrollment Information
     school_year = forms.CharField(error_messages={"required": "School year is required."})

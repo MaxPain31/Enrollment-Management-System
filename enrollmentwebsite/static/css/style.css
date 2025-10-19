@@ -1492,6 +1492,85 @@ footer {
   }
 }
 
+/* ScrollReveal.js will handle animations - keeping only essential styles */
+
+/* Hover animations for interactive elements */
+.org-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.contact-card:hover {
+  transform: translateY(-10px) rotateX(2deg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.announcement-card:hover {
+  transform: translateY(-5px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth transitions for all elements */
+* {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Parallax effect for carousel */
+.carousel {
+  transition: transform 0.1s ease;
+}
+
+/* Loading animation for elements that are not yet visible */
+.scroll-animate:not(.animate-in) {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #007bff, #0056b3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #0056b3, #004085);
+}
+
+/* Scroll progress indicator */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  z-index: 9999;
+  transition: width 0.1s ease;
+}
+
+/* ScrollReveal.js handles responsive animations automatically */
+
 @media (max-width: 768px) {
   .carousel-item img {
     height: 300px;
@@ -1912,3 +1991,627 @@ footer {
     height: 320px;
   }
 }
+/* Contact Section Styles */
+.contact-banner {
+  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+  text-align: center;
+}
+
+.contact-banner h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.contact-banner p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.contact {
+  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+  padding: 5rem 0;
+}
+
+/* Contact Cards */
+.contact-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  position: relative;
+}
+
+.contact-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  border-color: #007bff;
+}
+
+.contact-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, #007bff, #0056b3);
+  border-radius: 16px 16px 0 0;
+}
+
+.location-card::before {
+  background: linear-gradient(to right, #ff6b6b, #ee5a24);
+}
+
+.email-card::before {
+  background: linear-gradient(to right, #4ecdc4, #44a08d);
+}
+
+.phone-card::before {
+  background: linear-gradient(to right, #667eea, #764ba2);
+}
+
+.contact-card-header {
+  padding: 2rem 2rem 1rem 2rem;
+  text-align: center;
+  position: relative;
+}
+
+.contact-icon-wrapper {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem auto;
+  position: relative;
+  z-index: 2;
+}
+
+.location-icon {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+}
+
+.email-icon {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+}
+
+.phone-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.contact-icon-wrapper i {
+  color: white;
+  font-size: 1.8rem;
+}
+
+.contact-card-title {
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.contact-card-body {
+  padding: 0 2rem 2rem 2rem;
+}
+
+.contact-info h4 {
+  color: #475569;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.contact-address,
+.contact-email,
+.contact-phones {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.contact-email a,
+.contact-phone a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.contact-email a:hover,
+.contact-phone a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.contact-phones .contact-phone {
+  margin-bottom: 0.5rem;
+}
+
+.contact-action {
+  text-align: center;
+}
+
+.contact-action .btn {
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.contact-action .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* Map Section */
+.map-section {
+  margin-top: 4rem;
+}
+
+.map-title {
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.map-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.map-placeholder {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border: none;
+  border-radius: 16px;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #64748b;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.map-placeholder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, #007bff, #0056b3);
+  border-radius: 16px 16px 0 0;
+}
+
+.map-placeholder i {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+  color: #94a3b8;
+}
+
+.map-placeholder h4 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+
+.map-placeholder p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  color: #64748b;
+}
+
+.map-placeholder .btn {
+  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.map-placeholder .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+}
+
+/* Hide Password Button */
+.hide-password {
+  border-radius: 0.375rem;
+  border: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  color: #212529;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hide-password:hover {
+  background-color: #e2e8f0;
+}
+
+
+/* Responsive Design for Contact Section */
+@media (max-width: 768px) {
+  .contact-banner h1 {
+    font-size: 2rem;
+  }
+  
+  .contact-banner p {
+    font-size: 1rem;
+  }
+  
+  .contact-card-header {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+  }
+  
+  .contact-card-body {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+  }
+  
+  .contact-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+  }
+  
+  .contact-icon-wrapper i {
+    font-size: 1.5rem;
+  }
+  
+  .contact-card-title {
+    font-size: 1.2rem;
+  }
+  
+  .map-placeholder {
+    min-height: 250px;
+    padding: 3rem 1.5rem;
+  }
+  
+  .map-placeholder i {
+    font-size: 3rem;
+  }
+  
+  .map-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .contact-card-header {
+    padding: 1rem 1rem 0.5rem 1rem;
+  }
+  
+  .contact-card-body {
+    padding: 0 1rem 1rem 1rem;
+  }
+  
+  .contact-icon-wrapper {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .contact-icon-wrapper i {
+    font-size: 1.2rem;
+  }
+  
+  .contact-card-title {
+    font-size: 1.1rem;
+  }
+  
+  .map-placeholder {
+    padding: 2rem 1rem;
+  }
+  
+  .map-placeholder i {
+    font-size: 2.5rem;
+  }
+  
+  .map-title {
+    font-size: 1.3rem;
+  }
+}
+
+/* Different Banner Designs */
+
+/* Home Banner - Geometric Pattern */
+.home-banner {
+    background: #ffff;
+    text-align: center;
+    padding: 3rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.home-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="1.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.home-banner h1,
+.home-banner p {
+    position: relative;
+    z-index: 1;
+}
+
+/* Announcement Banner - Diagonal Stripes */
+.announcement-banner {
+    background: #ffff;
+    background-size: 20px 20px;
+    text-align: center;
+    padding: 3rem 0;
+    position: relative;
+    animation: diagonalMove 20s linear infinite;
+}
+
+@keyframes diagonalMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 40px 40px; }
+}
+
+/* Organizational Chart Banner - Hexagonal Pattern */
+.organizational-chart-banner {
+    background: #ffff;
+    text-align: center;
+    padding: 3rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.organizational-chart-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="50,10 90,30 90,70 50,90 10,70 10,30" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/></svg>');
+    background-size: 60px 60px;
+    opacity: 0.3;
+}
+
+.organizational-chart-banner h1,
+.organizational-chart-banner p {
+    position: relative;
+    z-index: 1;
+}
+
+/* FAQ Banner - Dots Pattern */
+.faq-banner {
+    background: #ffff;
+    text-align: center;
+    padding: 3rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.faq-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 2px, transparent 2px);
+    background-size: 30px 30px;
+    opacity: 0.6;
+}
+
+.faq-banner h1,
+.faq-banner p {
+    position: relative;
+    z-index: 1;
+}
+
+/* Analytics Banner - Circuit Pattern */
+.analytics-banner {
+    background: #ffff;
+    text-align: center;
+    padding: 3rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.analytics-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="20" height="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><rect x="70" y="10" width="20" height="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><rect x="10" y="70" width="20" height="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><rect x="70" y="70" width="20" height="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><line x1="30" y1="20" x2="70" y2="20" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><line x1="30" y1="80" x2="70" y2="80" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></svg>');
+    background-size: 50px 50px;
+    opacity: 0.4;
+}
+
+.analytics-banner h1,
+.analytics-banner p {
+    position: relative;
+    z-index: 1;
+}
+
+/* Contact Banner - Wave Pattern */
+.contact-banner {
+    background: #ffff;
+    text-align: center;
+    padding: 3rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0,50 Q25,20 50,50 T100,50 L100,100 L0,100 Z" fill="rgba(255,255,255,0.1)"/><path d="M0,60 Q25,30 50,60 T100,60 L100,100 L0,100 Z" fill="rgba(255,255,255,0.05)"/></svg>');
+    background-size: 200px 100px;
+    opacity: 0.3;
+}
+
+.contact-banner h1,
+.contact-banner p {
+    position: relative;
+    z-index: 1;
+}
+
+/* Common Banner Styles */
+.home-banner h1,
+.announcement-banner h1,
+.organizational-chart-banner h1,
+.faq-banner h1,
+.analytics-banner h1,
+.contact-banner h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.home-banner p,
+.announcement-banner p,
+.organizational-chart-banner p,
+.faq-banner p,
+.analytics-banner p,
+.contact-banner p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Analytics Section */
+.analytics {
+    background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%); 
+    padding: 4rem 0;
+}
+
+.analytics-container {
+    max-width: 1200px;
+}
+
+.analytics-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analytics-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.analytics-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.analytics-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.analytics-subtitle {
+    color: #718096;
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+.analytics-chart {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Responsive Design for All Banners */
+@media (max-width: 768px) {
+    .home-banner h1,
+    .announcement-banner h1,
+    .organizational-chart-banner h1,
+    .faq-banner h1,
+    .analytics-banner h1,
+    .contact-banner h1 {
+        font-size: 2rem;
+    }
+    
+    .home-banner p,
+    .announcement-banner p,
+    .organizational-chart-banner p,
+    .faq-banner p,
+    .analytics-banner p,
+    .contact-banner p {
+        font-size: 1rem;
+    }
+    
+    .analytics-card {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .analytics-chart {
+        height: 250px;
+    }
+    
+    .analytics-title {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .home-banner,
+    .announcement-banner,
+    .organizational-chart-banner,
+    .faq-banner,
+    .analytics-banner,
+    .contact-banner {
+        padding: 2rem 0;
+    }
+    
+    .home-banner h1,
+    .announcement-banner h1,
+    .organizational-chart-banner h1,
+    .faq-banner h1,
+    .analytics-banner h1,
+    .contact-banner h1 {
+        font-size: 1.8rem;
+    }
+    
+    .analytics {
+        padding: 2rem 0;
+    }
+    
+    .analytics-card {
+        padding: 1rem;
+    }
+    
+    .analytics-chart {
+        height: 200px;
+    }
+}
+

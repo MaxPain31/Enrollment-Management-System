@@ -1,6 +1,9 @@
 {% extends 'admin/base.html' %}
 {% load static %}
 {% load tz %}
+
+{% block title %}Admin - Student Users - TuloyEskwelaPDBNHS{% endblock %}
+
 {% block content %}
 
 <div class="pagetitle">
@@ -470,6 +473,28 @@
                     <button type="submit" class="btn btn-success">Save</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Submission Remarks Modal -->
+<div class="modal fade" id="submissionRemarksModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Submission Remarks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="submission_remarks" class="form-label">Submission Remarks</label>
+                    <textarea class="form-control" id="submission_remarks" name="submission_remarks" rows="5" style="resize: none;" placeholder="Enter any remarks about the student submission..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Skip</button>
+                <button type="button" class="btn btn-success">Save Remarks</button>
+            </div>
         </div>
     </div>
 </div>

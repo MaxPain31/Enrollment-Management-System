@@ -239,6 +239,7 @@ $(document).ready(function () {
             },
             {
                 data: null,
+                className: "align-middle text-center",
                 render: function (data, type, row) {
                     let middle = row.middle_name ? ` ${row.middle_name}` : "";
                     return `${row.last_name}, ${row.first_name}${middle} `.trim();
@@ -1878,12 +1879,12 @@ function getCookie(name) {
 
 function enableEditForm() {
     $("#enrollmentForm input, #enrollmentForm select, #documentForm input, #submissionRemarksForm textarea").prop("disabled", false);
-    $("#saveButton").show();
+    $("#editStudentUserButton").show();
     $("#editButton").hide();
 }
 
 function disableEditForm() {
     $("#enrollmentForm input, #enrollmentForm select, #documentForm input").prop("disabled", true);
     $("#editButton").show();
-    $("#saveButton").hide();
+    $("#editStudentUserButton").hide();
 }

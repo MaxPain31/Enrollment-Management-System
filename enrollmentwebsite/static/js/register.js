@@ -1,4 +1,60 @@
 $(document).ready(function () {
+    console.log("Register script loaded");
+    
+    // Password visibility toggle for main password field
+    $("#togglePassword").on("click", function(e) {
+        e.preventDefault();
+        console.log("Password toggle clicked");
+        const passwordInput = $("#password");
+        const toggleIcon = $("#toggleIcon");
+        
+        if (passwordInput.attr("type") === "password") {
+            passwordInput.attr("type", "text");
+            toggleIcon.removeClass("bi-eye").addClass("bi-eye-slash");
+        } else {
+            passwordInput.attr("type", "password");
+            toggleIcon.removeClass("bi-eye-slash").addClass("bi-eye");
+        }
+    });
+
+    // Password visibility toggle for confirm password field
+    $("#toggleConfirmPassword").on("click", function(e) {
+        e.preventDefault();
+        console.log("Confirm password toggle clicked");
+        const confirmPasswordInput = $("#confirm_password");
+        const toggleConfirmIcon = $("#toggleConfirmIcon");
+        
+        if (confirmPasswordInput.attr("type") === "password") {
+            confirmPasswordInput.attr("type", "text");
+            toggleConfirmIcon.removeClass("bi-eye").addClass("bi-eye-slash");
+        } else {
+            confirmPasswordInput.attr("type", "password");
+            toggleConfirmIcon.removeClass("bi-eye-slash").addClass("bi-eye");
+        }
+    });
+
+    // Real-time password confirmation validation
+    $("#confirm_password").on("input", function() {
+        const password = $("#password").val();
+        const confirmPassword = $(this).val();
+        
+        if (confirmPassword && password !== confirmPassword) {
+            $(this).addClass("is-invalid");
+            $(this).closest(".mb-2").find(".register-error").text("Passwords do not match");
+        } else {
+            $(this).removeClass("is-invalid");
+            $(this).closest(".mb-2").find(".register-error").text("");
+        }
+    });
+
+    // Clear validation when password changes
+    $("#password").on("input", function() {
+        const confirmPassword = $("#confirm_password").val();
+        if (confirmPassword) {
+            $("#confirm_password").trigger("input");
+        }
+    });
+
     $("#registerForm").on("submit", function (e) {
         e.preventDefault();
 

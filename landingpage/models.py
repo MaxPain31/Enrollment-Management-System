@@ -114,7 +114,7 @@ class StudentInformation(models.Model):
         ApplicationApproved, null=True, on_delete=models.SET_NULL
     )
     assessment = models.ForeignKey(Assessment, null=True, on_delete=models.SET_NULL)
-    application_no = models.CharField(max_length=191)
+    application_no = models.CharField(max_length=191, null=True, blank=True)
     status = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(null=True, blank=True)

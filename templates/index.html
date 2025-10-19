@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block title %}Home - TuloyEskwelaPDBNHS{% endblock %}
+
 {% block content %}
 <section class="home">
     <div class="home-container container">
@@ -40,8 +43,8 @@
                 para sa Junior High School at Senior High School. Ang aming mga programa ay dinisenyo upang palakasin
                 ang inyong mga anak at ihanda sila para sa kanilang kinabukasan.</p>
             <div>
-                <button type="button" class="btn btn-primary">About Us</button>
-                <button type="button" class="btn btn-light">Contact Us</button>
+                <a href="{% url 'about' %}" class="btn btn-primary">About Us</a>
+                <a href="#contact" class="btn btn-light">Contact Us</a>
             </div>
         </div>
     </div>
@@ -266,8 +269,441 @@
         </div>
     </div>
 </section>
+
+<div class="analytics-banner banner-2">
+    <h1>Enrollment Reports</h1>
+    <p>Track enrollment trends and statistics for Junior High School and Senior High School</p>
+</div>
+<section class="analytics">
+    <div class="analytics-container container">
+        <div class="row">
+            <!-- JHS Analytics -->
+            <div class="col-lg-6 mb-4">
+                <div class="analytics-card">
+                    <div class="analytics-header">
+                        <h3 class="analytics-title">Junior High School Enrollment</h3>
+                        <p class="analytics-subtitle">Number of Enrollees by Grade Level</p>
+                    </div>
+                    <div class="analytics-chart">
+                        <canvas id="jhsChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SHS Analytics -->
+            <div class="col-lg-6 mb-4">
+                <div class="analytics-card">
+                    <div class="analytics-header">
+                        <h3 class="analytics-title">Senior High School Enrollment</h3>
+                        <p class="analytics-subtitle">Number of Enrollees by Strand</p>
+                    </div>
+                    <div class="analytics-chart">
+                        <canvas id="shsChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="contact-banner banner-2" id="contact">
+    <h1>Contact Us</h1>
+    <p>Get in touch with TuloyEskwelaPDBNHS for any inquiries or concerns.</p>
+</div>
+<section class="contact">
+    <div class="contact-container container">
+        <div class="row g-4">
+            <!-- Email Card -->
+            <div class="col-lg-6 col-md-6">
+                <div class="contact-card email-card">
+                    <div class="contact-card-header">
+                        <div class="contact-icon-wrapper email-icon">
+                            <i class="bi bi-envelope-fill"></i>
+                        </div>
+                        <h3 class="contact-card-title">Email</h3>
+                    </div>
+                    <div class="contact-card-body">
+                        <div class="contact-info">
+                            <h4>Send us a Message</h4>
+                            <p class="contact-email">
+                                <a href="mailto:pasodeblas.nhs@deped.gov.ph">pasodeblas.nhs@deped.gov.ph</a>
+                            </p>
+                        </div>
+                        <div class="contact-action">
+                            <a href="mailto:pasodeblas.nhs@deped.gov.ph" class="btn btn-primary btn-sm">
+                                <i class="bi bi-send me-2"></i>Send Email
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phone Card -->
+            <div class="col-lg-6 col-md-6">
+                <div class="contact-card phone-card">
+                    <div class="contact-card-header">
+                        <div class="contact-icon-wrapper phone-icon">
+                            <i class="bi bi-telephone-fill"></i>
+                        </div>
+                        <h3 class="contact-card-title">Phone</h3>
+                    </div>
+                    <div class="contact-card-body">
+                        <div class="contact-info">
+                            <h4>Call Us</h4>
+                            <div class="contact-phones">
+                                <p class="contact-phone">
+                                    <a href="tel:+63283987897">(02) 8398-7897</a>
+                                </p>
+                                <p class="contact-phone">
+                                    <a href="tel:+63288066446">8806-6446</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="contact-action">
+                            <a href="tel:+63283987897" class="btn btn-success btn-sm">
+                                <i class="bi bi-telephone me-2"></i>Call Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Card -->
+            <div class="col-lg-6 col-md-6">
+                <div class="contact-card location-card">
+                    <div class="contact-card-header">
+                        <div class="contact-icon-wrapper location-icon">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                        <h3 class="contact-card-title">Location</h3>
+                    </div>
+                    <div class="contact-card-body">
+                        <div class="contact-info">
+                            <h4>Visit Us</h4>
+                            <p class="contact-address">
+                                #0027 Paso de Blas Street TCL, Paso de Blas
+                            </p>
+                        </div>
+                        <div class="contact-action">
+                            <a class="btn btn-outline-primary btn-sm" href="https://www.google.com/maps/place/Paso+De+Blas+Senior+High+School/@14.7044066,120.9843223,17z/data=!4m14!1m7!3m6!1s0x3397b3e29649a20b:0x2328c63230bc3144!2sPaso+De+Blas+Senior+High+School!8m2!3d14.7044014!4d120.9868972!16s%2Fg%2F11c549xfpm!3m5!1s0x3397b3e29649a20b:0x2328c63230bc3144!8m2!3d14.7044014!4d120.9868972!16s%2Fg%2F11c549xfpm?entry=ttu&g_ep=EgoyMDI1MTAxNC4wIKXMDSoASAFQAw%3D%3D" target="_blank">
+                                <i class="bi bi-map me-2"></i>Get Directions
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Facebook Card -->
+            <div class="col-lg-6 col-md-6">
+                <div class="contact-card facebook-card">
+                    <div class="contact-card-header">
+                        <div class="contact-icon-wrapper facebook-icon">
+                            <i class="bi bi-facebook"></i>
+                        </div>
+                        <h3 class="contact-card-title">Facebook</h3>
+                    </div>
+                    <div class="contact-card-body">
+                        <div class="contact-info">
+                            <h4>Follow Us</h4>
+                            <p class="contact-address">
+                                <a href="https://www.facebook.com/groups/258171935531963" target="_blank">Facebook</a>
+                            </p>
+                        </div>
+                        <div class="contact-action">
+                            <a class="btn btn-outline-primary btn-sm" href="https://www.facebook.com/groups/258171935531963" target="_blank">
+                                <i class="bi bi-facebook me-2"></i>Follow Us
+                            </a>
+                        </div>
+                    </div>
+                </div>      
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'js/org-chart-scroll.js' %}"></script>
+<script src="{% static 'js/scroll-animations.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Analytics data from Django
+const analyticsData = JSON.parse('{{ enrollment_analytics|escapejs }}');
+
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', function() {
+    // JHS Chart
+    const jhsCtx = document.getElementById('jhsChart');
+    if (jhsCtx) {
+        const jhsChart = new Chart(jhsCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: analyticsData.years || [],
+                datasets: [
+                    {
+                        label: 'Grade 7',
+                        data: analyticsData.jhs_data['Grade 7'] || [],
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Grade 8',
+                        data: analyticsData.jhs_data['Grade 8'] || [],
+                        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Grade 9',
+                        data: analyticsData.jhs_data['Grade 9'] || [],
+                        backgroundColor: 'rgba(255, 205, 86, 0.8)',
+                        borderColor: 'rgba(255, 205, 86, 1)',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Grade 10',
+                        data: analyticsData.jhs_data['Grade 10'] || [],
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                        borderSkipped: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'JHS Enrollment by Grade Level',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        color: '#2d3748'
+                    },
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#718096',
+                            font: {
+                                size: 11
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Enrollees',
+                            color: '#4a5568',
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#718096',
+                            font: {
+                                size: 11
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'School Year',
+                            color: '#4a5568',
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+    }
+
+    // SHS Chart
+    const shsCtx = document.getElementById('shsChart');
+    if (shsCtx) {
+        const shsChart = new Chart(shsCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: analyticsData.years || [],
+                datasets: [
+                    {
+                        label: 'Grade 11 ABM',
+                        data: analyticsData.shs_data['Grade 11 ABM'] || [],
+                        backgroundColor: 'rgba(153, 102, 255, 0.8)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Grade 11 STEM',
+                        data: analyticsData.shs_data['Grade 11 STEM'] || [],
+                        backgroundColor: 'rgba(255, 159, 64, 0.8)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Grade 12 ABM',
+                        data: analyticsData.shs_data['Grade 12 ABM'] || [],
+                        backgroundColor: 'rgba(201, 203, 207, 0.8)',
+                        borderColor: 'rgba(201, 203, 207, 1)',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Grade 12 STEM',
+                        data: analyticsData.shs_data['Grade 12 STEM'] || [],
+                        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                        borderSkipped: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'SHS Enrollment by Strand',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        color: '#2d3748'
+                    },
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#718096',
+                            font: {
+                                size: 11
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Enrollees',
+                            color: '#4a5568',
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#718096',
+                            font: {
+                                size: 11
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'School Year',
+                            color: '#4a5568',
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+    }
+});
+
+// Add scroll reveal animation for analytics section
+if (typeof ScrollReveal !== 'undefined') {
+    ScrollReveal().reveal('.analytics-card', {
+        distance: '50px',
+        duration: 1000,
+        easing: 'ease-in-out',
+        origin: 'bottom',
+        interval: 200
+    });
+}
+</script>
 {% endblock %}

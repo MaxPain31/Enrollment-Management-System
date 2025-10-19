@@ -214,7 +214,13 @@ class AdminDashboardDataAPI(View):
 class AdminApplicationView(View):
     def get(self, request):
         documents = DocumentRepository.get_all()
-        return render(request, "admin/application.html", {"documents": documents})
+        school_years = SchoolYearRepository.get_available_school_years()
+        current_academic_year = SchoolYearRepository.get_all().order_by("updated_at").last()
+        return render(request, "admin/application.html", {
+            "documents": documents,
+            "school_years": school_years,
+            "current_academic_year": current_academic_year
+        })
 
 #APPLICATION DATA API
 @method_decorator(
@@ -245,7 +251,13 @@ class AdminApplicationUpdateView(View):
 class AdminApplicationApprovedView(View):
     def get(self, request):
         documents = DocumentRepository.get_all()
-        return render(request, "admin/application_approved.html", {"documents": documents})
+        school_years = SchoolYearRepository.get_available_school_years()
+        current_academic_year = SchoolYearRepository.get_all().order_by("updated_at").last()
+        return render(request, "admin/application_approved.html", {
+            "documents": documents,
+            "school_years": school_years,
+            "current_academic_year": current_academic_year
+        })
 
 #APPLICATION APPROVED DATA API
 @method_decorator(
@@ -554,7 +566,13 @@ class AdminApplicationReapproveActionView(View):
 class AdminApplicationPendingView(View):
     def get(self, request):
         documents = DocumentRepository.get_all()
-        return render(request, "admin/application_rejected.html", {"documents": documents})
+        school_years = SchoolYearRepository.get_available_school_years()
+        current_academic_year = SchoolYearRepository.get_all().order_by("updated_at").last()
+        return render(request, "admin/application_rejected.html", {
+            "documents": documents,
+            "school_years": school_years,
+            "current_academic_year": current_academic_year
+        })
 
 #APPLICATION PENDING DATA API
 @method_decorator(
@@ -814,6 +832,17 @@ class AdminReportsDataAPI(View):
         # Get school year filter
         school_year_filter = request.GET.get('school_year', None)
         
+        # Get current school year from SchoolYearRepository
+        current_school_year = SchoolYearRepository.get_all().order_by("updated_at").last()
+        current_school_year_name = current_school_year.name if current_school_year else None
+        
+        # Use current school year as default only if no filter provided and filter is not 'all'
+        if not school_year_filter or school_year_filter == 'all':
+            if school_year_filter == 'all':
+                school_year_filter = None  # Don't filter by school year
+            else:
+                school_year_filter = current_school_year_name  # Use current as default
+        
         # Get current date and time
         now = timezone.now()
         current_year = now.year
@@ -823,25 +852,35 @@ class AdminReportsDataAPI(View):
         enrollment_queryset = EnrollmentFormRepository.get_all()
         student_queryset = StudentInformationRepository.get_all()
         
-        if school_year_filter and school_year_filter != 'all':
+        if school_year_filter:
             enrollment_queryset = enrollment_queryset.filter(school_year=school_year_filter)
             student_queryset = student_queryset.filter(school_year=school_year_filter)
         
-        # Get available school years for filter
-        available_school_years = list(EnrollmentFormRepository.get_all().values_list('school_year', flat=True).distinct().exclude(school_year__isnull=True))
+        # Get available school years for filter from SchoolYearRepository
+        available_school_years = list(SchoolYearRepository.get_all().values_list('name', flat=True).distinct().order_by('-name'))
         
         # Basic counts using repositories
         total_applications = enrollment_queryset.count()
-        approved_applications = ApplicationApprovedRepository.get_all().filter(enrollment__in=enrollment_queryset).count()
-        pending_applications = ApplicationPendingRepository.get_all().filter(enrollment__in=enrollment_queryset).count()
+        
+        # Filter approved and pending applications by school year
+        if school_year_filter:
+            approved_applications = ApplicationApprovedRepository.get_all().filter(enrollment__school_year=school_year_filter).count()
+            pending_applications = ApplicationPendingRepository.get_all().filter(enrollment__school_year=school_year_filter).count()
+        else:
+            approved_applications = ApplicationApprovedRepository.get_all().count()
+            pending_applications = ApplicationPendingRepository.get_all().count()
+            
         total_students = student_queryset.count()
         total_users = UserInformationRepository.get_all().count()
+        
+        # Calculate in review applications (total - approved - pending)
+        in_review_applications = total_applications - approved_applications - pending_applications
         
         # Application status distribution
         application_status_data = [
             {"value": approved_applications, "name": "Approved"},
             {"value": pending_applications, "name": "Pending"},
-            {"value": total_applications - approved_applications - pending_applications, "name": "In Review"}
+            {"value": in_review_applications, "name": "In Review"}
         ]
         
         # User role distribution using repositories
@@ -994,10 +1033,23 @@ class AdminReportsDataAPI(View):
         total_documents = DocumentRepository.get_all().count()
         required_documents = DocumentRepository.get_required_ids()
         
-        # Get assessment statistics
-        total_assessments = AssessmentRepository.get_all().count()
-        assessed_count = AssessmentRepository.get_all_with_assessed().count()
-        not_assessed_count = AssessmentRepository.get_all_with_not_assessed().count()
+        # Get assessment statistics - filter by school year through relationships
+        if school_year_filter:
+            # Filter assessments by school year through application_approved -> enrollment -> school_year
+            total_assessments = AssessmentRepository.get_all().filter(
+                application_approved__enrollment__school_year=school_year_filter
+            ).count()
+            assessed_count = AssessmentRepository.get_all_with_assessed().filter(
+                application_approved__enrollment__school_year=school_year_filter
+            ).count()
+            not_assessed_count = AssessmentRepository.get_all_with_not_assessed().filter(
+                application_approved__enrollment__school_year=school_year_filter
+            ).count()
+        else:
+            # No school year filter - get all assessments
+            total_assessments = AssessmentRepository.get_all().count()
+            assessed_count = AssessmentRepository.get_all_with_assessed().count()
+            not_assessed_count = AssessmentRepository.get_all_with_not_assessed().count()
         
         # Get FAQ statistics
         total_faqs = FAQRepository.get_all().count()
@@ -1043,6 +1095,10 @@ class AdminReportsDataAPI(View):
                 {"value": dropped_students, "name": "Dropped"}
             ],
             "strand_distribution": [
+                {"value": abm_students, "name": "ABM"},
+                {"value": stem_students, "name": "STEM"}
+            ],
+            "shs_strand_distribution": [
                 {"value": abm_students, "name": "ABM"},
                 {"value": stem_students, "name": "STEM"}
             ],
@@ -1092,6 +1148,8 @@ class AdminReportsDataAPI(View):
                 "active_announcements": active_announcements
             },
             "available_school_years": available_school_years,
+            "current_school_year": current_school_year_name,
+            "selected_school_year": school_year_filter if school_year_filter else 'all',
             "repository_school_years": list(school_years)
         }
         
@@ -1176,9 +1234,9 @@ class UpdateApplicationView(View):
                 "enrollment_type": application.enrollment_type,
                 "user_id": application.user.id,
                 "user_role": application.user.user_role,
-                "application_no": application.application_no,
+                "application_no": application.application_no or "",
                 "status": application.status,
-                "early_reg": application.early_reg,
+                "early_reg": application.early_reg if application.early_reg is not None else "",
             })
 
             form = ApplicationFormValidation(data=nested_data)

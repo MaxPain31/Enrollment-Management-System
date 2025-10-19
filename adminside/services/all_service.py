@@ -50,6 +50,7 @@ class EnrollmentFormService:
         student_type = request.GET.get("student_type")
         enrollment_type = request.GET.get("enrollment_type")
         early_reg = request.GET.get("early_reg")
+        school_year = request.GET.get("school_year")
         
         # Map DataTables column index -> model field
         column_map = {
@@ -61,7 +62,11 @@ class EnrollmentFormService:
             6: "created_at",
         }
         
-        applications = EnrollmentFormService.get_all_with_documents().filter(school_year=current_academic_year.name)
+        # Use school year filter if provided, otherwise use current academic year
+        if school_year:
+            applications = EnrollmentFormService.get_all_with_documents().filter(school_year=school_year)
+        else:
+            applications = EnrollmentFormService.get_all_with_documents().filter(school_year=current_academic_year.name)
         
         # Filtering
         if grade_level:
@@ -128,9 +133,9 @@ class EnrollmentFormService:
                 "enrollment_type": enrollment.enrollment_type,
                 "user_id": enrollment.user.id,
                 "user_role": enrollment.user.user_role,
-                "application_no": enrollment.application_no,
+                "application_no": enrollment.application_no or "",
                 "status": enrollment.status,
-                "early_reg": enrollment.early_reg,
+                "early_reg": enrollment.early_reg if enrollment.early_reg is not None else "",
             })
             form = ApplicationFormValidation(form_data)
             if not form.is_valid():
@@ -204,6 +209,7 @@ class ApplicationApprovedService:
         student_type = request.GET.get("student_type")
         enrollment_type = request.GET.get("enrollment_type")
         early_reg = request.GET.get("early_reg")
+        school_year = request.GET.get("school_year")
         
         # Map DataTables column index -> model field
         column_map = {
@@ -215,7 +221,11 @@ class ApplicationApprovedService:
             6: "enrollment__created_at",
         }
         
-        applications = ApplicationApprovedRepository.get_all_with_enrollment().filter(enrollment__school_year=current_academic_year.name).prefetch_related("enrollment__documents")
+        # Use school year filter if provided, otherwise use current academic year
+        if school_year:
+            applications = ApplicationApprovedRepository.get_all_with_enrollment().filter(enrollment__school_year=school_year).prefetch_related("enrollment__documents")
+        else:
+            applications = ApplicationApprovedRepository.get_all_with_enrollment().filter(enrollment__school_year=current_academic_year.name).prefetch_related("enrollment__documents")
         
         # Filtering
         if grade_level:
@@ -482,8 +492,9 @@ class ApplicationPendingService:
         student_type = request.GET.get("student_type")
         enrollment_type = request.GET.get("enrollment_type")
         early_reg = request.GET.get("early_reg")
+        school_year = request.GET.get("school_year")
         
-                # Map DataTables column index -> model field
+        # Map DataTables column index -> model field
         column_map = {
             1: "enrollment__application_no",
             2: "enrollment__last_name",
@@ -493,11 +504,19 @@ class ApplicationPendingService:
             6: "enrollment__created_at",
         }
         
-        applications = (
-            ApplicationPendingRepository.get_all_with_enrollment().filter(enrollment__school_year=current_academic_year.name)
-            .filter(Q(is_reapproved=False) | Q(is_reapproved__isnull=True))
-            .prefetch_related("enrollment__documents")
-        )
+        # Use school year filter if provided, otherwise use current academic year
+        if school_year:
+            applications = (
+                ApplicationPendingRepository.get_all_with_enrollment().filter(enrollment__school_year=school_year)
+                .filter(Q(is_reapproved=False) | Q(is_reapproved__isnull=True))
+                .prefetch_related("enrollment__documents")
+            )
+        else:
+            applications = (
+                ApplicationPendingRepository.get_all_with_enrollment().filter(enrollment__school_year=current_academic_year.name)
+                .filter(Q(is_reapproved=False) | Q(is_reapproved__isnull=True))
+                .prefetch_related("enrollment__documents")
+            )
         
         # Filtering
         if grade_level:
@@ -1129,9 +1148,9 @@ class StudentInformationService:
                 "enrollment_type": student.enrollment_type,
                 "user_id": student.user.id,
                 "user_role": student.user.user_role,
-                "application_no": student.application_no if student.application_no else "",
+                "application_no": student.application_no or "",
                 "status": student.status,
-                "early_reg": student.early_reg,
+                "early_reg": student.early_reg if student.early_reg is not None else "",
             })
             
             # Create a form similar to ApplicationForm but for student updates
