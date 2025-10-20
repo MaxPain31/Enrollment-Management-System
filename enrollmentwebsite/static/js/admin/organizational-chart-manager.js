@@ -1,4 +1,21 @@
 $(document).ready(function () {
+    const shouldShowDepartment = (designationValue) => {
+        return designationValue === 'Junior High School Faculty';
+    };
+
+    const toggleDepartmentVisibility = (formEl, designationValue) => {
+        const departmentField = $(formEl).find('[name="department"]');
+        const departmentGroup = departmentField.closest('.mb-3');
+        if (shouldShowDepartment(designationValue)) {
+            departmentGroup.show();
+        } else {
+            departmentGroup.hide();
+            // Also clear invalid state when hiding
+            departmentField.removeClass('is-invalid');
+            departmentField.siblings('.invalid-feedback').text('').hide();
+        }
+    };
+
     let organizationalChartTable = $('#organizationalChartTable').DataTable({
         serverSide: true,
         processing: true,
@@ -223,6 +240,19 @@ $(document).ready(function () {
         }, 500);
     });
 
+    // Toggle department visibility on Add modal designation change
+    $(document).on('change', '#addDesignation', function () {
+        const form = $('#addOrganizationChartForm');
+        toggleDepartmentVisibility(form, $(this).val());
+    });
+
+    // Initialize department visibility on Add modal open
+    $('#addOrganizationChartModal').on('shown.bs.modal', function () {
+        const form = $('#addOrganizationChartForm');
+        const designationValue = $('#addDesignation').val();
+        toggleDepartmentVisibility(form, designationValue);
+    });
+
     // Clear validation on input change for Org Chart forms
     $(document).on("input change", "#addOrganizationChartForm .form-control, #addOrganizationChartForm .form-select, #editOrganizationChartForm .form-control, #editOrganizationChartForm .form-select", function () {
         $(this).removeClass("is-invalid");
@@ -247,8 +277,20 @@ $(document).ready(function () {
         setValue("name", info.name);
         setValue("position", info.position);
         setValue("department", info.department);
-        setValue("designation", info.designation);
+        // Set designation select for edit
+        const editDesignationEl = document.getElementById('editDesignation');
+        if (editDesignationEl) {
+            editDesignationEl.value = info.designation || '';
+        }
         setValue("currentImage", info.image);
+
+        // Initialize department visibility based on current designation in Edit modal
+        toggleDepartmentVisibility('#editOrganizationChartForm', info.designation);
+
+        // Bind change listener for designation in Edit modal
+        $(document).off('change.editDesignation').on('change.editDesignation', '#editDesignation', function () {
+            toggleDepartmentVisibility('#editOrganizationChartForm', $(this).val());
+        });
 
         $("#editOrganizationChartForm").off("submit").on("submit", function (e) {
             e.preventDefault();

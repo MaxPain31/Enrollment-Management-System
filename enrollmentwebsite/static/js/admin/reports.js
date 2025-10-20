@@ -16,9 +16,8 @@ class ReportsManager {
      */
     init() {
         this.showLoadingSpinner();
-        this.loadSchoolYears();
-        this.fetchReportsData();
         this.setupEventListeners();
+        this.fetchReportsData();
     }
 
     /**
@@ -56,8 +55,8 @@ class ReportsManager {
             this.data = await response.json();
             this.hideLoadingSpinner();
             this.updateSummaryCards();
-            this.loadSchoolYears();
             this.initializeCharts();
+            this.loadSchoolYears();
             
         } catch (error) {
             console.error('Error fetching reports data:', error);
@@ -133,6 +132,9 @@ class ReportsManager {
     initializeCharts() {
         if (!this.data) return;
 
+        // Check if mobile device
+        const isMobile = window.innerWidth <= 768;
+        
         // Initialize each chart
         this.initApplicationStatusChart();
         this.initUserRoleChart();
@@ -168,6 +170,9 @@ class ReportsManager {
 
         this.charts.applicationStatus = echarts.init(chartElement);
         
+        // Check if mobile device
+        const isMobile = window.innerWidth <= 768;
+        
         // Ensure data exists and has values
         const chartData = this.data.application_status || [];
 
@@ -184,39 +189,40 @@ class ReportsManager {
                 borderWidth: 1,
                 textStyle: { 
                     color: '#fff',
-                    fontSize: 14,
+                    fontSize: isMobile ? 12 : 14,
                     fontWeight: 'bold'
                 },
                 extraCssText: 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); border-radius: 6px;'
             },
             legend: {
-                orient: 'vertical',
-                left: 'left',
+                orient: isMobile ? 'horizontal' : 'vertical',
+                left: isMobile ? 'center' : 'left',
+                top: isMobile ? 'bottom' : 'middle',
                 textStyle: { 
-                    fontSize: 12,
+                    fontSize: isMobile ? 10 : 12,
                     color: '#333',
                     fontWeight: 'normal'
                 },
-                itemGap: 10
+                itemGap: isMobile ? 5 : 10
             },
             series: [{
                 name: 'Application Status',
                 type: 'pie',
-                radius: '60%',
-                center: ['65%', '50%'],
+                radius: isMobile ? '50%' : '60%',
+                center: isMobile ? ['50%', '45%'] : ['65%', '50%'],
                 data: chartData,
                 label: {
-                    show: true,
+                    show: !isMobile,
                     formatter: function(params) {
                         return `${params.name}: ${params.value}`;
                     },
-                    fontSize: 12,
+                    fontSize: isMobile ? 9 : 12,
                     color: '#333',
                     fontWeight: 'bold',
                     position: 'outside'
                 },
                 labelLine: {
-                    show: true,
+                    show: !isMobile,
                     length: 15,
                     length2: 10,
                     lineStyle: {
@@ -232,7 +238,7 @@ class ReportsManager {
                     },
                     label: {
                         show: true,
-                        fontSize: 14,
+                        fontSize: isMobile ? 10 : 14,
                         fontWeight: 'bold',
                         color: '#333'
                     },
@@ -776,8 +782,8 @@ class ReportsManager {
             // Check if there's data for the selected school year
             if (this.hasDataForSchoolYear()) {
                 this.updateSummaryCards();
-                this.loadSchoolYears();
                 this.initializeCharts();
+                this.loadSchoolYears();
             } else {
                 this.showNoDataMessage(schoolYear);
             }
@@ -848,32 +854,41 @@ class ReportsManager {
      */
     loadSchoolYears() {
         const schoolYearFilter = document.getElementById('schoolYearFilter');
-        if (schoolYearFilter && this.data && this.data.available_school_years) {
+        if (schoolYearFilter && this.data) {
+            console.log('Loading school years:', this.data.available_school_years);
+            
             // Store current selection before clearing
             const currentSelection = schoolYearFilter.value;
             
-            // Clear existing options except "All School Years"
+            // Clear existing options
             schoolYearFilter.innerHTML = '<option value="all">All School Years</option>';
             
             // Add school years from backend data
-            this.data.available_school_years.forEach(year => {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                schoolYearFilter.appendChild(option);
-            });
+            if (this.data.available_school_years && Array.isArray(this.data.available_school_years)) {
+                this.data.available_school_years.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    schoolYearFilter.appendChild(option);
+                });
+            }
             
             // Restore selection or set default
             if (currentSelection && currentSelection !== 'all') {
                 // Keep the user's selection if it exists
                 schoolYearFilter.value = currentSelection;
-            } else if (this.data.selected_school_year) {
+            } else if (this.data.selected_school_year && this.data.selected_school_year !== 'all') {
                 // Use the selected school year from API
                 schoolYearFilter.value = this.data.selected_school_year;
-            } else if (this.data.current_school_year) {
+            } else if (this.data.current_school_year && this.data.current_school_year !== 'all') {
                 // Fall back to current school year
                 schoolYearFilter.value = this.data.current_school_year;
+            } else {
+                // Default to "All School Years"
+                schoolYearFilter.value = 'all';
             }
+            
+            console.log('School year filter value set to:', schoolYearFilter.value);
         }
     }
 

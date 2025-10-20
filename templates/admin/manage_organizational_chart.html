@@ -88,18 +88,35 @@
                         <input type="text" class="form-control" name="position" placeholder="Your position here">
                         <div class="invalid-feedback"></div>
                     </div>
-                    <div class="mb-3">
-                        <label for="department" class="form-label">Department</label>
-                        <input type="text" class="form-control" name="department" placeholder="Your department here">
-                        <div class="invalid-feedback"></div>
-                    </div>
-                    <div class="mb-3">
+                    <div class="mb-3">  
                         <label for="designation" class="form-label">Designation</label>
-                        <input type="text" class="form-control" name="designation" placeholder="Your designation here"></textarea>
+                        <select class="form-select" name="designation" id="addDesignation">
+                            <option selected disabled>--</option>
+                            <option value="Principal">Principal</option>
+                            <option value="Administrative Staff">Administrative Staff</option>
+                            <option value="Support Staff">Support Staff</option>
+                            <option value="Junior High School Faculty">Junior High School Faculty</option>
+                            <option value="Senior High School Faculty">Senior High School Faculty</option>
+                        </select>   
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3" style="display: none;">
+                        <label for="department" class="form-label">Department</label>
+                        <select class="form-select" name="department">
+                            <option selected disabled>--</option>
+                            <option value="TLE Department">TLE Department</option>
+                            <option value="Science Department">Science Department</option>
+                            <option value="Math Department">Math Department</option>
+                            <option value="English Department">English Department</option>
+                            <option value="Filipino Department">Filipino Department</option>
+                            <option value="ESP Department">ESP Department</option>
+                            <option value="MAPEH Department">MAPEH Department</option>
+                            <option value="AP Department">AP Department</option>
+                        </select>
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="image" class="form-label">Image</label>
+                        <label for="image" class="form-label">Image</label> 
                         <input type="file" class="form-control" name="image" accept="image/*">
                         <div class="invalid-feedback"></div>
                     </div>
@@ -133,14 +150,31 @@
                         <input type="text" class="form-control" name="position" id="position">
                         <div class="invalid-feedback"></div>
                     </div>
-                    <div class="mb-3">
-                        <label for="department" class="form-label">Department</label>
-                        <input type="text" class="form-control" name="department" id="department">
+                    <div class="mb-3">  
+                        <label for="editDesignation" class="form-label">Designation</label>
+                        <select class="form-select" name="designation" id="editDesignation">
+                            <option selected disabled>--</option>
+                            <option value="Principal">Principal</option>
+                            <option value="Administrative Staff">Administrative Staff</option>
+                            <option value="Support Staff">Support Staff</option>
+                            <option value="Junior High School Faculty">Junior High School Faculty</option>
+                            <option value="Senior High School Faculty">Senior High School Faculty</option>
+                        </select>
                         <div class="invalid-feedback"></div>
                     </div>
-                    <div class="mb-3">
-                        <label for="designation" class="form-label">Designation</label>
-                        <input type="text" class="form-control" name="designation" id="designation">
+                    <div class="mb-3" style="display: none;">
+                        <label for="department" class="form-label">Department</label>
+                        <select class="form-select" name="department" id="department">
+                            <option selected disabled>--</option>
+                            <option value="TLE Department">TLE Department</option>
+                            <option value="Science Department">Science Department</option>
+                            <option value="Math Department">Math Department</option>
+                            <option value="English Department">English Department</option>
+                            <option value="Filipino Department">Filipino Department</option>
+                            <option value="ESP Department">ESP Department</option>
+                            <option value="MAPEH Department">MAPEH Department</option>
+                            <option value="AP Department">AP Department</option>
+                        </select>
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3 d-flex flex-column">

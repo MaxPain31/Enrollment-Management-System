@@ -411,7 +411,7 @@
         
 
         <!-- Right side columns -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 col-12">
             <div class="card">
                 <div class="filter">
                     <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
@@ -428,12 +428,14 @@
 
                 <div class="card-body pb-0">
                     <h5 class="card-title">Application Report <span>| Today</span></h5>
-                    <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
+                    <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
+                        <div id="trafficChart" style="height: 100%; width: 100%;" class="echart"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-6">
+        <div class="col-lg-6 col-12">
             <div class="card">
                 <div class="filter">
                     <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
@@ -450,7 +452,9 @@
         
                 <div class="card-body">
                     <h5 class="card-title">User Report <span>| Today</span></h5>
-                    <canvas id="barChart" style="min-height: 380px;"></canvas>
+                    <div class="chart-container" style="position: relative; height: 380px; width: 100%;">
+                        <canvas id="barChart" style="height: 100%; width: 100%;"></canvas>
+                    </div>
                 </div>
             </div>
         </div>

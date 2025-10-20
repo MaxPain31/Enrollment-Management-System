@@ -329,7 +329,6 @@ nav .enroll-btn {
 }
 
 .about-content .row p {
-  letter-spacing: 0.1rem;
   text-indent: 2em;
   text-align: justify;
   padding: 2rem 1rem;
@@ -350,13 +349,11 @@ nav .enroll-btn {
   background: #f4f7fe;
 }
 
-.mission-vision-content {
-  letter-spacing: 0.1rem;
-}
 
 .mission-vision-content p {
   text-align: justify;
   padding: 2rem;
+  text-indent: 2em;
 }
 
 .enrollment-container {
@@ -1030,7 +1027,7 @@ footer {
 .mission-vision-card {
   background: #fff;
   border-radius: 16px;
-  padding: 3rem;
+  padding: 2.5rem;
   height: 100%;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid #e2e8f0;
@@ -1069,7 +1066,7 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 2rem auto;
+  margin: 1rem auto 2rem auto;
   font-size: 2rem;
   color: #fff;
 }
@@ -1751,19 +1748,21 @@ html {
   .admin-level .org-cards-grid,
   .support-level .org-cards-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1.25rem;
   }
 
   .admin-level .org-card,
   .support-level .org-card {
     max-width: 260px;
+    margin: auto;
   }
 
   .admin-level .org-card-image,
   .support-level .org-card-image {
     height: 200px;
   }
+  
 
   .admin-level .placeholder-image,
   .support-level .placeholder-image {
@@ -1880,11 +1879,11 @@ html {
   }
 
   .about-card {
-    padding: 2rem;
+    padding: .5rem;
   }
 
   .mission-vision-card {
-    padding: 2rem;
+    padding: 0.5rem;
   }
 
   .card-title {
@@ -1948,6 +1947,7 @@ html {
     flex: 0 0 220px;
     min-width: 220px;
     max-width: 220px;
+    min-height: 300px;
   }
   .org-card .org-card-image {
     height: 180px;
@@ -2082,6 +2082,10 @@ html {
 
 .phone-icon {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.facebook-icon {
+  background: linear-gradient(135deg, #1861ff 0%, #004085 100%);
 }
 
 .contact-icon-wrapper i {
@@ -2353,6 +2357,14 @@ html {
 .home-banner p {
     position: relative;
     z-index: 1;
+}
+
+.main-announcement-banner {
+    background: #f4f7fe;
+    text-align: center;
+    padding: 6rem 0;
+    position: relative;
+    overflow: hidden;
 }
 
 /* Announcement Banner - Diagonal Stripes */

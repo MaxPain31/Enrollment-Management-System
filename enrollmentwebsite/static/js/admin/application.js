@@ -465,10 +465,14 @@ $(document).ready(function () {
         setValue("gender", app.gender);
         setValue("place_of_birth", app.place_of_birth);
         setValue("mother_tongue", app.mother_tongue);
-        if (app.submission_remarks !== null) {
+        if (app.submission_remarks && app.submission_remarks.trim() !== "") {
             $("#submission_remarks_check").prop("checked", true);
             $("#submission_remarks_textarea").show();
-            $("#submission_remarks").prop("disabled", false).val(app.submission_remarks);
+            $("#submission_remarks").prop("disabled", true).val(app.submission_remarks);
+        } else {
+            $("#submission_remarks_check").prop("checked", false);
+            $("#submission_remarks_textarea").hide();
+            $("#submission_remarks").prop("disabled", true).val("");
         }
         //if checkbox is clicked show the textarea and the data
         $("#submission_remarks_check").on("click", function () {
@@ -480,7 +484,7 @@ $(document).ready(function () {
                 $("#submission_remarks").prop("disabled", true).val("");
             }
         });
-        
+
         $("#documentForm input[type=checkbox]").prop("checked", false);
         if (!app.documents) {
             const documents = $(this).data('documents');
@@ -986,8 +990,8 @@ $(document).ready(function () {
             const total = result.value.total;
 
             Swal.fire({
-                title: `Approving applications...`,
-                html: `<div id="progressText">0 / ${total} ${actionName.toLowerCase()}d</div>`,
+                title: `Approving All`,
+                html: `<div id="progressText">Approving all applications...</div>`,
                 allowOutsideClick: false,
                 showConfirmButton: false,
                 didOpen: () => {
@@ -1013,7 +1017,7 @@ $(document).ready(function () {
                                 Swal.fire({
                                     icon: "success",
                                     title: "All done!",
-                                    html: `<strong>${data.total}</strong> applications ${actionName.toLowerCase()}d successfully.`,
+                                    html: `All applications ${actionName.toLowerCase()}d successfully.`,
                                     confirmButtonText: "OK"
                                 }).then(() => {
                                     applicationTable.ajax.reload();
