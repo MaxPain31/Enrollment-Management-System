@@ -90,7 +90,9 @@ nav .enroll-btn {
 }
 
 .carousel-item img {
-  width: 480px;
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
 }
 
 .carousel-inner {
@@ -102,9 +104,9 @@ nav .enroll-btn {
 }
 
 .c-img {
-  height: 100%;
   filter: brightness(0.9);
   image-rendering: high-quality;
+  object-fit: cover;
 }
 
 .home-content {
@@ -180,39 +182,140 @@ nav .enroll-btn {
 
 .announcement {
   padding: 5rem 0 5rem 0;
+  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
 }
 
 .announcement-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 0;
+  padding: 0 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.announcement-content h2 {
+.announcement-card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.announcement-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.announcement-date-column {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.announcement-date-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.announcement-date {
   text-align: center;
-  margin-bottom: 2rem;
+  color: #fff;
+  padding: 1rem;
 }
 
-.announcement-content .row .col-sm-6 .card .card-body {
-  min-height: 230px;
+.announcement-date .date-number {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
 }
 
-.announcement-content .row .col-sm-6 .card .card-body h4 {
+.announcement-date .date-month {
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.25rem;
+}
+
+.announcement-date .date-year {
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.announcement-body {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.announcement-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.announcement-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
   margin: 0;
+  line-height: 1.4;
 }
 
-.announcement-content .row .col-sm-6 .card .card-body .card-title h4 {
-  font-weight: bold;
+.announcement-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.9rem;
 }
 
-.announcement-content .row .col-sm-6 .card .card-body .card-title span {
+.announcement-meta i {
+  font-size: 1rem;
+}
+
+.announcement-excerpt {
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0.5rem 0;
+}
+
+.announcement-footer {
+  margin-top: 0.5rem;
+}
+
+.btn-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-read-more:hover {
+  gap: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.no-announcements {
+  text-align: center;
+  padding: 4rem 2rem;
   color: #64748b;
 }
 
-.announcement-content .row .col-sm-6 .card .card-body p {
-  color: #000;
-  font-weight: 400;
+.no-announcements p {
+  margin-top: 1rem;
+  font-size: 1.1rem;
 }
 
 .about {
@@ -260,6 +363,14 @@ nav .enroll-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+}
+
+.img-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 0;
 }
 
 footer {
@@ -328,6 +439,12 @@ footer {
   padding: 6rem 0;
 }
 
+.banner-2 {
+  background: #ffffff;
+  text-align: center;
+  padding: 6rem 0;
+}
+
 .banner h1 {
   font-weight: 900;
 }
@@ -336,22 +453,765 @@ footer {
   letter-spacing: 0.1rem;
 }
 
+/* Organizational Chart Section */
+.organizational-chart {
+  padding: 5rem 0;
+  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+}
+
+.org-chart-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+  overflow-x: hidden;
+}
+
+.org-level {
+  margin-bottom: 4rem;
+}
+
+.org-section-title {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 2.5rem;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.org-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(to right, #007bff, #0056b3);
+  border-radius: 2px;
+}
+
+/* Principal Card */
+.principal-level {
+  display: flex;
+  justify-content: center;
+  margin: 5rem 0;
+}
+
+.principal-card {
+  width: 280px;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border: none;
+  box-shadow: 0 8px 24px rgba(0, 123, 255, 0.3);
+}
+
+.principal-card .org-card-content {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: #fff;
+}
+
+.principal-card .org-name,
+.principal-card .org-position {
+  color: #fff;
+}
+
+.principal-card .org-card-image {
+  border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+}
+
+.principal-card .org-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.principal-card .placeholder-image {
+  background: rgba(255, 255, 255, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.principal-card .placeholder-image i {
+  color: #fff;
+}
+
+/* Organization Cards */
+.org-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.org-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  border-color: #007bff;
+  z-index: 1000;
+}
+
+.org-card-image {
+  width: 100%;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-bottom: 2px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.org-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.placeholder-image {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 3px solid #007bff;
+}
+
+.placeholder-image i {
+  font-size: 4.5rem;
+  color: #007bff;
+}
+
+.org-card-content {
+  padding: 1.5rem;
+  text-align: center;
+  background: #fff;
+}
+
+.org-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.org-position {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Grid Layouts */
+.org-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Horizontal Scrolling for Departments */
+.department-section .org-cards-grid {
+  display: flex !important;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  gap: 1.5rem;
+  padding: 0.5rem 0 1.5rem 0;
+  margin-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Senior High School Faculty - also horizontal scroll */
+.faculty-level > .org-cards-grid {
+  display: flex !important;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  gap: 1.5rem;
+  padding: 0.5rem 0 1.5rem 0;
+  margin-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Admin and Support - horizontal scroll */
+.admin-level .org-cards-grid,
+.support-level .org-cards-grid {
+  display: flex !important;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  gap: 1.5rem;
+  padding: 0.5rem 0 1.5rem 0;
+  margin-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+  width: 100%;
+  min-width: 0;
+}
+
+.department-section .org-cards-grid::-webkit-scrollbar,
+.faculty-level > .org-cards-grid::-webkit-scrollbar,
+.admin-level .org-cards-grid::-webkit-scrollbar,
+.support-level .org-cards-grid::-webkit-scrollbar {
+  height: 0; /* hidden by default */
+}
+
+.department-section .org-cards-grid::-webkit-scrollbar-track,
+.faculty-level > .org-cards-grid::-webkit-scrollbar-track,
+.admin-level .org-cards-grid::-webkit-scrollbar-track,
+.support-level .org-cards-grid::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.department-section .org-cards-grid::-webkit-scrollbar-thumb,
+.faculty-level > .org-cards-grid::-webkit-scrollbar-thumb,
+.admin-level .org-cards-grid::-webkit-scrollbar-thumb,
+.support-level .org-cards-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.department-section .org-cards-grid::-webkit-scrollbar-thumb:hover,
+.faculty-level > .org-cards-grid::-webkit-scrollbar-thumb:hover,
+.admin-level .org-cards-grid::-webkit-scrollbar-thumb:hover,
+.support-level .org-cards-grid::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Hide scrollbar by default (Firefox) */
+.department-section .org-cards-grid,
+.faculty-level > .org-cards-grid,
+.admin-level .org-cards-grid,
+.support-level .org-cards-grid {
+  scrollbar-width: none; /* hidden */
+}
+
+/* Show scrollbar on container hover */
+.department-section:hover .org-cards-grid,
+.faculty-level:hover > .org-cards-grid,
+.admin-level:hover .org-cards-grid,
+.support-level:hover .org-cards-grid {
+  scrollbar-width: thin; /* show on hover (Firefox) */
+}
+
+/* WebKit: show scrollbar on hover */
+.department-section:hover .org-cards-grid::-webkit-scrollbar,
+.faculty-level:hover > .org-cards-grid::-webkit-scrollbar,
+.admin-level:hover .org-cards-grid::-webkit-scrollbar,
+.support-level:hover .org-cards-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.small-grid {
+  gap: 1.5rem;
+}
+
+.medium-grid {
+  gap: 1.5rem;
+}
+
+/* Small Cards for Teachers */
+.small-card {
+  flex: 0 0 260px;
+  min-width: 260px;
+  max-width: 260px;
+  width: 260px;
+}
+
+.small-card .org-card-image {
+  height: 200px;
+}
+
+.small-card .org-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.small-card .placeholder-image {
+  width: 120px;
+  height: 120px;
+}
+
+.small-card .placeholder-image i {
+  font-size: 3.5rem;
+}
+
+.small-card .org-card-content {
+  padding: 1.5rem;
+}
+
+.small-card .org-name {
+  font-size: 1.05rem;
+}
+
+.small-card .org-position {
+  font-size: 0.95rem;
+}
+
+/* Regular org cards in scrollable containers */
+.department-section .org-card:not(.small-card) {
+  flex: 0 0 280px;
+  min-width: 280px;
+  max-width: 280px;
+  width: 280px;
+}
+
+.faculty-level > .org-cards-grid .org-card:not(.small-card) {
+  flex: 0 0 280px;
+  min-width: 280px;
+  max-width: 280px;
+  width: 280px;
+}
+
+/* Department Sections */
+.department-section {
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Cursor style for draggable scrolling */
+.department-section .org-cards-grid,
+.faculty-level > .org-cards-grid {
+  cursor: grab;
+}
+
+.department-section .org-cards-grid:active,
+.faculty-level > .org-cards-grid:active {
+  cursor: grabbing;
+}
+
+
+/* Academic Staff Container */
+.academic-staff-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+/* Faculty Level */
+.faculty-level {
+  background: #f8fafc;
+  padding: 2.5rem;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+}
+/* Admin and Support Level */
+.admin-level,
+.support-level {
+  padding: 2rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Announcement Detail Page Styles */
+.detail-announcement-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.announcement-detail-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.announcement-detail-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  padding: 2rem;
+  color: #fff;
+}
+
+.announcement-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.announcement-date-badge {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  min-width: 100px;
+}
+
+.announcement-date-badge .date-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.announcement-date-badge .date-month {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.25rem;
+}
+
+.announcement-date-badge .date-year {
+  font-size: 0.9rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.announcement-meta-info {
+  flex: 1;
+}
+
+.announcement-detail-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  line-height: 1.3;
+}
+
+.announcement-detail-meta .announcement-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.announcement-detail-image {
+  padding: 2rem;
+  text-align: center;
+}
+
+.announcement-detail-image img {
+  border-radius: 12px;
+  max-height: 400px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.announcement-detail-content {
+  padding: 2rem;
+}
+
+.content-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #374151;
+}
+
+.announcement-detail-footer {
+  padding: 2rem;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+/* Pagination Styles */
+.pagination {
+  margin-top: 2rem;
+}
+
+.pagination .page-link {
+  color: #007bff;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem 0.75rem;
+  margin: 0 0.125rem;
+  border-radius: 0.375rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.pagination .page-link:hover {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  color: #0056b3;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #fff;
+}
+
+/* About Page Styles */
+.about {
+  padding: 5rem 0;
+  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+}
+
+.about-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.section-divider {
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(to right, #007bff, #0056b3);
+  border-radius: 2px;
+  margin: 0 auto;
+}
+
+.about-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.about-image img {
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.about-subtitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #007bff;
+  margin-bottom: 1.5rem;
+}
+
+.about-description {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #374151;
+  margin-bottom: 1.5rem;
+}
+
+.mission-vision {
+  padding: 5rem 0;
+  background: #f8fafc;
+}
+
+.mission-vision-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.mission-vision-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 3rem;
+  height: 100%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mission-vision-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.mission-vision-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, #007bff, #0056b3);
+}
+
+.mission-card::before {
+  background: linear-gradient(to right, #28a745, #20c997);
+}
+
+.vision-card::before {
+  background: linear-gradient(to right, #6f42c1, #e83e8c);
+}
+
+.card-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem auto;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.mission-card .card-icon {
+  background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.vision-card .card-icon {
+  background: linear-gradient(135deg, #6f42c1, #e83e8c);
+}
+
+.card-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.card-description {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #374151;
+  text-align: center;
+}
+
+/* FAQ Section */
+.faq {
+  padding: 0 0 5rem 0;
+  background: #ffffff;
+}
+
+.faq-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.faq-content {
+  padding: 0 1rem;
+}
+
+.faq-item {
+  margin-bottom: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.faq-item .accordion-button {
+  padding: 1.5rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  background-color: #fff;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.faq-item .accordion-button:not(.collapsed) {
+  background-color: #f1f5f9;
+  color: #007bff;
+  box-shadow: none;
+}
+
+.faq-item .accordion-button:focus {
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.faq-item .accordion-button::after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23007bff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+  width: 1.5rem;
+  height: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.faq-item .accordion-button:not(.collapsed)::after {
+  transform: rotate(-180deg);
+}
+
+.faq-item .accordion-body {
+  padding: 1.5rem 1.5rem 1.5rem 3.5rem;
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.7;
+  background-color: #fff;
+}
+
+.faq-item .accordion-button i {
+  color: #007bff;
+  font-size: 1.3rem;
+}
+
 .text-uppercase {
   text-transform: uppercase;
 }
 
+.profile-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 3rem 0;
+}
+
+.profie-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f4f8;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.profie-circle span {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #007bff;
+}
 
 /* Responsive Styles */
 @media (max-width: 1024px) {
   nav .nav-links {
     display: none;
     flex-direction: column;
-    width: 100%;
+    width: 60%;
     position: absolute;
-    top: 60px;
-    left: 0;
+    top: 0;
+    right: 0;
     background-color: #fff;
+    z-index: 1;
+    height: 100%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 3rem 2rem;
   }
 
   nav .nav-links.active {
@@ -360,6 +1220,7 @@ footer {
 
   nav .burger {
     display: block;
+    z-index: 1;
   }
 
   main .hero {
@@ -375,18 +1236,765 @@ footer {
     margin-top: 20px;
   }
 
+  .announcement-content {
+    padding: 0 1rem;
+  }
+
+  .announcement-date-column {
+    padding: 1.5rem 1rem;
+  }
+
+  .announcement-date .date-number {
+    font-size: 2.5rem;
+  }
+
+  .announcement-body {
+    padding: 1.5rem;
+  }
+
+  .announcement-title {
+    font-size: 1.3rem;
+  }
+
+  .faq-item .accordion-button {
+    font-size: 1rem;
+    padding: 1.25rem;
+  }
+
+  .faq-item .accordion-body {
+    padding: 1.25rem 1.25rem 1.25rem 3rem;
+  }
+
+  /* Organizational Chart Responsive */
+  .org-section-title {
+    font-size: 1.5rem;
+  }
+
+  /* Keep grid for admin/support, scroll for faculty */
+  .admin-level .org-cards-grid,
+  .support-level .org-cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .org-card-image {
+    height: 320px;
+  }
+
+  .placeholder-image {
+    width: 130px;
+    height: 130px;
+  }
+
+  .placeholder-image i {
+    font-size: 4.2rem;
+  }
+
+  /* Reduce card size slightly for smaller desktop/large tablet */
+  .small-card {
+    flex: 0 0 240px;
+    min-width: 240px;
+    max-width: 240px;
+    width: 240px;
+  }
+
+  .small-card .org-card-image {
+    height: 190px;
+  }
+
+  .small-card .placeholder-image {
+    width: 115px;
+    height: 115px;
+  }
+
+  .small-card .placeholder-image i {
+    font-size: 3.3rem;
+  }
+
+  .department-section .org-card:not(.small-card),
+  .faculty-level > .org-cards-grid .org-card:not(.small-card) {
+    flex: 0 0 260px;
+    min-width: 260px;
+    max-width: 260px;
+    width: 260px;
+  }
+
+  .department-section {
+    padding: 1.5rem;
+  }
+
+  .department-title {
+    font-size: 1.15rem;
+  }
+
+  .faculty-level {
+    padding: 2rem 1.5rem;
+  }
+
+  /* Announcement Detail Responsive */
+  .announcement-detail-meta {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .announcement-detail-title {
+    font-size: 1.8rem;
+  }
+
+  .announcement-detail-header {
+    padding: 1.75rem;
+  }
+
+  .announcement-detail-image,
+  .announcement-detail-content,
+  .announcement-detail-footer {
+    padding: 1.75rem;
+  }
+
+  /* About Page Responsive */
+  .section-title {
+    font-size: 2.2rem;
+  }
+
+  .about-card {
+    padding: 2.5rem;
+  }
+
+  .mission-vision-card {
+    padding: 2.5rem;
+  }
+
+  .card-title {
+    font-size: 1.6rem;
+  }
+
+  .card-icon {
+    width: 70px;
+    height: 70px;
+    font-size: 1.8rem;
+  }
+
   .footer-content {
     flex-direction: column;
     text-align: center;
   }
 }
 
+/* Large Desktop - 1200px to 1439px */
+@media (min-width: 1200px) and (max-width: 1439px) {
+  .org-card-image {
+    height: 270px;
+  }
+
+  .placeholder-image {
+    width: 150px;
+    height: 150px;
+  }
+
+  .placeholder-image i {
+    font-size: 4.8rem;
+  }
+
+  .small-card {
+    flex: 0 0 280px;
+    min-width: 280px;
+    max-width: 280px;
+    width: 280px;
+  }
+
+  .small-card .org-card-image {
+    height: 220px;
+  }
+
+  .small-card .placeholder-image {
+    width: 130px;
+    height: 130px;
+  }
+
+  .small-card .placeholder-image i {
+    font-size: 3.8rem;
+  }
+
+  .department-section .org-card:not(.small-card),
+  .faculty-level > .org-cards-grid .org-card:not(.small-card) {
+    flex: 0 0 300px;
+    min-width: 300px;
+    max-width: 300px;
+    width: 300px;
+  }
+}
+
+/* Extra Large Desktop - 1440px and above */
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1400px;
+    margin: 0 80px;
+    padding: 0 20px;
+  }
+
+  /* Larger cards for big screens */
+  .org-card-image {
+    height: 320px;
+  }
+
+  .placeholder-image {
+    width: 170px;
+    height: 170px;
+  }
+
+  .placeholder-image i {
+    font-size: 5.5rem;
+  }
+
+  .small-card {
+    flex: 0 0 310px;
+    min-width: 310px;
+    max-width: 310px;
+    width: 310px;
+  }
+
+  .small-card .org-card-image {
+    height: 320px;
+  }
+
+  .small-card .placeholder-image {
+    width: 150px;
+    height: 150px;
+  }
+
+  .small-card .placeholder-image i {
+    font-size: 4.5rem;
+  }
+
+  .department-section .org-card:not(.small-card),
+  .faculty-level > .org-cards-grid .org-card:not(.small-card) {
+    flex: 0 0 340px;
+    min-width: 340px;
+    max-width: 340px;
+    width: 340px;
+  }
+
+  .principal-card {
+    width: 340px;
+  }
+
+  .org-name {
+    font-size: 1.25rem;
+  }
+
+  .org-position {
+    font-size: 1.05rem;
+  }
+
+  .org-card-content {
+    padding: 2rem;
+  }
+}
+
+/* ScrollReveal.js will handle animations - keeping only essential styles */
+
+/* Hover animations for interactive elements */
+.org-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.contact-card:hover {
+  transform: translateY(-10px) rotateX(2deg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.announcement-card:hover {
+  transform: translateY(-5px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth transitions for all elements */
+* {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Parallax effect for carousel */
+.carousel {
+  transition: transform 0.1s ease;
+}
+
+/* Loading animation for elements that are not yet visible */
+.scroll-animate:not(.animate-in) {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #007bff, #0056b3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #0056b3, #004085);
+}
+
+/* Scroll progress indicator */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  z-index: 9999;
+  transition: width 0.1s ease;
+}
+
+/* ScrollReveal.js handles responsive animations automatically */
+
+@media (max-width: 768px) {
+  .carousel-item img {
+    height: 300px;
+  }
+
+  .c-item {
+    height: 300px;
+  }
+
+  .carousel-inner {
+    border-radius: 10px;
+  }
+
+  /* Organizational Chart Tablet */
+  .admin-level .org-cards-grid,
+  .support-level .org-cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .principal-card {
+    max-width: 280px;
+  }
+
+  .org-card-image {
+    height: 220px;
+  }
+
+  .placeholder-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .placeholder-image i {
+    font-size: 4rem;
+  }
+
+  /* Horizontal scroll cards for tablets */
+  .small-card {
+    flex: 0 0 230px;
+    min-width: 230px;
+    max-width: 230px;
+    width: 230px;
+  }
+
+  .small-card .org-card-image {
+    height: 180px;
+  }
+
+  .small-card .placeholder-image {
+    width: 110px;
+    height: 110px;
+  }
+
+  .small-card .placeholder-image i {
+    font-size: 3.2rem;
+  }
+
+  .department-section .org-card:not(.small-card),
+  .faculty-level > .org-cards-grid .org-card:not(.small-card) {
+    flex: 0 0 240px;
+    min-width: 240px;
+    max-width: 240px;
+    width: 240px;
+  }
+
+  /* Ensure horizontal scrolling works on tablets */
+  .department-section .org-cards-grid,
+  .faculty-level > .org-cards-grid {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 1.25rem;
+    scroll-behavior: smooth;
+  }
+}
+
+@media (max-width: 576px) {
+  .announcement-content {
+    padding: 0 0.5rem;
+  }
+
+  .carousel-inner {
+    border-radius: 0;
+  }
+
+  .carousel-item img {
+    height: 250px;
+  }
+
+  .c-item {
+    height: 250px;
+  }
+
+  .home-container {
+    gap: 2rem;
+  }
+
+  .announcement-date-column {
+    padding: 1rem;
+  }
+
+  .announcement-date .date-number {
+    font-size: 2rem;
+  }
+
+  .announcement-date .date-month {
+    font-size: 1rem;
+  }
+
+  .announcement-date .date-year {
+    font-size: 0.9rem;
+  }
+
+  .announcement-body {
+    padding: 1.25rem;
+  }
+
+  .announcement-title {
+    font-size: 1.1rem;
+  }
+
+  .announcement-meta {
+    font-size: 0.85rem;
+  }
+
+  .announcement-excerpt {
+    font-size: 0.95rem;
+  }
+
+  .btn-read-more {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .faq-item .accordion-button {
+    font-size: 0.95rem;
+    padding: 1rem;
+  }
+
+  .faq-item .accordion-body {
+    padding: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .faq-item .accordion-button i {
+    font-size: 1.1rem;
+  }
+
+  .banner h1 {
+    font-size: 2rem;
+  }
+
+  .banner p {
+    font-size: 0.95rem;
+  }
+
+  /* Organizational Chart Mobile */
+  .organizational-chart {
+    padding: 3rem 0;
+  }
+
+  .org-chart-container {
+    padding: 0 0.5rem;
+    overflow-x: hidden;
+  }
+
+  .org-section-title {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+  }
+
+  .principal-card {
+    width: 100%;
+    max-width: 260px;
+  }
+
+  /* Keep grid layout only for admin and support on mobile */
+  .admin-level .org-cards-grid,
+  .support-level .org-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .admin-level .org-card,
+  .support-level .org-card {
+    max-width: 260px;
+  }
+
+  .admin-level .org-card-image,
+  .support-level .org-card-image {
+    height: 200px;
+  }
+
+  .admin-level .placeholder-image,
+  .support-level .placeholder-image {
+    width: 110px;
+    height: 110px;
+  }
+
+  .admin-level .placeholder-image i,
+  .support-level .placeholder-image i {
+    font-size: 3.5rem;
+  }
+
+  /* Horizontal scrolling for faculty sections on mobile */
+  .department-section .org-cards-grid,
+  .faculty-level > .org-cards-grid {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 1rem;
+    scroll-behavior: smooth;
+  }
+
+  .small-card {
+    flex: 0 0 220px;
+    min-width: 220px;
+    max-width: 220px;
+    width: 220px;
+  }
+
+  .department-section .org-card:not(.small-card),
+  .faculty-level > .org-cards-grid .org-card:not(.small-card) {
+    flex: 0 0 240px;
+    min-width: 240px;
+    max-width: 240px;
+    width: 240px;
+  }
+
+  .small-card .org-card-image {
+    height: 180px;
+  }
+
+  .small-card .placeholder-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .small-card .placeholder-image i {
+    font-size: 3rem;
+  }
+
+  .department-section .org-card:not(.small-card) .org-card-image,
+  .faculty-level > .org-cards-grid .org-card:not(.small-card) .org-card-image {
+    height: 200px;
+  }
+
+  .department-section .org-card:not(.small-card) .placeholder-image,
+  .faculty-level > .org-cards-grid .org-card:not(.small-card) .placeholder-image {
+    width: 110px;
+    height: 110px;
+  }
+
+  .department-section .org-card:not(.small-card) .placeholder-image i,
+  .faculty-level > .org-cards-grid .org-card:not(.small-card) .placeholder-image i {
+    font-size: 3.5rem;
+  }
+
+  .department-section {
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .department-title {
+    font-size: 1rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .faculty-level {
+    padding: 1.5rem 1rem;
+  }
+
+  .org-level {
+    margin-bottom: 2.5rem;
+  }
+
+  .academic-staff-container {
+    gap: 2rem;
+  }
+
+  /* Announcement Detail Responsive */
+  .announcement-detail-meta {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .announcement-detail-title {
+    font-size: 1.5rem;
+  }
+
+  .announcement-detail-header {
+    padding: 1.5rem;
+  }
+
+  .announcement-detail-image,
+  .announcement-detail-content,
+  .announcement-detail-footer {
+    padding: 1.5rem;
+  }
+
+  /* About Page Responsive */
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .about-card {
+    padding: 2rem;
+  }
+
+  .mission-vision-card {
+    padding: 2rem;
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+  }
+
+  .card-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+}
+
+/* Normalize org-card sizing across all sections */
+/* Base (desktop) */
+.org-card {
+  width: 280px;
+}
+.org-cards-grid .org-card,
+.department-section .org-card,
+.faculty-level .org-card,
+.admin-level .org-card,
+.support-level .org-card {
+  flex: 0 0 280px;
+  min-width: 280px;
+  max-width: 280px;
+}
+.org-card .org-card-image {
+  height: 250px;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .org-card {
+    width: 230px;
+  }
+  .org-cards-grid .org-card,
+  .department-section .org-card,
+  .faculty-level .org-card,
+  .admin-level .org-card,
+  .support-level .org-card {
+    flex: 0 0 230px;
+    min-width: 230px;
+    max-width: 230px;
+  }
+  .org-card .org-card-image {
+    height: 180px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .org-card {
+    width: 220px;
+  }
+  .org-cards-grid .org-card,
+  .department-section .org-card,
+  .faculty-level .org-card,
+  .admin-level .org-card,
+  .support-level .org-card {
+    flex: 0 0 220px;
+    min-width: 220px;
+    max-width: 220px;
+  }
+  .org-card .org-card-image {
+    height: 180px;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1200px) and (max-width: 1439px) {
+  .org-card {
+    width: 300px;
+  }
+  .org-cards-grid .org-card,
+  .department-section .org-card,
+  .faculty-level .org-card,
+  .admin-level .org-card,
+  .support-level .org-card {
+    flex: 0 0 300px;
+    min-width: 300px;
+    max-width: 300px;
+  }
+  .org-card .org-card-image {
+    height: 240px;
+  }
+}
+
+/* Extra large desktop */
+@media (min-width: 1440px) {
+  .org-card {
+    width: 340px;
+  }
+  .org-cards-grid .org-card,
+  .department-section .org-card,
+  .faculty-level .org-card,
+  .admin-level .org-card,
+  .support-level .org-card {
+    flex: 0 0 340px;
+    min-width: 340px;
+    max-width: 340px;
+  }
+  .org-card .org-card-image {
+    height: 320px;
+  }
+}
 /* Contact Section Styles */
 .contact-banner {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-  color: white;
+  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
   text-align: center;
-  padding: 4rem 0;
 }
 
 .contact-banner h1 {
@@ -401,7 +2009,7 @@ footer {
 }
 
 .contact {
-  background-color: #f8fafc;
+  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
   padding: 5rem 0;
 }
 
@@ -623,6 +2231,21 @@ footer {
   background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
 }
 
+/* Hide Password Button */
+.hide-password {
+  border-radius: 0.375rem;
+  border: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  color: #212529;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hide-password:hover {
+  background-color: #e2e8f0;
+}
+
+
 /* Responsive Design for Contact Section */
 @media (max-width: 768px) {
   .contact-banner h1 {
@@ -704,528 +2327,291 @@ footer {
   }
 }
 
-/* Enrollment Page Styles */
-.enrollment {
-  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-  padding: 5rem 0;
-}
+/* Different Banner Designs */
 
-.enrollment-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-/* Announcement Card */
-.announcement-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
-  overflow: hidden;
-  position: relative;
-}
-
-.announcement-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(to right, #007bff, #0056b3);
-  border-radius: 16px 16px 0 0;
-}
-
-.announcement-header {
-  padding: 2rem 2rem 1rem 2rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.announcement-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.5rem;
-}
-
-.announcement-title {
-  color: #1e293b;
-  font-weight: 700;
-  font-size: 1.4rem;
-  margin: 0;
-}
-
-.announcement-content {
-  padding: 0 2rem 2rem 2rem;
-}
-
-.announcement-text {
-  color: #475569;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 1rem;
-}
-
-.enrollment-dates {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  border-radius: 8px;
-  padding: 1rem;
-  border-left: 4px solid #007bff;
-}
-
-.enrollment-dates strong {
-  color: #1e293b;
-  font-weight: 600;
-}
-
-/* Enrollment Options Card */
-.enrollment-options-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
-  overflow: hidden;
-  position: relative;
-}
-
-.enrollment-options-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(to right, #28a745, #20c997);
-  border-radius: 16px 16px 0 0;
-}
-
-.enrollment-header {
-  padding: 2rem 2rem 1rem 2rem;
-  text-align: center;
-}
-
-.enrollment-title {
-  color: #1e293b;
-  font-weight: 700;
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-}
-
-.enrollment-description {
-  color: #64748b;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin: 0;
-}
-
-/* Enrollment Cards */
-.enrollment-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-}
-
-.enrollment-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
-  border-color: #007bff;
-}
-
-.early-registration-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(to right, #ff6b6b, #ee5a24);
-  border-radius: 16px 16px 0 0;
-}
-
-.regular-enrollment-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(to right, #667eea, #764ba2);
-  border-radius: 16px 16px 0 0;
-}
-
-.enrollment-card-header {
-  padding: 2rem 2rem 1rem 2rem;
-  text-align: center;
-  position: relative;
-}
-
-.enrollment-icon-wrapper {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.5rem auto;
-  position: relative;
-  z-index: 2;
-}
-
-.early-registration-card .enrollment-icon-wrapper {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-}
-
-.regular-enrollment-card .enrollment-icon-wrapper {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.enrollment-icon-wrapper i {
-  color: white;
-  font-size: 2rem;
-}
-
-.enrollment-card-title {
-  color: #1e293b;
-  font-weight: 700;
-  font-size: 1.4rem;
-  margin: 0 0 0.5rem 0;
-}
-
-.enrollment-card-subtitle {
-  color: #64748b;
-  font-size: 1rem;
-  margin: 0;
-}
-
-.enrollment-card-body {
-  padding: 0 2rem 2rem 2rem;
-}
-
-.enrollment-image {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.enrollment-img {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.enrollment-form-group {
-  margin-bottom: 2rem;
-}
-
-.form-label {
-  color: #374151;
-  font-weight: 600;
-  font-size: 0.95rem;
-  margin-bottom: 0.5rem;
-}
-
-.enrollment-select {
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  background-color: white;
-}
-
-.enrollment-select:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-  outline: none;
-}
-
-.enrollment-action {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.btn-early-registration {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 2rem;
-  font-weight: 600;
-  color: white;
-  transition: all 0.3s ease;
-  font-size: 1rem;
-}
-
-.btn-early-registration:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-  background: linear-gradient(135deg, #ee5a24 0%, #d63031 100%);
-}
-
-.btn-regular-enrollment {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 2rem;
-  font-weight: 600;
-  color: white;
-  transition: all 0.3s ease;
-  font-size: 1rem;
-}
-
-.btn-regular-enrollment:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-  background: linear-gradient(135deg, #764ba2 0%, #6c5ce7 100%);
-}
-
-.btn-early-registration:disabled,
-.btn-regular-enrollment:disabled {
-  background: #94a3b8;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.enrollment-note {
-  color: #64748b;
-  font-size: 0.9rem;
-  text-align: center;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Login Required */
-.login-required {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
-
-.login-required-content {
-  text-align: center;
-  background: white;
-  border-radius: 16px;
-  padding: 3rem 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
-  max-width: 400px;
-}
-
-.login-required-content i {
-  font-size: 4rem;
-  color: #94a3b8;
-  margin-bottom: 1.5rem;
-}
-
-.login-required-content h3 {
-  color: #1e293b;
-  font-weight: 700;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.login-required-content p {
-  color: #64748b;
-  font-size: 1.1rem;
-  margin-bottom: 2rem;
-}
-
-/* Responsive Design for Enrollment */
-@media (max-width: 768px) {
-  .enrollment {
-    padding: 3rem 0;
-  }
-  
-  .enrollment-container {
-    padding: 0 0.5rem;
-  }
-  
-  .announcement-header {
-    padding: 1.5rem 1.5rem 1rem 1.5rem;
-    flex-direction: column;
+/* Home Banner - Geometric Pattern */
+.home-banner {
+    background: #ffff;
     text-align: center;
-    gap: 1rem;
-  }
-  
-  .announcement-content {
-    padding: 0 1.5rem 1.5rem 1.5rem;
-  }
-  
-  .enrollment-header {
-    padding: 1.5rem 1.5rem 1rem 1.5rem;
-  }
-  
-  .enrollment-title {
-    font-size: 1.5rem;
-  }
-  
-  .enrollment-description {
-    font-size: 1rem;
-  }
-  
-  .enrollment-card-header {
-    padding: 1.5rem 1.5rem 1rem 1.5rem;
-  }
-  
-  .enrollment-card-body {
-    padding: 0 1.5rem 1.5rem 1.5rem;
-  }
-  
-  .enrollment-icon-wrapper {
-    width: 60px;
-    height: 60px;
+    padding: 3rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.home-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="1.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.home-banner h1,
+.home-banner p {
+    position: relative;
+    z-index: 1;
+}
+
+/* Announcement Banner - Diagonal Stripes */
+.announcement-banner {
+    background: #ffff;
+    background-size: 20px 20px;
+    text-align: center;
+    padding: 3rem 0;
+    position: relative;
+    animation: diagonalMove 20s linear infinite;
+}
+
+@keyframes diagonalMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 40px 40px; }
+}
+
+/* Organizational Chart Banner - Hexagonal Pattern */
+.organizational-chart-banner {
+    background: #ffff;
+    text-align: center;
+    padding: 3rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.organizational-chart-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="50,10 90,30 90,70 50,90 10,70 10,30" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/></svg>');
+    background-size: 60px 60px;
+    opacity: 0.3;
+}
+
+.organizational-chart-banner h1,
+.organizational-chart-banner p {
+    position: relative;
+    z-index: 1;
+}
+
+/* FAQ Banner - Dots Pattern */
+.faq-banner {
+    background: #ffff;
+    text-align: center;
+    padding: 3rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.faq-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 2px, transparent 2px);
+    background-size: 30px 30px;
+    opacity: 0.6;
+}
+
+.faq-banner h1,
+.faq-banner p {
+    position: relative;
+    z-index: 1;
+}
+
+/* Analytics Banner - Circuit Pattern */
+.analytics-banner {
+    background: #ffff;
+    text-align: center;
+    padding: 3rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.analytics-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="20" height="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><rect x="70" y="10" width="20" height="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><rect x="10" y="70" width="20" height="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><rect x="70" y="70" width="20" height="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><line x1="30" y1="20" x2="70" y2="20" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><line x1="30" y1="80" x2="70" y2="80" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></svg>');
+    background-size: 50px 50px;
+    opacity: 0.4;
+}
+
+.analytics-banner h1,
+.analytics-banner p {
+    position: relative;
+    z-index: 1;
+}
+
+/* Contact Banner - Wave Pattern */
+.contact-banner {
+    background: #ffff;
+    text-align: center;
+    padding: 3rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0,50 Q25,20 50,50 T100,50 L100,100 L0,100 Z" fill="rgba(255,255,255,0.1)"/><path d="M0,60 Q25,30 50,60 T100,60 L100,100 L0,100 Z" fill="rgba(255,255,255,0.05)"/></svg>');
+    background-size: 200px 100px;
+    opacity: 0.3;
+}
+
+.contact-banner h1,
+.contact-banner p {
+    position: relative;
+    z-index: 1;
+}
+
+/* Common Banner Styles */
+.home-banner h1,
+.announcement-banner h1,
+.organizational-chart-banner h1,
+.faq-banner h1,
+.analytics-banner h1,
+.contact-banner h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
     margin-bottom: 1rem;
-  }
-  
-  .enrollment-icon-wrapper i {
+}
+
+.home-banner p,
+.announcement-banner p,
+.organizational-chart-banner p,
+.faq-banner p,
+.analytics-banner p,
+.contact-banner p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Analytics Section */
+.analytics {
+    background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%); 
+    padding: 4rem 0;
+}
+
+.analytics-container {
+    max-width: 1200px;
+}
+
+.analytics-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analytics-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.analytics-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.analytics-title {
     font-size: 1.5rem;
-  }
-  
-  .enrollment-card-title {
-    font-size: 1.2rem;
-  }
-  
-  .enrollment-img {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .login-required-content {
-    padding: 2rem 1.5rem;
-  }
-  
-  .login-required-content i {
-    font-size: 3rem;
-  }
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.analytics-subtitle {
+    color: #718096;
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+.analytics-chart {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Responsive Design for All Banners */
+@media (max-width: 768px) {
+    .home-banner h1,
+    .announcement-banner h1,
+    .organizational-chart-banner h1,
+    .faq-banner h1,
+    .analytics-banner h1,
+    .contact-banner h1 {
+        font-size: 2rem;
+    }
+    
+    .home-banner p,
+    .announcement-banner p,
+    .organizational-chart-banner p,
+    .faq-banner p,
+    .analytics-banner p,
+    .contact-banner p {
+        font-size: 1rem;
+    }
+    
+    .analytics-card {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .analytics-chart {
+        height: 250px;
+    }
+    
+    .analytics-title {
+        font-size: 1.3rem;
+    }
 }
 
 @media (max-width: 576px) {
-  .enrollment {
-    padding: 2rem 0;
-  }
-  
-  .announcement-header {
-    padding: 1rem 1rem 0.5rem 1rem;
-  }
-  
-  .announcement-content {
-    padding: 0 1rem 1rem 1rem;
-  }
-  
-  .enrollment-header {
-    padding: 1rem 1rem 0.5rem 1rem;
-  }
-  
-  .enrollment-title {
-    font-size: 1.3rem;
-  }
-  
-  .enrollment-description {
-    font-size: 0.95rem;
-  }
-  
-  .enrollment-card-header {
-    padding: 1rem 1rem 0.5rem 1rem;
-  }
-  
-  .enrollment-card-body {
-    padding: 0 1rem 1rem 1rem;
-  }
-  
-  .enrollment-icon-wrapper {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .enrollment-icon-wrapper i {
-    font-size: 1.2rem;
-  }
-  
-  .enrollment-card-title {
-    font-size: 1.1rem;
-  }
-  
-  .enrollment-img {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .btn-early-registration,
-  .btn-regular-enrollment {
-    padding: 0.6rem 1.5rem;
-    font-size: 0.9rem;
-  }
-  
-  .login-required-content {
-    padding: 1.5rem 1rem;
-  }
-  
-  .login-required-content i {
-    font-size: 2.5rem;
-  }
-  
-  .login-required-content h3 {
-    font-size: 1.3rem;
-  }
-  
-  .login-required-content p {
-    font-size: 1rem;
-  }
+    .home-banner,
+    .announcement-banner,
+    .organizational-chart-banner,
+    .faq-banner,
+    .analytics-banner,
+    .contact-banner {
+        padding: 2rem 0;
+    }
+    
+    .home-banner h1,
+    .announcement-banner h1,
+    .organizational-chart-banner h1,
+    .faq-banner h1,
+    .analytics-banner h1,
+    .contact-banner h1 {
+        font-size: 1.8rem;
+    }
+    
+    .analytics {
+        padding: 2rem 0;
+    }
+    
+    .analytics-card {
+        padding: 1rem;
+    }
+    
+    .analytics-chart {
+        height: 200px;
+    }
 }
 
-/* Password Toggle Button Styling */
-.hide-password {
-  background-color: #6c757d;
-  border: 1px solid #6c757d;
-  color: white;
-  border-radius: 0 0.375rem 0.375rem 0;
-  border-left: 0;
-  padding: 0.375rem 0.75rem;
-  transition: all 0.15s ease-in-out;
-}
-
-.hide-password:hover {
-  background-color: #5a6268;
-  border-color: #545b62;
-  color: white;
-}
-
-.hide-password:focus {
-  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
-  outline: 0;
-}
-
-.hide-password i {
-  font-size: 1rem;
-}
-
-/* Input group styling for password toggle */
-.input-group .form-control:focus + .hide-password {
-  border-color: #86b7fe;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-@media (min-width: 1440px) {
-  .container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-}
