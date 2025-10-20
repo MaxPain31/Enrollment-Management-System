@@ -28,7 +28,7 @@ class EnrollmentFormFactory(factory.django.DjangoModelFactory):
     created_at = factory.LazyFunction(timezone.now)
     status = "Missing"
     school_year = "2025-2026"
-    grade_level = "7"
+    grade_level = "9"
     # strand = random.choice(["ABM", "STEM"])
     # semester = "1st"
     student_type = "NEW STUDENT"
@@ -36,13 +36,14 @@ class EnrollmentFormFactory(factory.django.DjangoModelFactory):
 
     # Application no like 2025-0918009
     application_no = factory.LazyFunction(
-        lambda: f"{timezone.now().year}-{random.randint(1000000, 9999999)}"
+        lambda: f"{timezone.now().year}-{random.randint(0000000, 9999999):07d}"
     )
 
     # PSA no like 22-0004
     psa_no = factory.LazyFunction(
         lambda: f"{str(timezone.now().year)[-2:]}-{random.randint(1, 9999):04d}"
     )
+    
 
     # LRN 12 digits
     lrn = factory.LazyFunction(lambda: f"{random.randint(10**11, 10**12-1)}")
@@ -52,13 +53,13 @@ class EnrollmentFormFactory(factory.django.DjangoModelFactory):
     middle_name = factory.LazyAttribute(lambda _: fake.first_name())
     last_name = factory.LazyAttribute(lambda _: fake.last_name())
     extension_name = ""
-    birth_date = factory.LazyFunction(lambda: fake.date_of_birth(minimum_age=12, maximum_age=14))
+    birth_date = factory.LazyFunction(lambda: fake.date_of_birth(minimum_age=14, maximum_age=16))
     age = factory.LazyAttribute(lambda obj: timezone.now().year - obj.birth_date.year)
     gender = factory.LazyAttribute(lambda _: random.choice(["MALE", "FEMALE"]))
     place_of_birth = "VALENZUELA"
     mother_tongue = "FILIPINO"
     documents_submitted = ""
-    early_reg = False
+    early_reg = random.choice([True, False])
     is_approved = None
     accept_term = True
 

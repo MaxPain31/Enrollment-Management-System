@@ -108,8 +108,8 @@ class EnrollmentForm(forms.Form):
             raise ValidationError("Age must be greater than 13.")
         if grade_level == "9" and (not age or age <= 14):
             raise ValidationError("Age must be greater than 14.")
-        if grade_level == "10" and (not age or age <= 16):
-            raise ValidationError("Age must be greater than 16.")
+        if grade_level == "10" and (not age or age <= 15):
+            raise ValidationError("Age must be greater than 15.")
         if grade_level == "11" and (not age or age <= 17):
             raise ValidationError("Age must be greater than 17.")
         if birth_date:

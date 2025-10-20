@@ -431,7 +431,7 @@ class AdminApplicationBulkApproveView(View):
             total = len(application_ids)
             
             if not application_ids:
-                return {"success": False, "message": "No applications selected."}
+                return JsonResponse({"success": False, "message": "No applications selected."})
             
             batch_key = f"bulk_approve_{uuid.uuid4()}"
             cache.set(batch_key, {"approved": 0, "total": total, "skipped": []}, timeout=3600)
@@ -447,73 +447,78 @@ class AdminApplicationBulkApproveView(View):
                             skipped.append(application_id)
                             continue
                         
-                        application_approved, _ = ApplicationApprovedRepository.update_or_create(
-                            enrollment=application,
-                        )
-                        
-                        if application.grade_level != "7":
-                            application.user.user_role = "Student"
-                            ApplicantInformationRepository.delete_by_user(application.user)
-                            student_information, _ = StudentInformationRepository.update_or_create(
-                                application_approved=application_approved,
-                                defaults={
-                                    "user": application.user,
-                                    "application_no": application.application_no,
-                                    "status": application.status,
-                                    "created_at": application.created_at,
-                                    "school_year": application.school_year,
-                                    "grade": application.grade_level,
-                                    "with_lrn": application.with_lrn,
-                                    "student_type": application.student_type,
-                                    "gen_avg": application.gen_avg,
-                                    "section": None,
-                                    "psa_no": application.psa_no,
-                                    "lrn": application.lrn,
-                                    "first_name": application.first_name,
-                                    "middle_name": application.middle_name,
-                                    "last_name": application.last_name,
-                                    "extension_name": application.extension_name, 
-                                    "birth_date": application.birth_date,
-                                    "age": application.age,
-                                    "gender": application.gender,
-                                    "place_of_birth": application.place_of_birth,
-                                    "mother_tongue": application.mother_tongue,
-                                    "early_reg": application.early_reg,
-                                    "is_approved": True,
-                                    "enrollment_type": application.enrollment_type,
-                                    "semester": application.semester,
-                                    "strand": application.strand,
-                                    "student_status": "Enrolled",
-                                },
+                        # Add database transaction for each application
+                        with transaction.atomic():
+                            application_approved, _ = ApplicationApprovedRepository.update_or_create(
+                                enrollment=application,
                             )
-                            DocumentListRepository.get_filtered_by_enrollment(application).update(
-                                student_information=student_information,
-                                updated_at=timezone.now()
-                            )
-                            application.user.save()
-                        else:
-                            AssessmentRepository.create(
-                                application_approved=application_approved,
-                                literacy_level=None,
-                                literacy_result=None,
-                                numeracy_level=None,
-                                numeracy_result=None,
-                            )
+                            
+                            if application.grade_level != "7":
+                                application.user.user_role = "Student"
+                                ApplicantInformationRepository.delete_by_user(application.user)
+                                student_information, _ = StudentInformationRepository.update_or_create(
+                                    application_approved=application_approved,
+                                    defaults={
+                                        "user": application.user,
+                                        "application_no": application.application_no,
+                                        "status": application.status,
+                                        "created_at": application.created_at,
+                                        "school_year": application.school_year,
+                                        "grade": application.grade_level,
+                                        "with_lrn": application.with_lrn,
+                                        "student_type": application.student_type,
+                                        "gen_avg": application.gen_avg,
+                                        "section": None,
+                                        "psa_no": application.psa_no,
+                                        "lrn": application.lrn,
+                                        "first_name": application.first_name,
+                                        "middle_name": application.middle_name,
+                                        "last_name": application.last_name,
+                                        "extension_name": application.extension_name, 
+                                        "birth_date": application.birth_date,
+                                        "age": application.age,
+                                        "gender": application.gender,
+                                        "place_of_birth": application.place_of_birth,
+                                        "mother_tongue": application.mother_tongue,
+                                        "early_reg": application.early_reg,
+                                        "is_approved": True,
+                                        "enrollment_type": application.enrollment_type,
+                                        "semester": application.semester,
+                                        "strand": application.strand,
+                                        "student_status": "Enrolled",
+                                    },
+                                )
+                                DocumentListRepository.get_filtered_by_enrollment(application).update(
+                                    student_information=student_information,
+                                    updated_at=timezone.now()
+                                )
+                                application.user.save()
+                            else:
+                                AssessmentRepository.create(
+                                    application_approved=application_approved,
+                                    literacy_level=None,
+                                    literacy_result=None,
+                                    numeracy_level=None,
+                                    numeracy_result=None,
+                                )
+                            
+                            user = application.user
+                            if application.enrollment_type == "SHS":
+                                user.jhs_submitted = True
+                                user.shs_submitted = True
+                            elif application.enrollment_type == "JHS":
+                                user.jhs_submitted = True
+                            user.save()
+                            
+                            # Mark as approved
+                            application.is_approved = True
+                            application.save()
                         
-                        user = application.user
-                        if application.enrollment_type == "SHS":
-                            user.jhs_submitted = True
-                            user.shs_submitted = True
-                        elif application.enrollment_type == "JHS":
-                            user.jhs_submitted = True
-                        user.save()
-                        
-                        # Mark as approved
-                        application.is_approved = True
-                        application.save()
-                        
+                        # Move count increment and cache update outside transaction
                         approved_count += 1
+                        logger.info(f"Successfully approved application {application_id}")
                         
+                        # Update cache
                         cache.set(batch_key, {"approved": approved_count, "total": total, "skipped": skipped}, timeout=3600)
                             
                         # Send email notification
@@ -521,6 +526,10 @@ class AdminApplicationBulkApproveView(View):
 
                     except EnrollmentForm.DoesNotExist:
                         skipped.append(str(application_id))
+                        continue
+                    except Exception as e:
+                        skipped.append(str(application_id))
+                        logger.error(f"Error processing application {application_id}: {e}")
                         continue
 
             Thread(target=process_bulk).start()

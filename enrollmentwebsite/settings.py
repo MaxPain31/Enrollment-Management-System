@@ -30,8 +30,13 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", default=False)
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "72.60.236.137", "tuloyeskwela-pdbnhs.site", "www.tuloyeskwela-pdbnhs.site"]
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://72.60.236.137',
+    'http://tuloyeskwela-pdbnhs.site',
+    'https://tuloyeskwela-pdbnhs.site',
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -140,12 +145,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "enrollmentwebsite/static")]
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "enrollmentwebsite/static")]
+STATIC_URL = "static/"
+MEDIA_URL = "/media/"
+STATIC_ROOT = os.getenv(
+    'STATIC_ROOT',
+    os.path.join(BASE_DIR.parent, 'static')  # → /srv/django/capstone/static
+)
+
+MEDIA_ROOT = os.getenv(
+    'MEDIA_ROOT',
+    os.path.join(BASE_DIR.parent, 'media')   # → /srv/django/capstone/media
+)
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
