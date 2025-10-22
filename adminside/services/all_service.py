@@ -977,6 +977,8 @@ class StudentInformationService:
         #filtering
         student_status = request.GET.get("student_status")
         is_active = request.GET.get("is_active")
+        submission_remarks = request.GET.get("submission_remarks")
+        status = request.GET.get("status")
 
         
         students = StudentInformationService.get_all_with_documents().select_related("user")
@@ -989,6 +991,17 @@ class StudentInformationService:
                 students = students.filter(user__is_active=True)
             elif is_active == "No":
                 students = students.filter(user__is_active=False)
+        if status:
+            if status == "Complete":
+                students = students.filter(
+                    Q(status="Complete") & Q(submission_remarks__isnull=True)
+                )
+            elif status == "Missing":
+                students = students.filter(
+                    Q(status="Missing") | Q(submission_remarks__isnull=False)
+                )
+            else:
+                students = students.filter(status=status)
         
         # Search filter
         if search_value:

@@ -130,7 +130,7 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Save Section</button>
+                    <button type="submit" class="btn btn-primary" {% if school_year|stringformat:"s" != current_school_year|stringformat:"s" %}disabled{% endif %}>Save Section</button>
                 </form>
             </div>
         </div>

@@ -214,6 +214,12 @@ class AddSectionView(View):
         academic_year = request.POST.get("academic_year")
         status = request.POST.get("status")
         teacher_id = request.POST.get("teacher_name")
+        
+        current_school_year = SchoolYearRepository.get_all().order_by("updated_at").last()
+        if academic_year != current_school_year.name:
+            return JsonResponse(
+                {"success": False, "message": "School year has been ended. You cannot make any changes to the section."}
+            )
 
         if (
             not section_name
