@@ -8,6 +8,7 @@ from adminside.views import (
     AdminApplicationView,
     AdminReportsView,
     AdminReportsDataAPI,
+    AdminReportsExcelExportAPI,
     BulkApproveProgressView,
     BulkReApproveProgressView,
     EditAdminUserView,
@@ -95,6 +96,7 @@ urlpatterns = [
     # --REPORTS--
     path("reports/", AdminReportsView.as_view(), name="reports"),
     path("reports-data/", AdminReportsDataAPI.as_view(), name="reports_data"),
+    path("reports-excel-export/", AdminReportsExcelExportAPI.as_view(), name="reports_excel_export"),
     
     # CAN BE DELETED THIS FUNCTION
     path("get_application/<int:application_id>/", GetApplicationDataView.as_view(), name="get_application"),

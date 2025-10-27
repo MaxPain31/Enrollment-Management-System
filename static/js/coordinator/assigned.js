@@ -48,7 +48,11 @@ $(document).ready(function () {
                 className: "align-middle text-center",
                 render: function (data, type, row) {
                     let middle = row.student_information.middle_name ? ` ${row.student_information.middle_name}` : "";
-                    return `${row.student_information.last_name}, ${row.student_information.first_name}${middle} `.trim();
+                    if (row.status === "Missing" || (row.student_information.submission_remarks && row.student_information.submission_remarks.trim() !== "")) {
+                        return `<p class="text-danger mb-0">${row.student_information.last_name}, ${row.student_information.first_name}${middle} </p>`.trim();
+                    } else {
+                        return `<p class="text-success mb-0">${row.student_information.last_name}, ${row.student_information.first_name}${middle} </p>`.trim();
+                    }
                 }
             },
             {

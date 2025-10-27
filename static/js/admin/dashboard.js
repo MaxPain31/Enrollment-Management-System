@@ -48,34 +48,45 @@ document.addEventListener("DOMContentLoaded", function () {
                               filterType === 'month' ? 'This Month' : 
                               filterType === 'year' ? 'This Year' : 'All Time';
 
-            echarts.init(document.querySelector("#trafficChart")).setOption({
+            const chartInstance = echarts.init(document.querySelector("#trafficChart"));
+            
+            // Check if mobile device
+            const isMobile = window.innerWidth <= 768;
+            
+            chartInstance.setOption({
                 backgroundColor: '#ffffff',
                 color: ['rgb(0, 227, 150)', 'rgb(255, 193, 7)', 'rgb(108, 117, 125)'],
                 tooltip: {
                     trigger: 'item',
                     formatter: '{a} <br/>{b}: {c} ({d}%)',
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    textStyle: { color: '#fff' }
+                    textStyle: { color: '#fff' },
+                    position: isMobile ? 'inside' : 'auto'
                 },
                 legend: {
-                    top: '5%',
+                    top: isMobile ? '15%' : '8%',
                     left: 'center',
-                    textStyle: { color: '#333' }
+                    textStyle: { 
+                        color: '#333',
+                        fontSize: isMobile ? 10 : 12
+                    },
+                    orient: isMobile ? 'horizontal' : 'horizontal'
                 },
                 title: {
                     text: `Application Report | ${filterText}`,
                     left: 'center',
-                    top: '2%',
+                    top: isMobile ? '2%' : '1%',
                     textStyle: { 
                         color: '#333',
-                        fontSize: 14,
+                        fontSize: isMobile ? 12 : 14,
                         fontWeight: 'bold'
                     }
                 },
                 series: [{
                     name: 'Application Status',
                     type: 'pie',
-                    radius: ['40%', '70%'],
+                    radius: isMobile ? ['25%', '50%'] : ['35%', '60%'],
+                    center: isMobile ? ['50%', '65%'] : ['50%', '55%'],
                     avoidLabelOverlap: false,
                     label: {
                         show: false,
@@ -84,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     emphasis: {
                         label: {
                             show: true,
-                            fontSize: '18',
+                            fontSize: isMobile ? '14' : '18',
                             fontWeight: 'bold',
                             color: '#333'
                         }
@@ -94,6 +105,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     data: applicationReportData
                 }]
+            });
+            
+            // Handle window resize for responsive behavior
+            window.addEventListener('resize', function() {
+                chartInstance.resize();
             });
         } catch (error) {
             console.error("Error rendering application report chart:", error);
@@ -114,6 +130,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 window.barChartInstance.destroy();
             }
 
+            // Check if mobile device
+            const isMobile = window.innerWidth <= 768;
+            
             window.barChartInstance = new Chart(document.querySelector('#barChart'), {
                 type: 'bar',
                 data: {
@@ -140,23 +159,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         title: {
                             display: true,
                             text: `User Report | ${filterText}`,
                             font: {
-                                size: 14,
+                                size: isMobile ? 12 : 14,
                                 weight: 'bold'
                             },
                             color: '#333'
                         },
                         legend: {
                             display: true,
+                            position: isMobile ? 'bottom' : 'top',
                             labels: {
                                 color: '#333',
                                 font: {
-                                    size: 12
-                                }
+                                    size: isMobile ? 10 : 12
+                                },
+                                padding: isMobile ? 10 : 20
                             }
                         },
                         tooltip: {
@@ -164,7 +186,13 @@ document.addEventListener("DOMContentLoaded", function () {
                             titleColor: '#fff',
                             bodyColor: '#fff',
                             borderColor: '#333',
-                            borderWidth: 1
+                            borderWidth: 1,
+                            titleFont: {
+                                size: isMobile ? 11 : 12
+                            },
+                            bodyFont: {
+                                size: isMobile ? 10 : 11
+                            }
                         }
                     },
                     scales: {
@@ -172,8 +200,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             ticks: {
                                 color: '#333',
                                 font: {
-                                    size: 12
-                                }
+                                    size: isMobile ? 9 : 12
+                                },
+                                maxRotation: isMobile ? 45 : 0
                             },
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.1)'
@@ -184,7 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             ticks: {
                                 color: '#333',
                                 font: {
-                                    size: 12
+                                    size: isMobile ? 9 : 12
                                 }
                             },
                             grid: {

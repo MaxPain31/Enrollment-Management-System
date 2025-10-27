@@ -1,5 +1,68 @@
 /* Reports and Analytics Custom Styles */
 
+/* Export and Print Button Styles */
+.chart-print-btn,
+.chart-excel-btn,
+.chart-export-btn {
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+    margin: 0 2px;
+}
+
+.chart-print-btn:hover,
+.chart-excel-btn:hover,
+.chart-export-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.chart-print-btn {
+    background-color: #f8f9fa;
+    border-color: #6c757d;
+    color: #495057;
+}
+
+.chart-print-btn:hover {
+    background-color: #e9ecef;
+    border-color: #495057;
+    color: #212529;
+}
+
+.chart-excel-btn {
+    background-color: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.chart-excel-btn:hover {
+    background-color: #c3e6cb;
+    border-color: #1e7e34;
+    color: #0c4a1e;
+}
+
+.chart-export-btn {
+    background-color: #e2e3e5;
+    border-color: #6c757d;
+    color: #495057;
+}
+
+.chart-export-btn:hover {
+    background-color: #d6d8db;
+    border-color: #495057;
+    color: #212529;
+}
+
+/* Button group spacing */
+.btn-group .btn {
+    margin-right: 2px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
 /* Summary Cards Enhancement */
 .info-card {
     transition: all 0.3s ease;

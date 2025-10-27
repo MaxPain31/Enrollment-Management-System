@@ -878,7 +878,7 @@ class AdminReportsDataAPI(View):
         # Filter approved and pending applications by school year
         if school_year_filter:
             approved_applications = ApplicationApprovedRepository.get_all().filter(enrollment__school_year=school_year_filter).count()
-            pending_applications = ApplicationPendingRepository.get_all().filter(enrollment__school_year=school_year_filter).count()
+            pending_applications = ApplicationPendingRepository.get_all().filter(enrollment__school_year=school_year_filter, is_reapproved=False).count()
         else:
             approved_applications = ApplicationApprovedRepository.get_all().count()
             pending_applications = ApplicationPendingRepository.get_all().count()
@@ -1168,6 +1168,298 @@ class AdminReportsDataAPI(View):
         
         return JsonResponse(data)
 
+
+# CSV EXPORT API
+@method_decorator(
+    [login_required(login_url="/authentication/sign-in/"), user_passes_test(is_admin)],
+    name="dispatch",
+)
+class AdminReportsExcelExportAPI(View):
+    def get(self, request):
+        from django.http import HttpResponse
+        from django.db.models import Count, Q
+        from django.utils import timezone
+        from datetime import datetime, timedelta
+        import calendar
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        from openpyxl.utils import get_column_letter
+        from adminside.repositories.all_repository import (
+            EnrollmentFormRepository, ApplicationApprovedRepository, ApplicationPendingRepository,
+            StudentInformationRepository, UserInformationRepository, TeacherInformationRepository,
+            SectionRepository, SchoolYearRepository, EnrollmentManagementRepository,
+            DocumentRepository, AssessmentRepository, FAQRepository, AnnouncementRepository
+        )
+        
+        # Get parameters
+        chart_type = request.GET.get('chart_type', 'applicationStatus')
+        school_year_filter = request.GET.get('school_year', None)
+        
+        # Get current school year from SchoolYearRepository
+        current_school_year = SchoolYearRepository.get_all().order_by("updated_at").last()
+        current_school_year_name = current_school_year.name if current_school_year else None
+        
+        # Use current school year as default only if no filter provided and filter is not 'all'
+        if not school_year_filter or school_year_filter == 'all':
+            if school_year_filter == 'all':
+                school_year_filter = None  # Don't filter by school year
+            else:
+                school_year_filter = current_school_year_name  # Use current as default
+        
+        # Apply school year filter if provided
+        enrollment_queryset = EnrollmentFormRepository.get_all()
+        student_queryset = StudentInformationRepository.get_all()
+        
+        if school_year_filter:
+            enrollment_queryset = enrollment_queryset.filter(school_year=school_year_filter)
+            student_queryset = student_queryset.filter(school_year=school_year_filter)
+        
+        # Create Excel workbook
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+        # Format chart type name for worksheet title
+        import re
+        formatted_title = re.sub(r'([A-Z])', r' \1', chart_type).strip().title()
+        worksheet.title = formatted_title
+        
+        # Define styles
+        header_font = Font(bold=True, color="FFFFFF")
+        header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+        data_font = Font(size=11)
+        border = Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'),
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
+        center_alignment = Alignment(horizontal='center', vertical='center')
+        
+        # Write header
+        headers = ['Chart Type', 'Category', 'Value', 'Percentage', 'School Year', 'Generated At']
+        for col, header in enumerate(headers, 1):
+            cell = worksheet.cell(row=1, column=col, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = center_alignment
+            cell.border = border
+        
+        # Generate data based on chart type
+        if chart_type == 'applicationStatus':
+            # Application status data
+            if school_year_filter:
+                approved_count = ApplicationApprovedRepository.get_all().filter(enrollment__school_year=school_year_filter).count()
+                pending_count = ApplicationPendingRepository.get_all().filter(enrollment__school_year=school_year_filter, is_reapproved=False).count()
+            else:
+                approved_count = ApplicationApprovedRepository.get_all().count()
+                pending_count = ApplicationPendingRepository.get_all().count()
+            
+            total_applications = enrollment_queryset.count()
+            in_review_count = total_applications - approved_count - pending_count
+            
+            data = [
+                {"name": "Approved", "value": approved_count},
+                {"name": "Pending", "value": pending_count},
+                {"name": "In Review", "value": in_review_count}
+            ]
+            
+        elif chart_type == 'userRole':
+            data = [
+                {"name": "Students", "value": UserInformationRepository.get_all().filter(user_role="Student").count()},
+                {"name": "Teachers", "value": UserInformationRepository.get_all().filter(user_role="Teacher").count()},
+                {"name": "Coordinators", "value": UserInformationRepository.get_all().filter(user_role="Coordinator").count()},
+                {"name": "Administrators", "value": UserInformationRepository.get_all().filter(user_role="Administrator").count()},
+                {"name": "Applicants", "value": UserInformationRepository.get_all().filter(user_role="Applicant").count()}
+            ]
+            
+        elif chart_type == 'gender':
+            data = [
+                {"name": "Male", "value": student_queryset.filter(gender__iexact="MALE").count()},
+                {"name": "Female", "value": student_queryset.filter(gender__iexact="FEMALE").count()}
+            ]
+            
+        elif chart_type == 'enrollmentType':
+            data = [
+                {"name": "Junior High School", "value": student_queryset.filter(enrollment_type="JHS").count()},
+                {"name": "Senior High School", "value": student_queryset.filter(enrollment_type="SHS").count()}
+            ]
+            
+        elif chart_type == 'studentType':
+            data = [
+                {"name": "New Students", "value": student_queryset.filter(student_type="new student").count()},
+                {"name": "Transferees", "value": student_queryset.filter(student_type="transferee").count()},
+                {"name": "Returnees", "value": student_queryset.filter(student_type="returning").count()}
+            ]
+            
+        elif chart_type == 'gradeLevel':
+            data = []
+            for grade in range(7, 13):  # Grades 7-12
+                count = student_queryset.filter(grade=str(grade)).count()
+                data.append({
+                    "name": f"Grade {grade}",
+                    "value": count
+                })
+                
+        elif chart_type == 'registrationType':
+            early_reg_count = enrollment_queryset.filter(early_reg=True).count()
+            regular_reg_count = enrollment_queryset.count() - early_reg_count
+            data = [
+                {"name": "Early Registration", "value": early_reg_count},
+                {"name": "Regular Registration", "value": regular_reg_count}
+            ]
+            
+        elif chart_type == 'documentStatus':
+            complete_docs = enrollment_queryset.filter(status="Complete").count()
+            missing_docs = enrollment_queryset.filter(status="Missing").count()
+            data = [
+                {"name": "Complete Documents", "value": complete_docs},
+                {"name": "Missing Documents", "value": missing_docs}
+            ]
+            
+        elif chart_type == 'strand':
+            data = []
+            strands = student_queryset.filter(enrollment_type="SHS").values_list('strand', flat=True).distinct()
+            for strand in strands:
+                if strand:
+                    count = student_queryset.filter(strand=strand).count()
+                    data.append({
+                        "name": strand,
+                        "value": count
+                    })
+                    
+        elif chart_type == 'studentStatus':
+            data = [
+                {"name": "Enrolled", "value": student_queryset.filter(student_status="Enrolled").count()},
+                {"name": "Transferred", "value": student_queryset.filter(student_status="Transferred").count()},
+                {"name": "Dropped", "value": student_queryset.filter(student_status="Dropped").count()}
+            ]
+            
+        elif chart_type == 'ageGroup':
+            data = [
+                {"name": "12-14 years", "value": student_queryset.filter(age__gte=12, age__lte=14).count()},
+                {"name": "15-17 years", "value": student_queryset.filter(age__gte=15, age__lte=17).count()},
+                {"name": "18-20 years", "value": student_queryset.filter(age__gte=18, age__lte=20).count()},
+                {"name": "21+ years", "value": student_queryset.filter(age__gte=21).count()}
+            ]
+            
+        elif chart_type == 'semester':
+            data = [
+                {"name": "1st Semester", "value": enrollment_queryset.filter(semester="1st").count()},
+                {"name": "2nd Semester", "value": enrollment_queryset.filter(semester="2nd").count()}
+            ]
+            
+        elif chart_type == 'assessment':
+            if school_year_filter:
+                total_assessments = AssessmentRepository.get_all().filter(
+                    application_approved__enrollment__school_year=school_year_filter
+                ).count()
+                assessed_count = AssessmentRepository.get_all_with_assessed().filter(
+                    application_approved__enrollment__school_year=school_year_filter
+                ).count()
+            else:
+                total_assessments = AssessmentRepository.get_all().count()
+                assessed_count = AssessmentRepository.get_all_with_assessed().count()
+            
+            not_assessed_count = total_assessments - assessed_count
+            data = [
+                {"name": "Assessed", "value": assessed_count},
+                {"name": "Not Assessed", "value": not_assessed_count}
+            ]
+            
+        elif chart_type == 'content':
+            total_faqs = FAQRepository.get_all().count()
+            total_announcements = AnnouncementRepository.get_all().count()
+            active_announcements = AnnouncementRepository.get_all().filter(status="active").count()
+            data = [
+                {"name": "FAQs", "value": total_faqs},
+                {"name": "Announcements", "value": total_announcements},
+                {"name": "Active Announcements", "value": active_announcements}
+            ]
+            
+        elif chart_type == 'monthlyTrends':
+            # Monthly trends data
+            now = timezone.now()
+            data = []
+            for i in range(12):
+                month_date = now - timedelta(days=30*i)
+                month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+                if i == 0:
+                    month_end = now
+                else:
+                    next_month = month_start + timedelta(days=32)
+                    month_end = next_month.replace(day=1) - timedelta(days=1)
+                
+                count = enrollment_queryset.filter(
+                    created_at__gte=month_start,
+                    created_at__lte=month_end
+                ).count()
+                
+                data.append({
+                    "name": month_start.strftime("%b %Y"),
+                    "value": count
+                })
+            
+            data.reverse()  # Show oldest to newest
+        
+        # Calculate total for percentage calculation
+        total_value = sum(item['value'] for item in data)
+        
+        # Write data rows
+        row_num = 2
+        for item in data:
+            percentage = (item['value'] / total_value * 100) if total_value > 0 else 0
+            # Format chart type name for display
+            import re
+            formatted_chart_type = re.sub(r'([A-Z])', r' \1', chart_type).strip().title()
+            
+            # Write data to Excel
+            row_data = [
+                formatted_chart_type,
+                item['name'],
+                item['value'],
+                f"{percentage:.2f}%",
+                school_year_filter or 'All School Years',
+                datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            ]
+            
+            for col, value in enumerate(row_data, 1):
+                cell = worksheet.cell(row=row_num, column=col, value=value)
+                cell.font = data_font
+                cell.border = border
+                if col in [3, 4]:  # Value and Percentage columns
+                    cell.alignment = center_alignment
+                else:
+                    cell.alignment = Alignment(horizontal='left', vertical='center')
+            
+            row_num += 1
+        
+        # Auto-adjust column widths
+        for col in range(1, len(headers) + 1):
+            column_letter = get_column_letter(col)
+            max_length = 0
+            for row in range(1, row_num):
+                cell_value = worksheet[f"{column_letter}{row}"].value
+                if cell_value:
+                    max_length = max(max_length, len(str(cell_value)))
+            adjusted_width = min(max_length + 2, 50)  # Cap at 50 characters
+            worksheet.column_dimensions[column_letter].width = adjusted_width
+        
+        # Add summary information
+        summary_row = row_num + 2
+        worksheet.cell(row=summary_row, column=1, value="Summary Information").font = Font(bold=True, size=12)
+        worksheet.cell(row=summary_row + 1, column=1, value=f"Total Records: {len(data)}").font = Font(bold=True)
+        worksheet.cell(row=summary_row + 2, column=1, value=f"Total Value: {total_value:,}").font = Font(bold=True)
+        worksheet.cell(row=summary_row + 3, column=1, value=f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}").font = Font(italic=True)
+        
+        # Create HTTP response
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        filename = f"{chart_type}_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        # Save workbook to response
+        workbook.save(response)
+        return response
 
 
 # CAN BE DELETED

@@ -16,9 +16,8 @@ class ReportsManager {
      */
     init() {
         this.showLoadingSpinner();
-        this.loadSchoolYears();
-        this.fetchReportsData();
         this.setupEventListeners();
+        this.fetchReportsData();
     }
 
     /**
@@ -56,8 +55,8 @@ class ReportsManager {
             this.data = await response.json();
             this.hideLoadingSpinner();
             this.updateSummaryCards();
-            this.loadSchoolYears();
             this.initializeCharts();
+            this.loadSchoolYears();
             
         } catch (error) {
             console.error('Error fetching reports data:', error);
@@ -133,6 +132,9 @@ class ReportsManager {
     initializeCharts() {
         if (!this.data) return;
 
+        // Check if mobile device
+        const isMobile = window.innerWidth <= 768;
+        
         // Initialize each chart
         this.initApplicationStatusChart();
         this.initUserRoleChart();
@@ -168,6 +170,9 @@ class ReportsManager {
 
         this.charts.applicationStatus = echarts.init(chartElement);
         
+        // Check if mobile device
+        const isMobile = window.innerWidth <= 768;
+        
         // Ensure data exists and has values
         const chartData = this.data.application_status || [];
 
@@ -184,39 +189,40 @@ class ReportsManager {
                 borderWidth: 1,
                 textStyle: { 
                     color: '#fff',
-                    fontSize: 14,
+                    fontSize: isMobile ? 12 : 14,
                     fontWeight: 'bold'
                 },
                 extraCssText: 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); border-radius: 6px;'
             },
             legend: {
-                orient: 'vertical',
-                left: 'left',
+                orient: isMobile ? 'horizontal' : 'vertical',
+                left: isMobile ? 'center' : 'left',
+                top: isMobile ? 'bottom' : 'middle',
                 textStyle: { 
-                    fontSize: 12,
+                    fontSize: isMobile ? 10 : 12,
                     color: '#333',
                     fontWeight: 'normal'
                 },
-                itemGap: 10
+                itemGap: isMobile ? 5 : 10
             },
             series: [{
                 name: 'Application Status',
                 type: 'pie',
-                radius: '60%',
-                center: ['65%', '50%'],
+                radius: isMobile ? '50%' : '60%',
+                center: isMobile ? ['50%', '45%'] : ['65%', '50%'],
                 data: chartData,
                 label: {
-                    show: true,
+                    show: !isMobile,
                     formatter: function(params) {
                         return `${params.name}: ${params.value}`;
                     },
-                    fontSize: 12,
+                    fontSize: isMobile ? 9 : 12,
                     color: '#333',
                     fontWeight: 'bold',
                     position: 'outside'
                 },
                 labelLine: {
-                    show: true,
+                    show: !isMobile,
                     length: 15,
                     length2: 10,
                     lineStyle: {
@@ -232,7 +238,7 @@ class ReportsManager {
                     },
                     label: {
                         show: true,
-                        fontSize: 14,
+                        fontSize: isMobile ? 10 : 14,
                         fontWeight: 'bold',
                         color: '#333'
                     },
@@ -746,6 +752,32 @@ class ReportsManager {
                 this.filterBySchoolYear(e.target.value);
             });
         }
+        
+        // Print button handlers
+        document.querySelectorAll('.chart-print-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const chartName = e.target.closest('[data-print-chart]').dataset.printChart;
+                this.printChart(chartName);
+            });
+        });
+        
+        // Excel export button handlers
+        document.querySelectorAll('.chart-excel-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const chartName = e.target.closest('[data-excel-chart]').dataset.excelChart;
+                const filename = e.target.closest('[data-filename]').dataset.filename;
+                this.exportChartToExcel(chartName, filename);
+            });
+        });
+        
+        // Image export button handlers
+        document.querySelectorAll('.chart-export-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const chartName = e.target.closest('[data-export-chart]').dataset.exportChart;
+                const filename = e.target.closest('[data-filename]').dataset.filename;
+                this.exportChart(chartName, filename);
+            });
+        });
     }
     
     /**
@@ -776,8 +808,8 @@ class ReportsManager {
             // Check if there's data for the selected school year
             if (this.hasDataForSchoolYear()) {
                 this.updateSummaryCards();
-                this.loadSchoolYears();
                 this.initializeCharts();
+                this.loadSchoolYears();
             } else {
                 this.showNoDataMessage(schoolYear);
             }
@@ -848,32 +880,41 @@ class ReportsManager {
      */
     loadSchoolYears() {
         const schoolYearFilter = document.getElementById('schoolYearFilter');
-        if (schoolYearFilter && this.data && this.data.available_school_years) {
+        if (schoolYearFilter && this.data) {
+            console.log('Loading school years:', this.data.available_school_years);
+            
             // Store current selection before clearing
             const currentSelection = schoolYearFilter.value;
             
-            // Clear existing options except "All School Years"
+            // Clear existing options
             schoolYearFilter.innerHTML = '<option value="all">All School Years</option>';
             
             // Add school years from backend data
-            this.data.available_school_years.forEach(year => {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                schoolYearFilter.appendChild(option);
-            });
+            if (this.data.available_school_years && Array.isArray(this.data.available_school_years)) {
+                this.data.available_school_years.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    schoolYearFilter.appendChild(option);
+                });
+            }
             
             // Restore selection or set default
             if (currentSelection && currentSelection !== 'all') {
                 // Keep the user's selection if it exists
                 schoolYearFilter.value = currentSelection;
-            } else if (this.data.selected_school_year) {
+            } else if (this.data.selected_school_year && this.data.selected_school_year !== 'all') {
                 // Use the selected school year from API
                 schoolYearFilter.value = this.data.selected_school_year;
-            } else if (this.data.current_school_year) {
+            } else if (this.data.current_school_year && this.data.current_school_year !== 'all') {
                 // Fall back to current school year
                 schoolYearFilter.value = this.data.current_school_year;
+            } else {
+                // Default to "All School Years"
+                schoolYearFilter.value = 'all';
             }
+            
+            console.log('School year filter value set to:', schoolYearFilter.value);
         }
     }
 
@@ -920,6 +961,125 @@ class ReportsManager {
             link.href = url;
             link.click();
         }
+    }
+
+    /**
+     * Print chart
+     */
+    printChart(chartName) {
+        if (this.charts[chartName]) {
+            const chartElement = document.getElementById(`${chartName}Chart`);
+            if (chartElement) {
+                const printWindow = window.open('', '_blank');
+                const chartDataURL = this.charts[chartName].getDataURL({
+                    type: 'png',
+                    pixelRatio: 2,
+                    backgroundColor: '#fff'
+                });
+                
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Print ${chartName} Chart</title>
+                            <style>
+                                body { margin: 0; padding: 20px; text-align: center; }
+                                img { max-width: 100%; height: auto; }
+                                h1 { color: #333; margin-bottom: 20px; }
+                            </style>
+                        </head>
+                        <body>
+                            <h1>${this.getChartTitle(chartName)}</h1>
+                            <img src="${chartDataURL}" alt="${chartName} Chart">
+                            <script>
+                                window.onload = function() {
+                                    window.print();
+                                }
+                            </script>
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            }
+        }
+    }
+
+    /**
+     * Export chart to Excel
+     */
+    async exportChartToExcel(chartName, filename) {
+        try {
+            const chartType = this.getChartTypeFromName(chartName);
+            const schoolYear = document.getElementById('schoolYearFilter')?.value || 'all';
+            
+            const url = `/admin/reports-excel-export/?chart_type=${chartType}&school_year=${encodeURIComponent(schoolYear)}`;
+            
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = filename || `${chartName}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(downloadUrl);
+            
+        } catch (error) {
+            console.error('Error exporting to Excel:', error);
+            this.showError('Error exporting to Excel. Please try again.');
+        }
+    }
+
+    /**
+     * Get chart title for display
+     */
+    getChartTitle(chartName) {
+        const titles = {
+            'applicationStatus': 'Application Status Distribution',
+            'userRole': 'User Role Distribution',
+            'monthlyTrends': 'Monthly Application Trends',
+            'gender': 'Gender Distribution',
+            'enrollmentType': 'Enrollment Type Distribution',
+            'studentType': 'Student Type Distribution',
+            'gradeLevel': 'Grade Level Distribution',
+            'registrationType': 'Registration Type Distribution',
+            'documentStatus': 'Document Status Distribution',
+            'strand': 'SHS Strand Distribution',
+            'studentStatus': 'Student Status Distribution',
+            'ageGroup': 'Age Group Distribution',
+            'semester': 'Semester Distribution',
+            'assessment': 'Assessment Status',
+            'content': 'Content Management'
+        };
+        return titles[chartName] || chartName;
+    }
+
+    /**
+     * Get chart type for Excel export
+     */
+    getChartTypeFromName(chartName) {
+        const typeMap = {
+            'applicationStatus': 'applicationStatus',
+            'userRole': 'userRole',
+            'monthlyTrends': 'monthlyTrends',
+            'gender': 'gender',
+            'enrollmentType': 'enrollmentType',
+            'studentType': 'studentType',
+            'gradeLevel': 'gradeLevel',
+            'registrationType': 'registrationType',
+            'documentStatus': 'documentStatus',
+            'strand': 'strand',
+            'studentStatus': 'studentStatus',
+            'ageGroup': 'ageGroup',
+            'semester': 'semester',
+            'assessment': 'assessment',
+            'content': 'content'
+        };
+        return typeMap[chartName] || chartName;
     }
 
     /**
@@ -1249,14 +1409,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Add export functionality if buttons exist
-    document.querySelectorAll('[data-export-chart]').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const chartName = e.target.dataset.exportChart;
-            const filename = e.target.dataset.filename || `${chartName}.png`;
-            window.reportsManager.exportChart(chartName, filename);
+    // Re-setup event listeners after charts are initialized
+    setTimeout(() => {
+        // Print button handlers
+        document.querySelectorAll('.chart-print-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const chartName = e.target.closest('[data-print-chart]').dataset.printChart;
+                window.reportsManager.printChart(chartName);
+            });
         });
-    });
+        
+        // Excel export button handlers
+        document.querySelectorAll('.chart-excel-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const chartName = e.target.closest('[data-excel-chart]').dataset.excelChart;
+                const filename = e.target.closest('[data-filename]').dataset.filename;
+                window.reportsManager.exportChartToExcel(chartName, filename);
+            });
+        });
+        
+        // Image export button handlers
+        document.querySelectorAll('.chart-export-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const chartName = e.target.closest('[data-export-chart]').dataset.exportChart;
+                const filename = e.target.closest('[data-filename]').dataset.filename;
+                window.reportsManager.exportChart(chartName, filename);
+            });
+        });
+    }, 1000);
 });
 
 // Utility functions

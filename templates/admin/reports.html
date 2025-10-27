@@ -20,9 +20,9 @@
 
 <!-- Summary Cards -->
 <section class="section fade-in">
-    <div class="row g-3">
-        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-            <div class="card info-card sales-card">
+    <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="card info-card sales-card m-2">
                 <div class="card-body">
                     <h5 class="card-title">Total Applications</h5>
                     <div class="d-flex align-items-center">
@@ -38,8 +38,8 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-            <div class="card info-card revenue-card">
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="card info-card revenue-card m-2">
                 <div class="card-body">
                     <h5 class="card-title">Approved Applications</h5>
                     <div class="d-flex align-items-center">
@@ -55,8 +55,8 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-            <div class="card info-card customers-card">
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="card info-card customers-card m-2">
                 <div class="card-body">
                     <h5 class="card-title">Total Students</h5>
                     <div class="d-flex align-items-center">
@@ -72,8 +72,8 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-            <div class="card info-card sales-card">
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="card info-card sales-card m-2">
                 <div class="card-body">
                     <h5 class="card-title">Pending Applications</h5>
                     <div class="d-flex align-items-center">
@@ -93,16 +93,24 @@
 
 <!-- Charts Section -->
 <section class="section">
-    <div class="row g-3">
+    <div class="row g-3 mb-4">
         <!-- Application Status Chart -->
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6 col-md-12">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Application Status Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="applicationStatus" data-filename="application-status.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="applicationStatus" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="applicationStatus" data-filename="application-status.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="applicationStatus" data-filename="application-status.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="applicationStatusChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -110,14 +118,22 @@
         </div>
 
         <!-- User Role Distribution -->
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6 col-md-12">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">User Role Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="userRole" data-filename="user-roles.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="userRole" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="userRole" data-filename="user-roles.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="userRole" data-filename="user-roles.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="userRoleChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -125,14 +141,22 @@
         </div>
 
         <!-- Monthly Trends -->
-        <div class="col-lg-12 col-md-12 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-12 col-md-12">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Monthly Application Trends</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="monthlyTrends" data-filename="monthly-trends.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="monthlyTrends" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="monthlyTrends" data-filename="monthly-trends.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="monthlyTrends" data-filename="monthly-trends.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="monthlyTrendsChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -140,14 +164,22 @@
         </div>
 
         <!-- Gender Distribution -->
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6 col-md-12">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Gender Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="gender" data-filename="gender-distribution.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="gender" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="gender" data-filename="gender-distribution.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="gender" data-filename="gender-distribution.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="genderChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -155,14 +187,22 @@
         </div>
 
         <!-- Enrollment Type Distribution -->
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6 col-md-12">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Enrollment Type Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="enrollmentType" data-filename="enrollment-types.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="enrollmentType" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="enrollmentType" data-filename="enrollment-types.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="enrollmentType" data-filename="enrollment-types.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="enrollmentTypeChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -170,28 +210,44 @@
         </div>
 
         <!-- Student Type Distribution -->
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6 col-md-12">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Student Type Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="studentType" data-filename="student-types.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="studentType" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="studentType" data-filename="student-types.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="studentType" data-filename="student-types.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>                    <div id="studentTypeChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
             </div>
         </div>
 
         <!-- Grade Level Distribution -->
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6 col-md-12">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Grade Level Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="gradeLevel" data-filename="grade-levels.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="gradeLevel" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="gradeLevel" data-filename="grade-levels.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="gradeLevel" data-filename="grade-levels.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="gradeLevelChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -199,14 +255,22 @@
         </div>
 
         <!-- Registration Type Distribution -->
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6 col-md-12">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Registration Type Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="registrationType" data-filename="registration-types.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="registrationType" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="registrationType" data-filename="registration-types.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="registrationType" data-filename="registration-types.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="registrationTypeChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -214,14 +278,22 @@
         </div>
 
         <!-- Document Status Distribution -->
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6 col-md-12">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Document Status Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="documentStatus" data-filename="document-status.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="documentStatus" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="documentStatus" data-filename="document-status.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="documentStatus" data-filename="document-status.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="documentStatusChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -229,14 +301,22 @@
         </div>
 
         <!-- Strand Distribution (SHS only) -->
-        <div class="col-lg-12 mb-4" id="strandSection" style="display: none;">
-            <div class="card chart-card">
+        <div class="col-lg-12" id="strandSection" style="display: none;">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">SHS Strand Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="strand" data-filename="strand-distribution.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="strand" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="strand" data-filename="strand-distribution.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="strand" data-filename="strand-distribution.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="strandChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -244,14 +324,22 @@
         </div>
 
         <!-- Student Status Distribution -->
-        <div class="col-lg-6 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Student Status Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="studentStatus" data-filename="student-status.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="studentStatus" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="studentStatus" data-filename="student-status.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="studentStatus" data-filename="student-status.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="studentStatusChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -259,14 +347,22 @@
         </div>
 
         <!-- Age Group Distribution -->
-        <div class="col-lg-6 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Age Group Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="ageGroup" data-filename="age-groups.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="ageGroup" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="ageGroup" data-filename="age-groups.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="ageGroup" data-filename="age-groups.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="ageGroupChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -274,14 +370,22 @@
         </div>
 
         <!-- Semester Distribution -->
-        <div class="col-lg-6 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Semester Distribution</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="semester" data-filename="semester-distribution.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="semester" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="semester" data-filename="semester-distribution.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="semester" data-filename="semester-distribution.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="semesterChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -289,14 +393,22 @@
         </div>
 
         <!-- Assessment Status -->
-        <div class="col-lg-6 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Assessment Status</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="assessment" data-filename="assessment-status.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="assessment" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="assessment" data-filename="assessment-status.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="assessment" data-filename="assessment-status.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="assessmentChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>
@@ -304,14 +416,22 @@
         </div>
 
         <!-- Content Management -->
-        <div class="col-lg-6 mb-4">
-            <div class="card chart-card">
+        <div class="col-lg-6">
+            <div class="card chart-card m-2">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Content Management</h5>
-                        <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="content" data-filename="content-management.png">
-                            <i class="bi bi-download"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary chart-print-btn" data-print-chart="content" title="Print Chart">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success chart-excel-btn" data-excel-chart="content" data-filename="content-management.xlsx" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary chart-export-btn" data-export-chart="content" data-filename="content-management.png" title="Export Image">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="contentChart" class="chart-container" style="min-height: 400px;"></div>
                 </div>

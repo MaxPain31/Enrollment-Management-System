@@ -166,35 +166,16 @@
         flex: 0 0 50%;
         max-width: 50%;
     }
+    
+    .chart-container {
+        min-height: 350px;
+    }
 }
 
-@media (max-width: 768px) {
-    .info-card .card-body {
-        padding: 1rem;
-    }
-    
-    .info-card .card-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-    }
-    
-    .chart-card .card-body {
-        padding: 1rem;
-    }
-    
-    .btn-group {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    
-    .btn-group .btn {
-        width: 100%;
-    }
-    
+@media (max-width: 992px) {
     .col-lg-3 {
-        flex: 0 0 100%;
-        max-width: 100%;
+        flex: 0 0 50%;
+        max-width: 50%;
         margin-bottom: 1rem;
     }
     
@@ -204,22 +185,133 @@
         margin-bottom: 1rem;
     }
     
+    .chart-container {
+        min-height: 320px;
+    }
+}
+
+@media (max-width: 768px) {
+    .info-card {
+        height: auto;
+        min-height: 120px;
+    }
+    
+    .info-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .info-card .card-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+    
+    .info-card .card-title {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-card h6 {
+        font-size: 1.2rem;
+    }
+    
+    .info-card small {
+        font-size: 0.7rem;
+    }
+    
+    .chart-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .chart-card .card-title {
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+        font-size: 0.8rem;
+        padding: 0.5rem;
+    }
+    
+    .col-lg-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 0.75rem;
+    }
+    
+    .col-lg-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 0.75rem;
+    }
+    
     .col-lg-12 {
         flex: 0 0 100%;
         max-width: 100%;
     }
     
     .chart-container {
-        height: 300px;
-        min-height: 300px;
+        height: 280px;
+        min-height: 280px;
+        padding: 5px;
+    }
+    
+    /* School year filter responsive */
+    .d-flex.gap-3 {
+        flex-direction: column;
+        gap: 0.5rem !important;
+    }
+    
+    .form-select {
+        width: 100% !important;
+        margin-bottom: 0.5rem;
     }
 }
 
 @media (max-width: 576px) {
-    .d-flex.justify-content-between {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: 1rem;
+    .info-card {
+        height: auto;
+        min-height: 100px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-card .card-body {
+        padding: 0.5rem;
+    }
+    
+    .info-card .card-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 0.9rem;
+    }
+    
+    .info-card .card-title {
+        font-size: 0.75rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .info-card h6 {
+        font-size: 1rem;
+    }
+    
+    .info-card small {
+        font-size: 0.65rem;
+    }
+    
+    .chart-card .card-body {
+        padding: 0.5rem;
+    }
+    
+    .chart-card .card-title {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
     }
     
     .btn-group {
@@ -227,19 +319,73 @@
         justify-content: center;
     }
     
-    .form-select {
-        width: 100% !important;
-        margin-bottom: 1rem;
+    .btn-group .btn {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
     }
     
-    .info-card {
-        height: auto;
-        min-height: 100px;
+    .form-select {
+        width: 100% !important;
+        margin-bottom: 0.5rem;
+        font-size: 0.8rem;
     }
     
     .chart-container {
-        height: 250px;
-        min-height: 250px;
+        height: 220px;
+        min-height: 220px;
+        padding: 3px;
+    }
+    
+    /* Make charts more readable on mobile */
+    .chart-container canvas,
+    .chart-container div {
+        font-size: 10px !important;
+    }
+    
+    /* Adjust chart legends for mobile */
+    .echarts-legend {
+        font-size: 10px !important;
+    }
+    
+    .echarts-label {
+        font-size: 9px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .info-card {
+        min-height: 90px;
+    }
+    
+    .info-card .card-body {
+        padding: 0.4rem;
+    }
+    
+    .info-card .card-icon {
+        width: 25px;
+        height: 25px;
+        font-size: 0.8rem;
+    }
+    
+    .info-card .card-title {
+        font-size: 0.7rem;
+    }
+    
+    .info-card h6 {
+        font-size: 0.9rem;
+    }
+    
+    .info-card small {
+        font-size: 0.6rem;
+    }
+    
+    .chart-container {
+        height: 200px;
+        min-height: 200px;
+    }
+    
+    .chart-card .card-title {
+        font-size: 0.75rem;
     }
 }
 

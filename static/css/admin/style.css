@@ -1065,12 +1065,16 @@ h6 {
 
 /* Hide Password Button */
 .hide-password {
-  border-radius: 0.375rem;
-  border: 1px solid #dee2e6;
   background-color: #f8f9fa;
   color: #212529;
   cursor: pointer;
   transition: all 0.3s ease;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  border: 1px solid #dee2e6;
+  border-left: 0 !important;
+  border-radius: 0 0.375rem 0.375rem 0 !important;
 }
 
 .hide-password:hover {
@@ -1260,4 +1264,61 @@ h6 {
   text-align: center;
   font-size: 13px;
   color: #012970;
+}
+
+/*--------------------------------------------------------------
+# Chart Responsive Styles
+--------------------------------------------------------------*/
+.chart-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Mobile chart adjustments */
+@media (max-width: 768px) {
+  .chart-container {
+    height: 300px !important;
+    margin-bottom: 20px;
+    padding: 10px;
+  }
+  
+  .card-body {
+    padding: 15px;
+  }
+  
+  .card-title {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+  
+  /* Ensure charts are readable on mobile */
+  .echart {
+    min-height: 250px !important;
+    padding: 10px 0;
+  }
+  
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Adjust card layout for mobile */
+  .col-lg-6 {
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .chart-container {
+    height: 250px !important;
+  }
+  
+  .card-title {
+    font-size: 12px;
+  }
+  
+  .echart {
+    min-height: 200px !important;
+  }
 }

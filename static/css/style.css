@@ -646,7 +646,7 @@ footer {
   min-width: 0;
 }
 
-/* Admin and Support - horizontal scroll */
+/* Admin and Support - horizontal scroll (keep scrollable) */
 .admin-level .org-cards-grid,
 .support-level .org-cards-grid {
   display: flex !important;
@@ -825,7 +825,15 @@ footer {
 .support-level {
   padding: 2rem 0;
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* prevent clipping the last card */
+}
+
+/* Ensure admin and support-level cards are always visible */
+.admin-level .org-card,
+.support-level .org-card {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
 }
 
 /* Announcement Detail Page Styles */
@@ -1270,10 +1278,11 @@ footer {
     font-size: 1.5rem;
   }
 
-  /* Keep grid for admin/support, scroll for faculty */
+  /* Keep horizontal scroll for admin/support */
   .admin-level .org-cards-grid,
   .support-level .org-cards-grid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    display: flex !important;
+    overflow-x: auto !important;
     gap: 1.5rem;
   }
 
@@ -1584,10 +1593,11 @@ html {
     border-radius: 10px;
   }
 
-  /* Organizational Chart Tablet */
+  /* Organizational Chart Tablet - keep horizontal scroll */
   .admin-level .org-cards-grid,
   .support-level .org-cards-grid {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    display: flex !important;
+    overflow-x: auto !important;
     gap: 1.5rem;
   }
 
@@ -1747,11 +1757,11 @@ html {
     max-width: 260px;
   }
 
-  /* Keep grid layout only for admin and support on mobile */
+  /* Keep horizontal scroll for admin and support on mobile */
   .admin-level .org-cards-grid,
   .support-level .org-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex !important;
+    overflow-x: auto !important;
     gap: 1.25rem;
   }
 
@@ -2052,6 +2062,10 @@ html {
 
 .phone-card::before {
   background: linear-gradient(to right, #667eea, #764ba2);
+}
+
+.facebook-icon {
+  background: linear-gradient(to right, #0051ff, #0051ff);
 }
 
 .contact-card-header {

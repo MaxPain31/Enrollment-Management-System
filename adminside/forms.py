@@ -126,8 +126,19 @@ class StudentForm(BaseLRNForm):
     def clean_age(self):
         age = self.cleaned_data.get("age")
         birth_date = self.cleaned_data.get("birth_date")
-        if not age or age <= 11:
-            raise ValidationError("Age must be greater than 11.")
+        grade_level = self.cleaned_data.get("grade_level")
+        if grade_level == "7" and (not age or age <= 12):
+            raise ValidationError("Age must be 12 years old or above.")
+        if grade_level == "8" and (not age or age <= 13):
+            raise ValidationError("Age must be 13 years old or above.")
+        if grade_level == "9" and (not age or age <= 14):
+            raise ValidationError("Age must be 14 years old or above.")
+        if grade_level == "10" and (not age or age <= 15):
+            raise ValidationError("Age must be 15 years old or above.")
+        if grade_level == "11" and (not age or age <= 16):
+            raise ValidationError("Age must be 16 years old or above.")
+        if grade_level == "12" and (not age or age <= 17):
+            raise ValidationError("Age must be 17 years old or above.")
         if birth_date:
             today = date.today()
             expected_age = today.year - birth_date.year - (
@@ -235,8 +246,19 @@ class ApplicationForm(forms.Form):
     def clean_age(self):
         age = self.cleaned_data.get("age")
         birth_date = self.cleaned_data.get("birth_date")
-        if not age or age <= 11:
-            raise ValidationError("Age must be greater than 11.")
+        grade_level = self.cleaned_data.get("grade_level")
+        if grade_level == "7" and (not age or age <= 12):
+            raise ValidationError("Age must be 12 years old or above.")
+        if grade_level == "8" and (not age or age <= 13):
+            raise ValidationError("Age must be 13 years old or above.")
+        if grade_level == "9" and (not age or age <= 14):
+            raise ValidationError("Age must be 14 years old or above.")
+        if grade_level == "10" and (not age or age <= 15):
+            raise ValidationError("Age must be 15 years old or above.")
+        if grade_level == "11" and (not age or age <= 16):
+            raise ValidationError("Age must be 16 years old or above.")
+        if grade_level == "12" and (not age or age <= 17):
+            raise ValidationError("Age must be 17 years old or above.")
         if birth_date:
             today = date.today()
             expected_age = today.year - birth_date.year - (

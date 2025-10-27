@@ -2064,6 +2064,10 @@ html {
   background: linear-gradient(to right, #667eea, #764ba2);
 }
 
+.facebook-icon {
+  background: linear-gradient(to right, #0051ff, #0051ff);
+}
+
 .contact-card-header {
   padding: 2rem 2rem 1rem 2rem;
   text-align: center;

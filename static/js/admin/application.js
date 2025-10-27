@@ -1017,7 +1017,7 @@ $(document).ready(function () {
                                 Swal.fire({
                                     icon: "success",
                                     title: "All done!",
-                                    html: `<strong>${data.total}</strong> applications ${actionName.toLowerCase()}d successfully.`,
+                                    html: `All applications ${actionName.toLowerCase()}d successfully.`,
                                     confirmButtonText: "OK"
                                 }).then(() => {
                                     applicationTable.ajax.reload();
