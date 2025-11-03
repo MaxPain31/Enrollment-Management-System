@@ -43,9 +43,9 @@ class RegistrationView(View):
         )
 
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse({"success": True, "message": "Account created successfully! You can now log in."})
+            return JsonResponse({"success": True, "message": f"Account created successfully! Your LRN number is {form.cleaned_data['lrn']}. You can now log in."})
 
-        messages.success(request, "Account created successfully! You can now log in.")
+        messages.success(request, f"Account created successfully! Your LRN number is {form.cleaned_data['lrn']}. You can now log in.")
         return redirect("login")
 
 

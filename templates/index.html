@@ -130,6 +130,7 @@
         <!-- Administrative Staff -->
         <div class="org-level admin-level">
             <h3 class="org-section-title">Administrative Staff</h3>
+            {% if admin_staff %}
             <div class="org-cards-grid">
                 {% for staff in admin_staff %}
                 <div class="org-card">
@@ -143,14 +144,18 @@
                         {% endif %}
                     </div>
                     <div class="org-card-content">
-                        <h5 class="org-name">{{ staff.name }}</h5>
+                        <h5 class="org-name">{{ staff.name }}</h5>`
                         <p class="org-position">{{ staff.position }}</p>
                     </div>
                 </div>
-                {% empty %}
-                <p class="text-muted text-center">No administrative staff found.</p>
                 {% endfor %}
             </div>
+            {% else %}
+            <div class="no-org-data">
+                <i class="bi bi-diagram-3" style="font-size: 3rem; color: #94a3b8;"></i>
+                <p>No administrative staff information available.</p>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Academic Staff Container -->
@@ -181,6 +186,11 @@
                         {% endfor %}
                     </div>
                 </div>
+                {% empty %}
+                <div class="no-org-data">
+                    <i class="bi bi-diagram-3" style="font-size: 3rem; color: #94a3b8;"></i>
+                    <p>No junior high school faculty information available.</p>
+                </div>
                 {% endfor %}
             </div>
             <!-- Senior High School Staff -->
@@ -209,6 +219,11 @@
                         {% endfor %}
                     </div>
                 </div>
+                {% empty %}
+                <div class="no-org-data">
+                    <i class="bi bi-diagram-3" style="font-size: 3rem; color: #94a3b8;"></i>
+                    <p>No senior high school faculty information available.</p>
+                </div>
                 {% endfor %}
             </div>
         </div>
@@ -216,6 +231,7 @@
         <!-- Support Staff -->
         <div class="org-level support-level">
             <h3 class="org-section-title">Support Staff</h3>
+            {% if support_staff %}
             <div class="org-cards-grid">
                 {% for staff in support_staff %}
                 <div class="org-card">
@@ -233,10 +249,14 @@
                         <p class="org-position">{{ staff.position }}</p>
                     </div>
                 </div>
-                {% empty %}
-                <p class="text-muted">No support staff found.</p>
                 {% endfor %}
             </div>
+            {% else %}
+            <div class="no-org-data">
+                <i class="bi bi-diagram-3" style="font-size: 3rem; color: #94a3b8;"></i>
+                <p>No support staff information available.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 </section>
@@ -263,7 +283,10 @@
                     </div>
                 </div>
                 {% empty %}
-                <p class="text-center text-muted">No FAQs available at the moment.</p>
+                <div class="no-org-data">
+                    <i class="bi bi-question-circle-fill" style="font-size: 3rem; color: #94a3b8;"></i>
+                    <p>No FAQs available at the moment.</p>
+                </div>
                 {% endfor %}
             </div>
         </div>
@@ -705,5 +728,22 @@ if (typeof ScrollReveal !== 'undefined') {
         interval: 200
     });
 }
+</script>
+<script>
+// Disable reveal animation for org cards so they render immediately
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof ScrollReveal !== 'undefined') {
+        try {
+            // Remove any ScrollReveal effects bound to org-card
+            ScrollReveal().clean && ScrollReveal().clean('.org-card');
+        } catch (e) {}
+    }
+    // Ensure all org cards are visible and not transformed
+    document.querySelectorAll('.org-card').forEach(function(el){
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+        el.style.visibility = 'visible';
+    });
+});
 </script>
 {% endblock %}

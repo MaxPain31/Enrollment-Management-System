@@ -14,6 +14,7 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from .forms import EnrollmentForm as EnrollmentValidationForm
 from .utils import emailNotification
+from django.forms.utils import ErrorList
 
 
 class HomeView(View):
@@ -203,6 +204,16 @@ class JuniorEnrollmentView(View):
 
         cleaned_data = form.cleaned_data
 
+        # Handle checkbox arrays (getlist for multiple values)
+        disability_types = request.POST.getlist("disability_type")
+        disability_visual_types = request.POST.getlist("disability_visual_type")
+        disability_health_types = request.POST.getlist("disability_health_type")
+        
+        # Convert to JSON strings
+        cleaned_data["disability_type"] = json.dumps(disability_types) if disability_types else None
+        cleaned_data["disability_visual_type"] = json.dumps(disability_visual_types) if disability_visual_types else None
+        cleaned_data["disability_health_type"] = json.dumps(disability_health_types) if disability_health_types else None
+
         model_fields = [f.name for f in EnrollmentForm._meta.get_fields()]
         valid_data = {k: v for k, v in cleaned_data.items() if k in model_fields}
         valid_data['user'] = request.user
@@ -215,7 +226,7 @@ class JuniorEnrollmentView(View):
         
         user = request.user
         user.jhs_submitted = True
-        user.save()
+        user.save(update_fields=["jhs_submitted"])
 
         emailNotification(
             form.cleaned_data["first_name"],
@@ -295,6 +306,28 @@ class SeniorEnrollmentView(View):
         
         cleaned_data = form.cleaned_data
 
+        # Handle checkbox arrays (getlist for multiple values)
+        disability_types = request.POST.getlist("disability_type")
+        disability_visual_types = request.POST.getlist("disability_visual_type")
+        disability_health_types = request.POST.getlist("disability_health_type")
+        learning_modalities = request.POST.getlist("learning_modality")
+        
+        # Validate Distance Learning Modalities - at least one must be selected
+        if not learning_modalities or len(learning_modalities) == 0:
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({
+                    "success": False,
+                    "errors": {"learning_modality": ["Please select at least one Distance Learning Modality preference."]}
+                })
+            form.add_error("learning_modality", "Please select at least one Distance Learning Modality preference.")
+            return render(request, "senior_enrollment.html", {"form": form})
+        
+        # Convert to JSON strings
+        cleaned_data["disability_type"] = json.dumps(disability_types) if disability_types else None
+        cleaned_data["disability_visual_type"] = json.dumps(disability_visual_types) if disability_visual_types else None
+        cleaned_data["disability_health_type"] = json.dumps(disability_health_types) if disability_health_types else None
+        cleaned_data["learning_modality"] = json.dumps(learning_modalities) if learning_modalities else None
+
         model_fields = [f.name for f in EnrollmentForm._meta.get_fields()]
         valid_data = {k: v for k, v in cleaned_data.items() if k in model_fields}
         valid_data['user'] = request.user
@@ -307,8 +340,9 @@ class SeniorEnrollmentView(View):
 
         # Mark user as submitted
         user = request.user
+        user.jhs_submitted = True
         user.shs_submitted = True
-        user.save(update_fields=["shs_submitted"])
+        user.save(update_fields=["jhs_submitted", "shs_submitted"])
 
         # Send email notification
         emailNotification(

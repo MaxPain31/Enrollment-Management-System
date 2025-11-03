@@ -1047,6 +1047,179 @@ $(document).ready(function () {
         setValue("gender", app.gender);
         setValue("place_of_birth", app.place_of_birth);
         setValue("mother_tongue", app.mother_tongue);
+        
+        // Current Address
+        setValue("current_house_no", app.current_house_no);
+        setValue("current_street", app.current_street);
+        setValue("current_barangay", app.current_barangay);
+        setValue("current_municipality", app.current_municipality);
+        setValue("current_province", app.current_province);
+        setValue("current_country", app.current_country || "PHILIPPINES");
+        setValue("current_zip_code", app.current_zip_code);
+        
+        // Permanent Address
+        setValue("permanent_house_no", app.permanent_house_no);
+        setValue("permanent_street", app.permanent_street);
+        setValue("permanent_barangay", app.permanent_barangay);
+        setValue("permanent_municipality", app.permanent_municipality);
+        setValue("permanent_province", app.permanent_province);
+        setValue("permanent_country", app.permanent_country || "PHILIPPINES");
+        setValue("permanent_zip_code", app.permanent_zip_code);
+        
+        // Check if permanent address is same as current
+        if (app.current_house_no && app.permanent_house_no && 
+            app.current_street && app.permanent_street &&
+            app.current_house_no === app.permanent_house_no &&
+            app.current_street === app.permanent_street) {
+            $("#same_as_current_view").prop("checked", true);
+        } else {
+            $("#same_as_current_view").prop("checked", false);
+        }
+        
+        // Parent's/Guardian's Information
+        setValue("father_last_name", app.father_last_name);
+        setValue("father_first_name", app.father_first_name);
+        setValue("father_middle_name", app.father_middle_name);
+        setValue("father_contact_number", app.father_contact_number);
+        setValue("mother_last_name", app.mother_last_name);
+        setValue("mother_first_name", app.mother_first_name);
+        setValue("mother_middle_name", app.mother_middle_name);
+        setValue("mother_contact_number", app.mother_contact_number);
+        setValue("guardian_last_name", app.guardian_last_name);
+        setValue("guardian_first_name", app.guardian_first_name);
+        setValue("guardian_middle_name", app.guardian_middle_name);
+        setValue("guardian_contact_number", app.guardian_contact_number);
+        
+        // IP Community
+        if (app.ip_community === "yes") {
+            $("#ip_community_yes").prop("checked", true);
+            $("#ip_community_specify_view").show();
+            setValue("ip_community_specify_text", app.ip_community_specify_text);
+        } else {
+            $("#ip_community_no").prop("checked", true);
+            $("#ip_community_specify_view").hide();
+        }
+        
+        // 4Ps Beneficiary
+        if (app.beneficiary_4ps === "yes") {
+            $("#beneficiary_4ps_yes").prop("checked", true);
+            $("#household_id_field_view").show();
+            setValue("household_id_number", app.household_id_number);
+        } else {
+            $("#beneficiary_4ps_no").prop("checked", true);
+            $("#household_id_field_view").hide();
+        }
+        
+        // Learner with Disability
+        if (app.learner_with_disability === "yes") {
+            $("#learner_disability_yes").prop("checked", true);
+            $("#disability_types_section_view").show();
+            
+            // Parse disability types from JSON
+            let disabilityTypes = [];
+            let disabilityVisualTypes = [];
+            let disabilityHealthTypes = [];
+            
+            try {
+                if (app.disability_type) {
+                    disabilityTypes = typeof app.disability_type === 'string' ? JSON.parse(app.disability_type) : app.disability_type;
+                }
+                if (app.disability_visual_type) {
+                    disabilityVisualTypes = typeof app.disability_visual_type === 'string' ? JSON.parse(app.disability_visual_type) : app.disability_visual_type;
+                }
+                if (app.disability_health_type) {
+                    disabilityHealthTypes = typeof app.disability_health_type === 'string' ? JSON.parse(app.disability_health_type) : app.disability_health_type;
+                }
+            } catch (e) {
+                console.error("Error parsing disability JSON:", e);
+            }
+            
+            let disabilityHtml = '<div class="row">';
+            disabilityHtml += '<div class="col-12 col-md-6">';
+            
+            if (disabilityTypes.includes('visual_impairment')) {
+                disabilityHtml += '<div class="form-check mb-2"><label class="form-check-label"><strong>Visual Impairment</strong></label></div>';
+                if (disabilityVisualTypes.includes('blind')) {
+                    disabilityHtml += '<div class="ms-4 mb-2"><label class="form-check-label">• blind</label></div>';
+                }
+                if (disabilityVisualTypes.includes('low_vision')) {
+                    disabilityHtml += '<div class="ms-4 mb-2"><label class="form-check-label">• low vision</label></div>';
+                }
+            }
+            if (disabilityTypes.includes('hearing_impairment')) {
+                disabilityHtml += '<div class="form-check mb-2"><label class="form-check-label"><strong>Hearing Impairment</strong></label></div>';
+            }
+            if (disabilityTypes.includes('speech_language_disorder')) {
+                disabilityHtml += '<div class="form-check mb-2"><label class="form-check-label"><strong>Speech/Language Disorder</strong></label></div>';
+            }
+            if (disabilityTypes.includes('multiple_disorder')) {
+                disabilityHtml += '<div class="form-check mb-2"><label class="form-check-label"><strong>Multiple Disorder</strong></label></div>';
+            }
+            if (disabilityTypes.includes('learning_disability')) {
+                disabilityHtml += '<div class="form-check mb-2"><label class="form-check-label"><strong>Learning Disability</strong></label></div>';
+            }
+            
+            disabilityHtml += '</div><div class="col-12 col-md-6">';
+            
+            if (disabilityTypes.includes('emotional_behavioral_disorder')) {
+                disabilityHtml += '<div class="form-check mb-2"><label class="form-check-label"><strong>Emotional-Behavioral Disorder</strong></label></div>';
+            }
+            if (disabilityTypes.includes('cerebral_palsy')) {
+                disabilityHtml += '<div class="form-check mb-2"><label class="form-check-label"><strong>Cerebral Palsy</strong></label></div>';
+            }
+            if (disabilityTypes.includes('intellectual_disability')) {
+                disabilityHtml += '<div class="form-check mb-2"><label class="form-check-label"><strong>Intellectual Disability</strong></label></div>';
+            }
+            if (disabilityTypes.includes('orthopedic_physical_handicap')) {
+                disabilityHtml += '<div class="form-check mb-2"><label class="form-check-label"><strong>Orthopedic/Physical Handicap</strong></label></div>';
+            }
+            if (disabilityTypes.includes('special_health_problem')) {
+                disabilityHtml += '<div class="form-check mb-2"><label class="form-check-label"><strong>Special Health Problem/Chronic Disease</strong></label></div>';
+                if (disabilityHealthTypes.includes('cancer')) {
+                    disabilityHtml += '<div class="ms-4 mb-2"><label class="form-check-label">• Cancer</label></div>';
+                }
+            }
+            
+            disabilityHtml += '</div></div>';
+            $("#disability_types_display").html(disabilityHtml);
+        } else {
+            $("#learner_disability_no").prop("checked", true);
+            $("#disability_types_section_view").hide();
+        }
+        
+        // Distance Learning Modalities (SHS only)
+        if (app.enrollment_type === "SHS" && app.learning_modality) {
+            $("#learning_modality_section").show();
+            let learningModalities = [];
+            try {
+                learningModalities = typeof app.learning_modality === 'string' ? JSON.parse(app.learning_modality) : app.learning_modality;
+            } catch (e) {
+                console.error("Error parsing learning modality JSON:", e);
+            }
+            
+            const modalityLabels = {
+                'modular_print': 'Modular (Print)',
+                'online': 'Online',
+                'radio_based': 'Radio-Based Instruction',
+                'blended': 'Blended',
+                'modular_digital': 'Modular (Digital)',
+                'educational_tv': 'Educational Television',
+                'homeschooling': 'Homeschooling'
+            };
+            
+            let modalityHtml = '<div class="row"><div class="col-12 col-md-6">';
+            learningModalities.forEach((mod, index) => {
+                if (index > 0 && index % 4 === 0) {
+                    modalityHtml += '</div><div class="col-12 col-md-6">';
+                }
+                modalityHtml += `<div class="form-check mb-2"><label class="form-check-label">✓ ${modalityLabels[mod] || mod}</label></div>`;
+            });
+            modalityHtml += '</div></div>';
+            $("#learning_modality_display").html(modalityHtml);
+        } else {
+            $("#learning_modality_section").hide();
+        }
+        
         if (app.status === "Complete") {
             $("#document-status").html(`<span class="badge bg-success">Complete</span>`);
         } else {
@@ -1063,44 +1236,84 @@ $(document).ready(function () {
                 $("#document-" + doc.document_id).prop("checked", true);
             });
         }
+        
+        // Submission Remarks
+        if (app.submission_remarks && app.submission_remarks.trim() !== "") {
+            $("#submission_remarks_check").prop("checked", true);
+            $("#submission_remarks_textarea").show();
+            setValue("submission_remarks", app.submission_remarks);
+        } else {
+            $("#submission_remarks_check").prop("checked", false);
+            $("#submission_remarks_textarea").hide();
+            setValue("submission_remarks", "");
+        }
 
 
         const jhsHtml = `
             <div class="enrollment_information">
-                <h5>Student Information (JHS)</h5>
+                <h5>Enrollment Information (JHS)</h5>
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-12 col-md-6 mb-3">
                         <label for="school_year" class="form-label">School Year</label>
                         <select class="form-select" id="school_year" name="school_year" disabled readonly>
                             <option value="${app.school_year}">${app.school_year}</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-12 col-md-6 mb-3">
                         <label for="grade_level" class="form-label">Grade Level</label>
                         <select class="form-select" id="grade_level" name="grade_level" disabled readonly>
-                            <option value="7" ${app.grade_level=='7'?'selected':''}>GRADE 7</option>
-                            <option value="8" ${app.grade_level=='8'?'selected':''}>GRADE 8</option>
-                            <option value="9" ${app.grade_level=='9'?'selected':''}>GRADE 9</option>
-                            <option value="10" ${app.grade_level=='10'?'selected':''}>GRADE 10</option>
+                            <option value="7" ${app.grade_level=='7' || app.grade=='7'?'selected':''}>GRADE 7</option>
+                            <option value="8" ${app.grade_level=='8' || app.grade=='8'?'selected':''}>GRADE 8</option>
+                            <option value="9" ${app.grade_level=='9' || app.grade=='9'?'selected':''}>GRADE 9</option>
+                            <option value="10" ${app.grade_level=='10' || app.grade=='10'?'selected':''}>GRADE 10</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-12 col-md-6 mb-3">
                         <label for="student_type" class="form-label">Student Type</label>
                         <select class="form-select form-control" id="student_type" name="student_type" disabled readonly>
-                            <option value="new student" ${app.student_type=='NEW STUDENT'?'selected':''}>NEW STUDENT</option>
-                            <option value="returning" ${app.student_type=='RETURNING'?'selected':''}>RETURNING (BALIK ARAL)</option>
-                            <option value="transferee" ${app.student_type=='TRANSFEREE'?'selected':''}>TRANSFEREE</option>
+                            <option value="new student" ${app.student_type=='new student' || app.student_type=='NEW STUDENT'?'selected':''}>NEW STUDENT</option>
+                            <option value="returning" ${app.student_type=='returning' || app.student_type=='RETURNING'?'selected':''}>RETURNING (BALIK ARAL)</option>
+                            <option value="transferee" ${app.student_type=='transferee' || app.student_type=='TRANSFEREE'?'selected':''}>TRANSFEREE</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-12 col-md-6 mb-3">
                         <label for="gen_avg" class="form-label">General Average</label>
-                        <input type="number" class="form-control" id="gen_avg" name="gen_avg" value="${app.gen_avg}" disabled>
+                        <input type="number" step="0.01" class="form-control" id="gen_avg" name="gen_avg" value="${app.gen_avg}" disabled>
                         <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <div id="returning_transferee_section_view" style="display: none;">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary mb-3">For Returning Learner (Balik-Aral) and Those Who will Transfer/Move In:</h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-6 col-lg-3 mb-3">
+                            <label for="last_grade_level_view" class="form-label">Last Grade Level Completed</label>
+                            <input type="text" class="form-control" id="last_grade_level_view" name="last_grade_level" value="${app.last_grade_level || ''}" disabled>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3 mb-3">
+                            <label for="last_school_year_view" class="form-label">Last School Year Completed</label>
+                            <input type="text" class="form-control" id="last_school_year_view" name="last_school_year" value="${app.last_school_year || ''}" disabled>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3 mb-3">
+                            <label for="last_school_attended_view" class="form-label">Last School Attended</label>
+                            <input type="text" class="form-control text-uppercase" id="last_school_attended_view" name="last_school_attended" value="${app.last_school_attended || ''}" disabled>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3 mb-3">
+                            <label for="school_id_view" class="form-label">School ID</label>
+                            <input type="text" class="form-control" id="school_id_view" name="school_id" value="${app.school_id || ''}" maxlength="6" disabled>
+                            <div class="invalid-feedback"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1108,44 +1321,44 @@ $(document).ready(function () {
 
         const shsHtml = `
             <div class="enrollment_information">
-                <h5>Student Information (SHS)</h5>
+                <h5>Enrollment Information (SHS)</h5>
                 <div class="row">
-                    <div class="col-md-4 mb-3">
+                    <div class="col-12 col-md-4 mb-3">
                         <label for="school_year" class="form-label">School Year</label>
                         <select class="form-select" id="school_year" name="school_year" disabled>
                             <option value="${app.school_year}">${app.school_year}</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-12 col-md-4 mb-3">
                         <div class="mb-3">
                             <label for="student_type" class="form-label">Student Type</label>
                             <select class="form-select form-control" id="student_type" name="student_type" disabled>
-                                <option value="new student" ${app.student_type=='NEW STUDENT'?'selected':''}>NEW STUDENT</option>
-                                <option value="returning" ${app.student_type=='RETURNING'?'selected':''}>RETURNING (BALIK ARAL)</option>
-                                <option value="transferee" ${app.student_type=='TRANSFEREE'?'selected':''}>TRANSFEREE</option>
+                                <option value="new student" ${app.student_type=='new student' || app.student_type=='NEW STUDENT'?'selected':''}>NEW STUDENT</option>
+                                <option value="returning" ${app.student_type=='returning' || app.student_type=='RETURNING'?'selected':''}>RETURNING (BALIK ARAL)</option>
+                                <option value="transferee" ${app.student_type=='transferee' || app.student_type=='TRANSFEREE'?'selected':''}>TRANSFEREE</option>
                             </select>
                         </div>
                         <div class="invalid-feedback"></div>
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-12 col-md-4 mb-3">
                         <label for="grade_level" class="form-label">Grade Level</label>
                         <select class="form-select" id="grade_level" name="grade_level" disabled>
-                            <option value="11" ${app.grade_level=='11'?'selected':''}>GRADE 11</option>
-                            <option value="12" ${app.grade_level=='12'?'selected':''}>GRADE 12</option>
+                            <option value="11" ${app.grade_level=='11' || app.grade=='11'?'selected':''}>GRADE 11</option>
+                            <option value="12" ${app.grade_level=='12' || app.grade=='12'?'selected':''}>GRADE 12</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-12 col-md-4 mb-3">
                         <div class="mb-3">
                             <label for="gen_avg" class="form-label">General Average</label>
-                            <input type="number" class="form-control" id="gen_avg" name="gen_avg" value="${app.gen_avg}" disabled>
+                            <input type="number" step="0.01" class="form-control" id="gen_avg" name="gen_avg" value="${app.gen_avg}" disabled>
                             <div class="invalid-feedback"></div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-12 col-md-4 mb-3">
                         <label for="semester" class="form-label">Semester</label>
                         <select class="form-select" id="semester" name="semester" disabled>
                             <option value="">--</option>
@@ -1154,48 +1367,120 @@ $(document).ready(function () {
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-12 col-md-4 mb-3">
                         <label for="strand" class="form-label">Strand</label>
                         <select class="form-select" id="strand" name="strand" disabled>
                             <option value="">--</option>
                             <option value="ABM" ${app.strand=='ABM'?'selected':''}>ABM</option>
                             <option value="STEM" ${app.strand=='STEM'?'selected':''}>STEM</option>
                         </select>
-                        <div class="invalid-feedback"></div>
+                        <div class="invalid-feedback">                        </div>
+                    </div>
+                </div>
+                <div id="returning_transferee_section_view" style="display: none;">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary mb-3">For Returning Learner (Balik-Aral) and Those Who will Transfer/Move In:</h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-6 col-lg-3 mb-3">
+                            <label for="last_grade_level_view" class="form-label">Last Grade Level Completed</label>
+                            <input type="text" class="form-control" id="last_grade_level_view" name="last_grade_level" value="${app.last_grade_level || ''}" disabled>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3 mb-3">
+                            <label for="last_school_year_view" class="form-label">Last School Year Completed</label>
+                            <input type="text" class="form-control" id="last_school_year_view" name="last_school_year" value="${app.last_school_year || ''}" disabled>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3 mb-3">
+                            <label for="last_school_attended_view" class="form-label">Last School Attended</label>
+                            <input type="text" class="form-control text-uppercase" id="last_school_attended_view" name="last_school_attended" value="${app.last_school_attended || ''}" disabled>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3 mb-3">
+                            <label for="school_id_view" class="form-label">School ID</label>
+                            <input type="text" class="form-control" id="school_id_view" name="school_id" value="${app.school_id || ''}" maxlength="6" disabled>
+                            <div class="invalid-feedback"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
 
-        // Always clear the submission remarks form first
-        $("#submissionRemarksForm").empty();
-
-        // Only show submission remarks if status is Missing or if there are actual remarks
-        if (app.status === "Missing" || (app.submission_remarks && app.submission_remarks.trim() !== "")) {
-            const submissionRemarksHtml = `
-                <div class="d-flex align-items-center gap-2 my-2">
-                    <h5 class="mt-2">Submission Remarks</h5>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="mb-3">
-                            <textarea class="form-control" id="submission_remarks" name="submission_remarks" rows="5" style="resize: none;" disabled>${app.submission_remarks || ''}</textarea>
-                            <div class="invalid-feedback"></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            $("#submissionRemarksForm").html(submissionRemarksHtml);
-        }
-
         if (app.enrollment_type === "JHS") {
             $("#enrollemnt_jhs").html(jhsHtml);
             $("#enrollemnt_shs").empty();
-        }  
-        if (app.enrollment_type === "SHS") {
+        } else if (app.enrollment_type === "SHS") {
             $("#enrollemnt_shs").html(shsHtml);
             $("#enrollemnt_jhs").empty();
         }
+        
+        // Show/hide returning/transferee section based on student_type
+        const studentType = app.student_type ? app.student_type.toLowerCase() : '';
+        if (studentType === 'returning' || studentType === 'transferee') {
+            $("#returning_transferee_section_view").show();
+        } else {
+            $("#returning_transferee_section_view").hide();
+        }
+        
+        // Handle submission remarks checkbox change
+        $("#submission_remarks_check").off("click").on("click", function () {
+            if ($(this).is(":checked")) {
+                $("#submission_remarks_textarea").show();
+                $("#submission_remarks").prop("disabled", false);
+            } else {
+                $("#submission_remarks_textarea").hide();
+                $("#submission_remarks").prop("disabled", true).val("");
+            }
+        });
+        
+        // Handle same as current address checkbox
+        $("#same_as_current_view").off("change").on("change", function () {
+            if ($(this).is(":checked")) {
+                // Copy current address to permanent address
+                setValue("permanent_house_no", app.current_house_no);
+                setValue("permanent_street", app.current_street);
+                setValue("permanent_barangay", app.current_barangay);
+                setValue("permanent_municipality", app.current_municipality);
+                setValue("permanent_province", app.current_province);
+                setValue("permanent_country", app.current_country || "PHILIPPINES");
+                setValue("permanent_zip_code", app.current_zip_code);
+                $("#permanent_address_fields_view").hide();
+            } else {
+                $("#permanent_address_fields_view").show();
+            }
+        });
+        
+        // Handle IP Community radio change
+        $("input[name='ip_community']").off("change").on("change", function () {
+            if ($(this).val() === "yes") {
+                $("#ip_community_specify_view").show();
+            } else {
+                $("#ip_community_specify_view").hide();
+                setValue("ip_community_specify_text", "");
+            }
+        });
+        
+        // Handle 4Ps Beneficiary radio change
+        $("input[name='beneficiary_4ps']").off("change").on("change", function () {
+            if ($(this).val() === "yes") {
+                $("#household_id_field_view").show();
+            } else {
+                $("#household_id_field_view").hide();
+                setValue("household_id_number", "");
+            }
+        });
+        
+        // Handle Learner with Disability radio change
+        $("input[name='learner_with_disability']").off("change").on("change", function () {
+            if ($(this).val() === "yes") {
+                $("#disability_types_section_view").show();
+            } else {
+                $("#disability_types_section_view").hide();
+            }
+        });
     });
 
     // Edit Student Status Modal
@@ -1280,7 +1565,70 @@ $(document).ready(function () {
     // Save Student Information
     $("#editStudentUserButton").on("click", function () {
         const $form = $("#enrollmentForm");
+        
+        // Validate returning/transferee fields if student_type is returning or transferee
+        const studentType = $("#student_type").val();
+        let hasErrors = false;
+        
+        if (studentType === "returning" || studentType === "transferee") {
+            const lastGradeLevel = $("#last_grade_level_view").val()?.trim();
+            const lastSchoolYear = $("#last_school_year_view").val()?.trim();
+            const lastSchoolAttended = $("#last_school_attended_view").val()?.trim();
+            const schoolId = $("#school_id_view").val()?.trim();
+            
+            // Clear previous errors
+            $("#last_grade_level_view, #last_school_year_view, #last_school_attended_view, #school_id_view").removeClass("is-invalid");
+            $("#last_grade_level_view").closest(".mb-3").find(".invalid-feedback").text("");
+            $("#last_school_year_view").closest(".mb-3").find(".invalid-feedback").text("");
+            $("#last_school_attended_view").closest(".mb-3").find(".invalid-feedback").text("");
+            $("#school_id_view").closest(".mb-3").find(".invalid-feedback").text("");
+            
+            if (!lastGradeLevel) {
+                $("#last_grade_level_view").addClass("is-invalid");
+                $("#last_grade_level_view").closest(".mb-3").find(".invalid-feedback").text("Last Grade Level Completed is required for returning/transferee students.");
+                hasErrors = true;
+            }
+            if (!lastSchoolYear) {
+                $("#last_school_year_view").addClass("is-invalid");
+                $("#last_school_year_view").closest(".mb-3").find(".invalid-feedback").text("Last School Year Completed is required for returning/transferee students.");
+                hasErrors = true;
+            }
+            if (!lastSchoolAttended) {
+                $("#last_school_attended_view").addClass("is-invalid");
+                $("#last_school_attended_view").closest(".mb-3").find(".invalid-feedback").text("Last School Attended is required for returning/transferee students.");
+                hasErrors = true;
+            }
+            if (!schoolId) {
+                $("#school_id_view").addClass("is-invalid");
+                $("#school_id_view").closest(".mb-3").find(".invalid-feedback").text("School ID is required for returning/transferee students.");
+                hasErrors = true;
+            }
+            
+            if (hasErrors) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please fill in all required fields for returning/transferee students.'
+                });
+                return;
+            }
+        }
+        
         let formData = $form.serialize();
+        
+        // Handle submission remarks: if checkbox is unchecked, set value to empty/null
+        if (!$("#submission_remarks_check").is(":checked")) {
+            // Remove submission_remarks from formData if exists (handle both start and middle positions)
+            formData = formData.replace(/^submission_remarks=[^&]*&?/, '')
+                               .replace(/&submission_remarks=[^&]*/g, '');
+            // Add empty submission_remarks parameter
+            if (formData) {
+                formData += "&submission_remarks=";
+            } else {
+                formData = "submission_remarks=";
+            }
+        }
+        
         const $button = $(this);
         $button.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
         setTimeout(function() {
@@ -1341,6 +1689,11 @@ $(document).ready(function () {
     $("#addStudentUserModal").on("show.bs.modal", function () {
         const $enrollmentType = $("#enrollment_type");
         const $enrollmentFields = $("#enrollmentFields");
+        
+        // Initialize submission remarks section
+        $("#submission_remarks_check_add").prop("checked", false);
+        $("#submission_remarks_textarea_add").hide();
+        $("#submission_remarks_add").prop("disabled", true).val("");
     
         function updateEnrollmentFields() {
             const enrollmentType = $enrollmentType.val();
@@ -1411,12 +1764,229 @@ $(document).ready(function () {
         }
         updateEnrollmentFields();
         // Handle changes dynamically
-        $enrollmentType.off("change").on("change", updateEnrollmentFields);
+        $enrollmentType.off("change").on("change", function() {
+            updateEnrollmentFields();
+            // Show/hide learning modality section based on enrollment type
+            if ($enrollmentType.val() === "SHS") {
+                $("#learning_modality_section_add").show();
+            } else {
+                $("#learning_modality_section_add").hide();
+            }
+        });
+        
+        // Initialize learning modality section visibility
+        if ($enrollmentType.val() === "SHS") {
+            $("#learning_modality_section_add").show();
+        } else {
+            $("#learning_modality_section_add").hide();
+        }
+        
+        // Handle returning/transferee section visibility based on student_type
+        function updateReturningTransfereeSection() {
+            const studentType = $("#student_type").val();
+            if (studentType === "returning" || studentType === "transferee") {
+                $("#returning_transferee_section_add").slideDown();
+            } else {
+                $("#returning_transferee_section_add").slideUp();
+                // Clear returning/transferee fields
+                $("#last_grade_level_add").val("");
+                $("#last_school_year_add").val("");
+                $("#last_school_attended_add").val("");
+                $("#school_id_add").val("");
+            }
+        }
+        
+        // Handle student_type change
+        $("#student_type").off("change").on("change", function() {
+            updateReturningTransfereeSection();
+        });
+        
+        // Initialize returning/transferee section visibility
+        updateReturningTransfereeSection();
+        
+        // IP Community conditional display
+        $('input[name="ip_community"]').off("change").on("change", function() {
+            if ($(this).val() === "yes") {
+                $("#ip_community_specify_add").show();
+            } else {
+                $("#ip_community_specify_add").hide();
+                $("#ip_community_specify_text").val("");
+            }
+        });
+        
+        // 4Ps Beneficiary conditional display
+        $('input[name="beneficiary_4ps"]').off("change").on("change", function() {
+            if ($(this).val() === "yes") {
+                $("#household_id_field_add").show();
+            } else {
+                $("#household_id_field_add").hide();
+                $("#household_id_number").val("");
+            }
+        });
+        
+        // Learner with Disability conditional display
+        $('input[name="learner_with_disability"]').off("change").on("change", function() {
+            if ($(this).val() === "yes") {
+                $("#disability_types_section_add").show();
+            } else {
+                $("#disability_types_section_add").hide();
+                $('input[name="disability_type"]:checked').prop("checked", false);
+                $('input[name="disability_visual_type"]:checked').prop("checked", false);
+                $('input[name="disability_health_type"]:checked').prop("checked", false);
+            }
+        });
+        
+        // Same as current address checkbox (scope to Add Student modal to avoid ID collisions)
+        const $addStudentModal = $("#addStudentUserModal");
+        $addStudentModal.find("#same_as_current_add").off("change").on("change", function() {
+            if ($(this).is(":checked")) {
+                // Copy current address values to permanent address
+                $addStudentModal.find("#permanent_house_no").val($addStudentModal.find("#current_house_no").val());
+                $addStudentModal.find("#permanent_street").val($addStudentModal.find("#current_street").val());
+                $addStudentModal.find("#permanent_barangay").val($addStudentModal.find("#current_barangay").val());
+                $addStudentModal.find("#permanent_municipality").val($addStudentModal.find("#current_municipality").val());
+                $addStudentModal.find("#permanent_province").val($addStudentModal.find("#current_province").val());
+                $addStudentModal.find("#permanent_country").val($addStudentModal.find("#current_country").val());
+                $addStudentModal.find("#permanent_zip_code").val($addStudentModal.find("#current_zip_code").val());
+                // Disable permanent address fields
+                $addStudentModal.find("#permanent_address_fields_add input").prop("disabled", true);
+            } else {
+                // Clear permanent address fields
+                $addStudentModal.find("#permanent_address_fields_add input").val("");
+                $addStudentModal.find("#permanent_country").val("PHILIPPINES");
+                // Enable permanent address fields
+                $addStudentModal.find("#permanent_address_fields_add input").prop("disabled", false);
+            }
+        });
+        
+        // Copy current address values to permanent address when current address fields change (scoped)
+        $addStudentModal.find("#current_house_no, #current_street, #current_barangay, #current_municipality, #current_province, #current_country, #current_zip_code").off("input").on("input", function() {
+            if ($addStudentModal.find("#same_as_current_add").is(":checked")) {
+                const fieldMap = {
+                    "current_house_no": "permanent_house_no",
+                    "current_street": "permanent_street",
+                    "current_barangay": "permanent_barangay",
+                    "current_municipality": "permanent_municipality",
+                    "current_province": "permanent_province",
+                    "current_country": "permanent_country",
+                    "current_zip_code": "permanent_zip_code"
+                };
+                const currentFieldId = $(this).attr("id");
+                const permanentFieldId = fieldMap[currentFieldId];
+                if (permanentFieldId) {
+                    $addStudentModal.find("#" + permanentFieldId).val($(this).val());
+                }
+            }
+        });
+        
+        // Submission Remarks Checkbox Toggle
+        $("#submission_remarks_check_add").off("change").on("change", function() {
+            if ($(this).is(":checked")) {
+                $("#submission_remarks_textarea_add").show();
+                $("#submission_remarks_add").prop("disabled", false);
+            } else {
+                $("#submission_remarks_textarea_add").hide();
+                $("#submission_remarks_add").prop("disabled", true).val("");
+            }
+        });
+        
+        // Handle form submission
         $("#addStudentUserForm").on("submit", function (e) {
             e.preventDefault();
-            let form = $(this);
+            handleAddStudentSubmit();
+        });
+        
+        // Handle save button click
+        $("#addStudentUserModal #saveButton").off("click").on("click", function () {
+            handleAddStudentSubmit();
+        });
+        
+        function handleAddStudentSubmit() {
+            let form = $("#addStudentUserForm");
+            
+            // Validate returning/transferee fields if student_type is returning or transferee
+            const studentType = $("#student_type").val();
+            let hasErrors = false;
+            
+            if (studentType === "returning" || studentType === "transferee") {
+                const lastGradeLevel = $("#last_grade_level_add").val()?.trim();
+                const lastSchoolYear = $("#last_school_year_add").val()?.trim();
+                const lastSchoolAttended = $("#last_school_attended_add").val()?.trim();
+                const schoolId = $("#school_id_add").val()?.trim();
+                
+                // Clear previous errors
+                $("#last_grade_level_add, #last_school_year_add, #last_school_attended_add, #school_id_add").removeClass("is-invalid");
+                $("#last_grade_level_add").closest(".mb-3").find(".invalid-feedback").text("");
+                $("#last_school_year_add").closest(".mb-3").find(".invalid-feedback").text("");
+                $("#last_school_attended_add").closest(".mb-3").find(".invalid-feedback").text("");
+                $("#school_id_add").closest(".mb-3").find(".invalid-feedback").text("");
+                
+                if (!lastGradeLevel) {
+                    $("#last_grade_level_add").addClass("is-invalid");
+                    $("#last_grade_level_add").closest(".mb-3").find(".invalid-feedback").text("Last Grade Level Completed is required for returning/transferee students.");
+                    hasErrors = true;
+                }
+                if (!lastSchoolYear) {
+                    $("#last_school_year_add").addClass("is-invalid");
+                    $("#last_school_year_add").closest(".mb-3").find(".invalid-feedback").text("Last School Year Completed is required for returning/transferee students.");
+                    hasErrors = true;
+                }
+                if (!lastSchoolAttended) {
+                    $("#last_school_attended_add").addClass("is-invalid");
+                    $("#last_school_attended_add").closest(".mb-3").find(".invalid-feedback").text("Last School Attended is required for returning/transferee students.");
+                    hasErrors = true;
+                }
+                if (!schoolId) {
+                    $("#school_id_add").addClass("is-invalid");
+                    $("#school_id_add").closest(".mb-3").find(".invalid-feedback").text("School ID is required for returning/transferee students.");
+                    hasErrors = true;
+                }
+                
+                if (hasErrors) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        text: 'Please fill in all required fields for returning/transferee students.'
+                    });
+                    return;
+                }
+            }
+            
+            // Enable permanent address fields before serialization if "same as current address" is checked
+            if ($("#same_as_current_add").is(":checked")) {
+                $("#permanent_address_fields_add input").prop("disabled", false);
+            }
+            
+            // Enable submission remarks textarea before serialization if checkbox is checked
+            if ($("#submission_remarks_check_add").is(":checked")) {
+                $("#submission_remarks_add").prop("disabled", false);
+            }
+            
             let formData = form.serialize();
-            let button = $("#saveButton");
+            
+            // Re-disable permanent address fields after serialization if "same as current address" is checked
+            if ($("#same_as_current_add").is(":checked")) {
+                $("#permanent_address_fields_add input").prop("disabled", true);
+            }
+            
+            // Handle submission remarks: if checkbox is unchecked, set value to empty/null
+            if (!$("#submission_remarks_check_add").is(":checked")) {
+                // Remove submission_remarks from formData if exists (handle both start and middle positions)
+                formData = formData.replace(/^submission_remarks=[^&]*&?/, '')
+                                   .replace(/&submission_remarks=[^&]*/g, '');
+                // Add empty submission_remarks parameter
+                if (formData) {
+                    formData += "&submission_remarks=";
+                } else {
+                    formData = "submission_remarks=";
+                }
+            }
+            
+            // Re-disable submission remarks textarea after serialization if checkbox is checked
+            if ($("#submission_remarks_check_add").is(":checked")) {
+                $("#submission_remarks_add").prop("disabled", true);
+            }
+            let button = $("#addStudentUserModal #saveButton");
             button.prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span>');
 
             setTimeout(function() {
@@ -1426,7 +1996,7 @@ $(document).ready(function () {
                     data: formData,
                     headers: { 'X-CSRFToken': getCookie('csrftoken') },
                     success: function (response) {
-                        button.prop("disabled", false).html("Save");
+                        button.prop("disabled", false).html('<i class="bi bi-check-circle me-1"></i>Save');
                         form.find('.is-invalid').removeClass('is-invalid');
                         form.find('.invalid-feedback').text('');
                         if (response.success) {
@@ -1457,6 +2027,7 @@ $(document).ready(function () {
                         }
                     },
                     error: function () {
+                        button.prop("disabled", false).html('<i class="bi bi-check-circle me-1"></i>Save');
                         Swal.fire({
                             icon: 'error',
                             title: 'Server Error',
@@ -1465,10 +2036,11 @@ $(document).ready(function () {
                     }
                 });
             },500);
-            form.on("input change", ".form-control, .form-select, .form-check-input", function () {
-                $(this).removeClass("is-invalid");
-                $(this).closest(".mb-3").find(".invalid-feedback").text("");
-            });
+        }
+        
+        $("#addStudentUserForm").on("input change", ".form-control, .form-select, .form-check-input", function () {
+            $(this).removeClass("is-invalid");
+            $(this).closest(".mb-3").find(".invalid-feedback").text("");
         });        
     });
 
@@ -1886,13 +2458,35 @@ function getCookie(name) {
 }
 
 function enableEditForm() {
-    $("#enrollmentForm input, #enrollmentForm select, #documentForm input, #submissionRemarksForm textarea").prop("disabled", false);
+    $("#enrollmentForm input, #enrollmentForm select, #documentForm input, input[name='ip_community'], input[name='beneficiary_4ps'], input[name='learner_with_disability'], input[name='same_as_current'], #submissionRemarksForm input, #submissionRemarksForm textarea").prop("disabled", false);
+    // If submission remarks checkbox is checked, enable textarea
+    if ($("#submission_remarks_check").is(":checked")) {
+        $("#submission_remarks_textarea").show();
+        $("#submission_remarks").prop("disabled", false);
+    }
+    
+    // Handle student_type change in edit mode to show/hide returning/transferee section
+    $("#student_type").off("change").on("change", function() {
+        const studentType = $(this).val();
+        if (studentType === "returning" || studentType === "transferee") {
+            $("#returning_transferee_section_view").slideDown();
+        } else {
+            $("#returning_transferee_section_view").slideUp();
+            // Clear returning/transferee fields
+            $("#last_grade_level_view").val("");
+            $("#last_school_year_view").val("");
+            $("#last_school_attended_view").val("");
+            $("#school_id_view").val("");
+        }
+    });
+    
     $("#editStudentUserButton").show();
     $("#editButton").hide();
 }
 
 function disableEditForm() {
-    $("#enrollmentForm input, #enrollmentForm select, #documentForm input").prop("disabled", true);
+    $("#enrollmentForm input, #enrollmentForm select, #documentForm input, input[name='ip_community'], input[name='beneficiary_4ps'], input[name='learner_with_disability'], input[name='same_as_current']").prop("disabled", true);
+    $("#submissionRemarksForm input, #submissionRemarksForm textarea").prop("disabled", true);
     $("#editButton").show();
     $("#editStudentUserButton").hide();
 }

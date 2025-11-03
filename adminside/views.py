@@ -485,7 +485,57 @@ class AdminApplicationBulkApproveView(View):
                                         "enrollment_type": application.enrollment_type,
                                         "semester": application.semester,
                                         "strand": application.strand,
+                                        "track": application.track,
+                                        "science_avg": application.science_avg,
+                                        "math_avg": application.math_avg,
+                                        "last_grade_level": application.last_grade_level,
+                                        "last_school_year": application.last_school_year,
+                                        "last_school_attended": application.last_school_attended,
+                                        "school_id": application.school_id,
+                                        # Current Address
+                                        "current_house_no": application.current_house_no,
+                                        "current_street": application.current_street,
+                                        "current_barangay": application.current_barangay,
+                                        "current_municipality": application.current_municipality,
+                                        "current_province": application.current_province,
+                                        "current_country": application.current_country,
+                                        "current_zip_code": application.current_zip_code,
+                                        # Permanent Address
+                                        "permanent_house_no": application.permanent_house_no,
+                                        "permanent_street": application.permanent_street,
+                                        "permanent_barangay": application.permanent_barangay,
+                                        "permanent_municipality": application.permanent_municipality,
+                                        "permanent_province": application.permanent_province,
+                                        "permanent_country": application.permanent_country,
+                                        "permanent_zip_code": application.permanent_zip_code,
+                                        # Parent's/Guardian's Information
+                                        "father_last_name": application.father_last_name,
+                                        "father_first_name": application.father_first_name,
+                                        "father_middle_name": application.father_middle_name,
+                                        "father_contact_number": application.father_contact_number,
+                                        "mother_last_name": application.mother_last_name,
+                                        "mother_first_name": application.mother_first_name,
+                                        "mother_middle_name": application.mother_middle_name,
+                                        "mother_contact_number": application.mother_contact_number,
+                                        "guardian_last_name": application.guardian_last_name,
+                                        "guardian_first_name": application.guardian_first_name,
+                                        "guardian_middle_name": application.guardian_middle_name,
+                                        "guardian_contact_number": application.guardian_contact_number,
+                                        # IP Community
+                                        "ip_community": application.ip_community,
+                                        "ip_community_specify_text": application.ip_community_specify_text,
+                                        # 4Ps Beneficiary
+                                        "beneficiary_4ps": application.beneficiary_4ps,
+                                        "household_id_number": application.household_id_number,
+                                        # Learner with Disability
+                                        "learner_with_disability": application.learner_with_disability,
+                                        "disability_type": application.disability_type,
+                                        "disability_visual_type": application.disability_visual_type,
+                                        "disability_health_type": application.disability_health_type,
+                                        # Learning Modalities
+                                        "learning_modality": application.learning_modality,
                                         "student_status": "Enrolled",
+                                        "enrollment_status": "PASSED",
                                     },
                                 )
                                 DocumentListRepository.get_filtered_by_enrollment(application).update(
@@ -1015,6 +1065,24 @@ class AdminReportsDataAPI(View):
         # Strand analytics (SHS only)
         abm_students = student_queryset.filter(strand="ABM").count()
         stem_students = student_queryset.filter(strand="STEM").count()
+
+        # Barangay distribution (from current address)
+        barangay_qs = student_queryset.values_list('current_barangay', flat=True)
+        barangay_counts = {}
+        for b in barangay_qs:
+            key = b.strip() if isinstance(b, str) else None
+            if key:
+                barangay_counts[key] = barangay_counts.get(key, 0) + 1
+        barangay_distribution = [{"name": k, "value": v} for k, v in barangay_counts.items()]
+
+        # Municipality/City distribution
+        municipality_qs = student_queryset.values_list('current_municipality', flat=True)
+        municipality_counts = {}
+        for m in municipality_qs:
+            key = m.strip() if isinstance(m, str) else None
+            if key:
+                municipality_counts[key] = municipality_counts.get(key, 0) + 1
+        municipality_distribution = [{"name": k, "value": v} for k, v in municipality_counts.items()]
         
         # Semester analytics
         first_semester = enrollment_queryset.filter(semester="1st").count()
@@ -1058,11 +1126,19 @@ class AdminReportsDataAPI(View):
             not_assessed_count = AssessmentRepository.get_all_with_not_assessed().filter(
                 application_approved__enrollment__school_year=school_year_filter
             ).count()
+            # Grade 7 literacy/numeracy distributions
+            g7_assessments = AssessmentRepository.get_all().filter(
+                application_approved__enrollment__school_year=school_year_filter,
+                application_approved__enrollment__grade_level='7'
+            )
         else:
             # No school year filter - get all assessments
             total_assessments = AssessmentRepository.get_all().count()
             assessed_count = AssessmentRepository.get_all_with_assessed().count()
             not_assessed_count = AssessmentRepository.get_all_with_not_assessed().count()
+            g7_assessments = AssessmentRepository.get_all().filter(
+                application_approved__enrollment__grade_level='7'
+            )
         
         # Get FAQ statistics
         total_faqs = FAQRepository.get_all().count()
@@ -1115,6 +1191,8 @@ class AdminReportsDataAPI(View):
                 {"value": abm_students, "name": "ABM"},
                 {"value": stem_students, "name": "STEM"}
             ],
+            "barangay_distribution": barangay_distribution,
+            "municipality_distribution": municipality_distribution,
             "semester_distribution": [
                 {"value": first_semester, "name": "1st Semester"},
                 {"value": second_semester, "name": "2nd Semester"}
@@ -1155,6 +1233,19 @@ class AdminReportsDataAPI(View):
                 "not_assessed_count": not_assessed_count,
                 "assessment_rate": round((assessed_count / total_assessments * 100), 2) if total_assessments > 0 else 0
             },
+            # Grade 7 literacy & numeracy distributions
+            "literacy_g7": [
+                {"name": "Advanced", "value": g7_assessments.filter(literacy_level='Advanced').count()},
+                {"name": "Independent", "value": g7_assessments.filter(literacy_level='Independent').count()},
+                {"name": "Instructional", "value": g7_assessments.filter(literacy_level='Instructional').count()},
+                {"name": "Frustration", "value": g7_assessments.filter(literacy_level='Frustration').count()},
+            ],
+            "numeracy_g7": [
+                {"name": "Advanced", "value": g7_assessments.filter(numeracy_level='Advanced').count()},
+                {"name": "Independent", "value": g7_assessments.filter(numeracy_level='Independent').count()},
+                {"name": "Instructional", "value": g7_assessments.filter(numeracy_level='Instructional').count()},
+                {"name": "Frustration", "value": g7_assessments.filter(numeracy_level='Frustration').count()},
+            ],
             "content_stats": {
                 "total_faqs": total_faqs,
                 "total_announcements": total_announcements,
@@ -1346,6 +1437,20 @@ class AdminReportsExcelExportAPI(View):
                 {"name": "1st Semester", "value": enrollment_queryset.filter(semester="1st").count()},
                 {"name": "2nd Semester", "value": enrollment_queryset.filter(semester="2nd").count()}
             ]
+        elif chart_type == 'barangay':
+            # Barangay enrollees (current address)
+            from collections import Counter
+            names = list(student_queryset.values_list('current_barangay', flat=True))
+            names = [n.strip() for n in names if isinstance(n, str) and n.strip()]
+            counts = Counter(names)
+            data = [{"name": k, "value": v} for k, v in counts.items()]
+        elif chart_type == 'municipality':
+            # Municipality/City enrollees (current address)
+            from collections import Counter
+            names = list(student_queryset.values_list('current_municipality', flat=True))
+            names = [n.strip() for n in names if isinstance(n, str) and n.strip()]
+            counts = Counter(names)
+            data = [{"name": k, "value": v} for k, v in counts.items()]
             
         elif chart_type == 'assessment':
             if school_year_filter:
@@ -1363,6 +1468,30 @@ class AdminReportsExcelExportAPI(View):
             data = [
                 {"name": "Assessed", "value": assessed_count},
                 {"name": "Not Assessed", "value": not_assessed_count}
+            ]
+        elif chart_type == 'literacyG7':
+            from adminside.repositories.all_repository import AssessmentRepository
+            if school_year_filter:
+                g7 = AssessmentRepository.get_all().filter(application_approved__enrollment__school_year=school_year_filter, application_approved__enrollment__grade_level='7')
+            else:
+                g7 = AssessmentRepository.get_all().filter(application_approved__enrollment__grade_level='7')
+            data = [
+                {"name": "Advanced", "value": g7.filter(literacy_level='Advanced').count()},
+                {"name": "Independent", "value": g7.filter(literacy_level='Independent').count()},
+                {"name": "Instructional", "value": g7.filter(literacy_level='Instructional').count()},
+                {"name": "Frustration", "value": g7.filter(literacy_level='Frustration').count()},
+            ]
+        elif chart_type == 'numeracyG7':
+            from adminside.repositories.all_repository import AssessmentRepository
+            if school_year_filter:
+                g7 = AssessmentRepository.get_all().filter(application_approved__enrollment__school_year=school_year_filter, application_approved__enrollment__grade_level='7')
+            else:
+                g7 = AssessmentRepository.get_all().filter(application_approved__enrollment__grade_level='7')
+            data = [
+                {"name": "Advanced", "value": g7.filter(numeracy_level='Advanced').count()},
+                {"name": "Independent", "value": g7.filter(numeracy_level='Independent').count()},
+                {"name": "Instructional", "value": g7.filter(numeracy_level='Instructional').count()},
+                {"name": "Frustration", "value": g7.filter(numeracy_level='Frustration').count()},
             ]
             
         elif chart_type == 'content':
@@ -1901,36 +2030,8 @@ class ManageEnrollmentView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
-            settings = EnrollmentManagement.objects.get(id=1)
-
-            # Update settings fields
-            if "announcement_content" in data:
-                settings.announcement_content = data["announcement_content"]
-
-            if "enrollment_active" in data:
-                settings.enrollment_active = int(data["enrollment_active"])
-
-            if "early_registration_active" in data:
-                settings.early_registration_active = int(data["early_registration_active"])
-
-            if "enrollment_start_date" in data:
-                settings.enrollment_start_date = parse_date(data["enrollment_start_date"]) or settings.enrollment_start_date
-
-            if "enrollment_deadline_date" in data:
-                settings.enrollment_deadline_date = parse_date(data["enrollment_deadline_date"]) or settings.enrollment_deadline_date
-
-            if "early_registration_start_date" in data:
-                settings.early_registration_start_date = parse_date(data["early_registration_start_date"]) or settings.early_registration_start_date
-
-            if "early_registration_deadline_date" in data:
-                settings.early_registration_deadline_date = parse_date(data["early_registration_deadline_date"]) or settings.early_registration_deadline_date
-
-            if "academic_year_start" in data:
-                settings.academic_year_start = data["academic_year_start"]
-
-            if "academic_year_end" in data:
-                settings.academic_year_end = data["academic_year_end"]
                 
+            # Handle school year creation/update first
             if data.get("academic_year_start") and data.get("academic_year_end"):
                 start = data["academic_year_start"]
                 end = data["academic_year_end"]
@@ -1957,8 +2058,52 @@ class ManageEnrollmentView(View):
                         updated_at=timezone.now()
                     )
 
-
-            settings.save()
+            # Build update dictionary to use queryset.update() which bypasses save() method
+            # This prevents the save() method from auto-updating active flags based on dates
+            update_dict = {}
+            if "announcement_content" in data:
+                update_dict['announcement_content'] = data["announcement_content"]
+            if "enrollment_active" in data:
+                update_dict['enrollment_active'] = bool(data["enrollment_active"])
+            if "early_registration_active" in data:
+                update_dict['early_registration_active'] = bool(data["early_registration_active"])
+            if "enrollment_start_date" in data:
+                if data["enrollment_start_date"]:
+                    parsed_date = parse_date(data["enrollment_start_date"])
+                    if parsed_date:
+                        update_dict['enrollment_start_date'] = parsed_date
+                else:
+                    update_dict['enrollment_start_date'] = None
+            if "enrollment_deadline_date" in data:
+                if data["enrollment_deadline_date"]:
+                    parsed_date = parse_date(data["enrollment_deadline_date"])
+                    if parsed_date:
+                        update_dict['enrollment_deadline_date'] = parsed_date
+                else:
+                    update_dict['enrollment_deadline_date'] = None
+            if "early_registration_start_date" in data:
+                if data["early_registration_start_date"]:
+                    parsed_date = parse_date(data["early_registration_start_date"])
+                    if parsed_date:
+                        update_dict['early_registration_start_date'] = parsed_date
+                else:
+                    update_dict['early_registration_start_date'] = None
+            if "early_registration_deadline_date" in data:
+                if data["early_registration_deadline_date"]:
+                    parsed_date = parse_date(data["early_registration_deadline_date"])
+                    if parsed_date:
+                        update_dict['early_registration_deadline_date'] = parsed_date
+                else:
+                    update_dict['early_registration_deadline_date'] = None
+            if "academic_year_start" in data:
+                update_dict['academic_year_start'] = data["academic_year_start"]
+            if "academic_year_end" in data:
+                update_dict['academic_year_end'] = data["academic_year_end"]
+            
+            # Use queryset.update() to bypass the save() method
+            if update_dict:
+                EnrollmentManagement.objects.filter(id=1).update(**update_dict)
+                
             return JsonResponse({"status": "success", "message": "Settings updated successfully!"})
 
         except ValidationError as e:

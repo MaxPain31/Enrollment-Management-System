@@ -136,10 +136,12 @@
                 const academicYearEnd = document.getElementById('academicYearEnd').value;
 
                 if (announcementContent) data.announcement_content = announcementContent;
-                if (enrollmentActive !== undefined) data.enrollment_active = enrollmentActive;
+                // Always include boolean values, even if False
+                data.enrollment_active = enrollmentActive;
                 if (enrollmentStartDate) data.enrollment_start_date = enrollmentStartDate;
                 if (enrollmentDeadlineDate) data.enrollment_deadline_date = enrollmentDeadlineDate;
-                if (earlyRegistrationActive !== undefined) data.early_registration_active = earlyRegistrationActive;
+                // Always include boolean values, even if False
+                data.early_registration_active = earlyRegistrationActive;
                 if (earlyRegistrationStartDate) data.early_registration_start_date = earlyRegistrationStartDate;
                 if (earlyRegistrationDeadlineDate) data.early_registration_deadline_date = earlyRegistrationDeadlineDate;
                 if (academicYearStart) data.academic_year_start = academicYearStart;

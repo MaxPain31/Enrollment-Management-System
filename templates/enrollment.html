@@ -18,7 +18,8 @@
                     <div class="card-body">
                         <h4 class="card-title"><i class="bi bi-megaphone"></i> Announcement</h4>
                         <p id="announcementText" class="card-text pt-3"></p>
-                        <p id="enrollment_date"></p>
+                        <p id="early_registration_date" class="mt-2"></p>
+                        <p id="enrollment_date" class="mt-2"></p>
                     </div>
                 </div>
             </div>
@@ -44,6 +45,7 @@
                                         </div>
                                         <div class="form-group">
                                             <select id="earlyRegType" class="form-select form-control">
+                                                <option value="" disabled selected>Select Enrollment Type</option>
                                                 <option value="junior" {% if info and info.jhs_completed %} disabled {% elif user.jhs_submitted %} disabled {% endif %}>Junior High School</option>
                                                 <option value="senior" {% if info and info.shs_completed %} disabled {% elif user.shs_submitted %} disabled {% endif %}>Senior High School</option>                               
                                             </select>
@@ -71,6 +73,7 @@
                                         </div>
                                         <div class="form-group">
                                             <select id="enrollmentType" class="form-select form-control">
+                                                <option value="" disabled selected>Select Enrollment Type</option>
                                                 <option value="junior" {% if info and info.jhs_completed %} disabled {% elif user.jhs_submitted %} disabled {% endif %}>Junior High School</option>
                                                 <option value="senior" {% if info and info.shs_completed %} disabled {% elif user.shs_submitted %} disabled {% endif %}>Senior High School</option>
                                             </select>
@@ -125,12 +128,24 @@
             </div>
             {% endif %}
         {% else %}
-        <p>You need to log in to view this page.</p>
+        <div class="no-org-data">
+            <i class="bi bi-person-circle" style="font-size: 3rem; color: #94a3b8;"></i>
+            <p>You need to log in to view this page.</p>
+        </div>
         {% endif %}
     </div>
 </section>
 
 <script>
+    // Function to check if enrollment is completed by checking if selected option is disabled
+    function isEnrollmentCompleted(selectElement) {
+        if (!selectElement || !selectElement.value || selectElement.value === '') {
+            return false;
+        }
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        return selectedOption.disabled || false;
+    }
+
     fetch("{% url 'get_enrollment_management' %}")
         .then(response => response.json())
         .then(data => {
@@ -176,40 +191,173 @@
                     return current >= start && current <= end;
                 }
                 
-                // Check if enrollment is active and within date range
-                if (settings.enrollment_active) {
-                    if (isDateInRange(now, enrollmentStart, enrollmentEnd)) {
-                        document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Enrollment Date: </strong>' + enrollmentStart.toDateString() + ' - ' + enrollmentEnd.toDateString();
-                        document.getElementById('enrollmentButton').removeAttribute('disabled');
-                        console.log('Enrollment button enabled');
-                    } else {
-                        document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Enrollment Date: </strong>' + enrollmentStart.toDateString() + ' - ' + enrollmentEnd.toDateString() + ' <span class="text-muted">(Not yet active or expired)</span>';
-                        console.log('Enrollment button disabled - date range issue');
-                    }
-                } else {
-                    document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Enrollment is currently inactive</strong>';
-                    console.log('Enrollment button disabled - not active');
-                }
-                
                 // Check if early registration is active and within date range
                 if (settings.early_registration_active) {
-                    if (isDateInRange(now, earlyRegStart, earlyRegEnd)) {
-                        document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Early Registration Date: </strong>' + earlyRegStart.toDateString() + ' - ' + earlyRegEnd.toDateString();
-                        document.getElementById('earlyRegButton').removeAttribute('disabled');
-                        console.log('Early registration button enabled');
+                    const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const earlyRegStartDate = new Date(earlyRegStart.getFullYear(), earlyRegStart.getMonth(), earlyRegStart.getDate());
+                    const earlyRegEndDate = new Date(earlyRegEnd.getFullYear(), earlyRegEnd.getMonth(), earlyRegEnd.getDate());
+                    const earlyRegType = document.getElementById('earlyRegType').value;
+                    const earlyRegButton = document.getElementById('earlyRegButton');
+                    const earlyRegSelect = document.getElementById('earlyRegType');
+                    
+                    // First, determine the date status and display it
+                    let dateStatusHTML = '<strong><i class="bi bi-calendar"></i> Early Registration Date: </strong>' + earlyRegStart.toDateString() + ' - ' + earlyRegEnd.toDateString();
+                    
+                    if (currentDate > earlyRegEndDate) {
+                        dateStatusHTML += ' <span class="text-danger">(Early Registration has been ended)</span>';
+                        earlyRegButton.disabled = true;
+                        console.log('Early registration button disabled - date has ended');
+                    } else if (currentDate < earlyRegStartDate) {
+                        dateStatusHTML += ' <span class="text-muted">(Not yet started)</span>';
+                        earlyRegButton.disabled = true;
+                        console.log('Early registration button disabled - not yet started');
+                    } else if (isDateInRange(now, earlyRegStart, earlyRegEnd)) {
+                        // Date is in range - check if option is selected and not completed
+                        const isCompleted = isEnrollmentCompleted(earlyRegSelect);
+                        if (!earlyRegType || earlyRegType === '' || isCompleted) {
+                            earlyRegButton.disabled = true;
+                            console.log('Early registration button disabled - enrollment completed or not selected');
+                        } else {
+                            earlyRegButton.removeAttribute('disabled');
+                            console.log('Early registration button enabled');
+                        }
                     } else {
-                        document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Early Registration Date: </strong>' + earlyRegStart.toDateString() + ' - ' + earlyRegEnd.toDateString() + ' <span class="text-muted">(Not yet active or expired)</span>';
+                        dateStatusHTML += ' <span class="text-muted">(Not yet started or ended)</span>';
+                        earlyRegButton.disabled = true;
                         console.log('Early registration button disabled - date range issue');
                     }
+                    
+                    // Always display the date status
+                    document.getElementById('early_registration_date').innerHTML = dateStatusHTML;
                 } else {
-                    document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Early Registration is currently inactive</strong>';
+                    document.getElementById('early_registration_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Early Registration is currently inactive</strong>';
+                    document.getElementById('earlyRegButton').disabled = true;
                     console.log('Early registration button disabled - not active');
+                }
+                
+                // Check if enrollment is active and within date range
+                if (settings.enrollment_active) {
+                    const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const enrollmentStartDate = new Date(enrollmentStart.getFullYear(), enrollmentStart.getMonth(), enrollmentStart.getDate());
+                    const enrollmentEndDate = new Date(enrollmentEnd.getFullYear(), enrollmentEnd.getMonth(), enrollmentEnd.getDate());
+                    const enrollmentType = document.getElementById('enrollmentType').value;
+                    const enrollmentButton = document.getElementById('enrollmentButton');
+                    const enrollmentSelect = document.getElementById('enrollmentType');
+                    
+                    // First, determine the date status and display it
+                    let dateStatusHTML = '<strong><i class="bi bi-calendar"></i> Enrollment Date: </strong>' + enrollmentStart.toDateString() + ' - ' + enrollmentEnd.toDateString();
+                    
+                    if (currentDate > enrollmentEndDate) {
+                        dateStatusHTML += ' <span class="text-danger">(Enrollment has been ended)</span>';
+                        enrollmentButton.disabled = true;
+                        console.log('Enrollment button disabled - date has ended');
+                    } else if (currentDate < enrollmentStartDate) {
+                        dateStatusHTML += ' <span class="text-muted">(Not yet started)</span>';
+                        enrollmentButton.disabled = true;
+                        console.log('Enrollment button disabled - not yet started');
+                    } else if (isDateInRange(now, enrollmentStart, enrollmentEnd)) {
+                        // Date is in range - check if option is selected and not completed
+                        const isCompleted = isEnrollmentCompleted(enrollmentSelect);
+                        if (!enrollmentType || enrollmentType === '' || isCompleted) {
+                            enrollmentButton.disabled = true;
+                            console.log('Enrollment button disabled - enrollment completed or not selected');
+                        } else {
+                            enrollmentButton.removeAttribute('disabled');
+                            console.log('Enrollment button enabled');
+                        }
+                    } else {
+                        dateStatusHTML += ' <span class="text-muted">(Not yet started or ended)</span>';
+                        enrollmentButton.disabled = true;
+                        console.log('Enrollment button disabled - date range issue');
+                    }
+                    
+                    // Always display the date status
+                    document.getElementById('enrollment_date').innerHTML = dateStatusHTML;
+                } else {
+                    document.getElementById('enrollment_date').innerHTML = '<strong><i class="bi bi-calendar"></i> Enrollment is currently inactive</strong>';
+                    document.getElementById('enrollmentButton').disabled = true;
+                    console.log('Enrollment button disabled - not active');
                 }
             }
         })
         .catch(error => {
             console.error("Error fetching enrollment settings:", error);
         });
+
+    // Function to validate and enable/disable buttons when dropdown changes
+    function validateButtons() {
+        const earlyRegType = document.getElementById('earlyRegType').value;
+        const enrollmentType = document.getElementById('enrollmentType').value;
+        const earlyRegButton = document.getElementById('earlyRegButton');
+        const enrollmentButton = document.getElementById('enrollmentButton');
+        const earlyRegSelect = document.getElementById('earlyRegType');
+        const enrollmentSelect = document.getElementById('enrollmentType');
+        
+        // Re-fetch settings to check dates and update status messages
+        fetch("{% url 'get_enrollment_management' %}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    const settings = data.data;
+                    const now = new Date();
+                    
+                    // Validate Early Registration Button
+                    if (settings.early_registration_active) {
+                        const earlyRegStart = new Date(settings.early_registration_start_date);
+                        const earlyRegEnd = new Date(settings.early_registration_deadline_date);
+                        const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                        const earlyRegStartDate = new Date(earlyRegStart.getFullYear(), earlyRegStart.getMonth(), earlyRegStart.getDate());
+                        const earlyRegEndDate = new Date(earlyRegEnd.getFullYear(), earlyRegEnd.getMonth(), earlyRegEnd.getDate());
+                        
+                        let dateStatusHTML = '<strong><i class="bi bi-calendar"></i> Early Registration Date: </strong>' + earlyRegStart.toDateString() + ' - ' + earlyRegEnd.toDateString();
+                        
+                        if (currentDate > earlyRegEndDate) {
+                            dateStatusHTML += ' <span class="text-danger">(Early Registration has been ended)</span>';
+                            earlyRegButton.disabled = true;
+                        } else if (currentDate < earlyRegStartDate) {
+                            dateStatusHTML += ' <span class="text-muted">(Not yet started)</span>';
+                            earlyRegButton.disabled = true;
+                        } else if (!earlyRegType || earlyRegType === '' || isEnrollmentCompleted(earlyRegSelect)) {
+                            earlyRegButton.disabled = true;
+                        } else {
+                            earlyRegButton.removeAttribute('disabled');
+                        }
+                        
+                        document.getElementById('early_registration_date').innerHTML = dateStatusHTML;
+                    }
+                    
+                    // Validate Enrollment Button
+                    if (settings.enrollment_active) {
+                        const enrollmentStart = new Date(settings.enrollment_start_date);
+                        const enrollmentEnd = new Date(settings.enrollment_deadline_date);
+                        const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                        const enrollmentStartDate = new Date(enrollmentStart.getFullYear(), enrollmentStart.getMonth(), enrollmentStart.getDate());
+                        const enrollmentEndDate = new Date(enrollmentEnd.getFullYear(), enrollmentEnd.getMonth(), enrollmentEnd.getDate());
+                        
+                        let dateStatusHTML = '<strong><i class="bi bi-calendar"></i> Enrollment Date: </strong>' + enrollmentStart.toDateString() + ' - ' + enrollmentEnd.toDateString();
+                        
+                        if (currentDate > enrollmentEndDate) {
+                            dateStatusHTML += ' <span class="text-danger">(Enrollment has been ended)</span>';
+                            enrollmentButton.disabled = true;
+                        } else if (currentDate < enrollmentStartDate) {
+                            dateStatusHTML += ' <span class="text-muted">(Not yet started)</span>';
+                            enrollmentButton.disabled = true;
+                        } else if (!enrollmentType || enrollmentType === '' || isEnrollmentCompleted(enrollmentSelect)) {
+                            enrollmentButton.disabled = true;
+                        } else {
+                            enrollmentButton.removeAttribute('disabled');
+                        }
+                        
+                        document.getElementById('enrollment_date').innerHTML = dateStatusHTML;
+                    }
+                }
+            });
+    }
+
+    // Add event listeners for dropdown changes
+    document.getElementById('earlyRegType').addEventListener('change', validateButtons);
+    document.getElementById('enrollmentType').addEventListener('change', validateButtons);
+
     document.getElementById('earlyRegButton').addEventListener('click', function () {
         const earlyRegType = document.getElementById('earlyRegType').value;
         if (earlyRegType === 'junior') {

@@ -16,7 +16,7 @@ class EnrollmentForm(models.Model):
     grade_level = models.CharField(max_length=50)
     with_lrn = models.BooleanField(null=True, blank=True)
     student_type = models.CharField(max_length=50, null=True, blank=True)
-    gen_avg = models.IntegerField()
+    gen_avg = models.DecimalField(max_digits=5, decimal_places=2)
     psa_no = models.CharField(max_length=50)
     lrn = models.CharField(max_length=50)
     first_name = models.CharField(max_length=50)
@@ -51,6 +51,65 @@ class EnrollmentForm(models.Model):
         null=True,
         blank=True,
     )
+    track = models.CharField(max_length=50, null=True, blank=True)
+    science_avg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    math_avg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    
+    # Returning/Transferee fields
+    last_grade_level = models.CharField(max_length=50, null=True, blank=True)
+    last_school_year = models.CharField(max_length=50, null=True, blank=True)
+    last_school_attended = models.CharField(max_length=200, null=True, blank=True)
+    school_id = models.CharField(max_length=10, null=True, blank=True)
+    
+    # Current Address
+    current_house_no = models.CharField(max_length=50, null=True, blank=True)
+    current_street = models.CharField(max_length=200, null=True, blank=True)
+    current_barangay = models.CharField(max_length=100, null=True, blank=True)
+    current_municipality = models.CharField(max_length=100, null=True, blank=True)
+    current_province = models.CharField(max_length=100, null=True, blank=True)
+    current_country = models.CharField(max_length=100, null=True, blank=True)
+    current_zip_code = models.CharField(max_length=10, null=True, blank=True)
+    
+    # Permanent Address
+    permanent_house_no = models.CharField(max_length=50, null=True, blank=True)
+    permanent_street = models.CharField(max_length=200, null=True, blank=True)
+    permanent_barangay = models.CharField(max_length=100, null=True, blank=True)
+    permanent_municipality = models.CharField(max_length=100, null=True, blank=True)
+    permanent_province = models.CharField(max_length=100, null=True, blank=True)
+    permanent_country = models.CharField(max_length=100, null=True, blank=True)
+    permanent_zip_code = models.CharField(max_length=10, null=True, blank=True)
+    
+    # Parent's/Guardian's Information
+    father_last_name = models.CharField(max_length=100, null=True, blank=True)
+    father_first_name = models.CharField(max_length=100, null=True, blank=True)
+    father_middle_name = models.CharField(max_length=100, null=True, blank=True)
+    father_contact_number = models.CharField(max_length=20, null=True, blank=True)
+    mother_last_name = models.CharField(max_length=100, null=True, blank=True)
+    mother_first_name = models.CharField(max_length=100, null=True, blank=True)
+    mother_middle_name = models.CharField(max_length=100, null=True, blank=True)
+    mother_contact_number = models.CharField(max_length=20, null=True, blank=True)
+    guardian_last_name = models.CharField(max_length=100, null=True, blank=True)
+    guardian_first_name = models.CharField(max_length=100, null=True, blank=True)
+    guardian_middle_name = models.CharField(max_length=100, null=True, blank=True)
+    guardian_contact_number = models.CharField(max_length=20, null=True, blank=True)
+    
+    # IP Community
+    ip_community = models.CharField(max_length=10, null=True, blank=True)
+    ip_community_specify_text = models.CharField(max_length=200, null=True, blank=True)
+    
+    # 4Ps Beneficiary
+    beneficiary_4ps = models.CharField(max_length=10, null=True, blank=True)
+    household_id_number = models.CharField(max_length=50, null=True, blank=True)
+    
+    # Learner with Disability
+    learner_with_disability = models.CharField(max_length=10, null=True, blank=True)
+    disability_type = models.TextField(null=True, blank=True)  # JSON array stored as text
+    disability_visual_type = models.TextField(null=True, blank=True)  # JSON array
+    disability_health_type = models.TextField(null=True, blank=True)  # JSON array
+    
+    # Learning Modalities
+    learning_modality = models.TextField(null=True, blank=True)  # JSON array
+    
     class Meta:
         db_table = "enrollment_form"
 
@@ -70,6 +129,32 @@ class EnrollmentForm(models.Model):
         )
         self.mother_tongue = self.mother_tongue.upper() if self.mother_tongue else None
         self.student_type = self.student_type.upper() if self.student_type else None
+        
+        # Address fields uppercase
+        self.current_street = self.current_street.upper() if self.current_street else None
+        self.current_barangay = self.current_barangay.upper() if self.current_barangay else None
+        self.current_municipality = self.current_municipality.upper() if self.current_municipality else None
+        self.current_province = self.current_province.upper() if self.current_province else None
+        self.current_country = self.current_country.upper() if self.current_country else None
+        self.permanent_street = self.permanent_street.upper() if self.permanent_street else None
+        self.permanent_barangay = self.permanent_barangay.upper() if self.permanent_barangay else None
+        self.permanent_municipality = self.permanent_municipality.upper() if self.permanent_municipality else None
+        self.permanent_province = self.permanent_province.upper() if self.permanent_province else None
+        self.permanent_country = self.permanent_country.upper() if self.permanent_country else None
+        self.last_school_attended = self.last_school_attended.upper() if self.last_school_attended else None
+        
+        # Parent/Guardian names uppercase
+        self.father_last_name = self.father_last_name.upper() if self.father_last_name else None
+        self.father_first_name = self.father_first_name.upper() if self.father_first_name else None
+        self.father_middle_name = self.father_middle_name.upper() if self.father_middle_name else None
+        self.mother_last_name = self.mother_last_name.upper() if self.mother_last_name else None
+        self.mother_first_name = self.mother_first_name.upper() if self.mother_first_name else None
+        self.mother_middle_name = self.mother_middle_name.upper() if self.mother_middle_name else None
+        self.guardian_last_name = self.guardian_last_name.upper() if self.guardian_last_name else None
+        self.guardian_first_name = self.guardian_first_name.upper() if self.guardian_first_name else None
+        self.guardian_middle_name = self.guardian_middle_name.upper() if self.guardian_middle_name else None
+        self.ip_community_specify_text = self.ip_community_specify_text.upper() if self.ip_community_specify_text else None
+        
         super(EnrollmentForm, self).save(*args, **kwargs)
 
 
@@ -123,7 +208,7 @@ class StudentInformation(models.Model):
     grade = models.CharField(max_length=191)
     with_lrn = models.BooleanField(null=True, blank=True)
     student_type = models.CharField(max_length=191, null=True, blank=True)
-    gen_avg = models.IntegerField()
+    gen_avg = models.DecimalField(max_digits=5, decimal_places=2)
     section = models.CharField(max_length=191, null=True, blank=True)
     psa_no = models.CharField(max_length=191)
     lrn = models.CharField(max_length=191)
@@ -177,6 +262,66 @@ class StudentInformation(models.Model):
     )
     jhs_completed = models.BooleanField(default=False, null=True, blank=True)
     shs_completed = models.BooleanField(default=False, null=True, blank=True)
+    
+    # Additional fields from enrollment form
+    track = models.CharField(max_length=50, null=True, blank=True)
+    science_avg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    math_avg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    
+    # Returning/Transferee fields
+    last_grade_level = models.CharField(max_length=50, null=True, blank=True)
+    last_school_year = models.CharField(max_length=50, null=True, blank=True)
+    last_school_attended = models.CharField(max_length=200, null=True, blank=True)
+    school_id = models.CharField(max_length=10, null=True, blank=True)
+    
+    # Current Address
+    current_house_no = models.CharField(max_length=50, null=True, blank=True)
+    current_street = models.CharField(max_length=200, null=True, blank=True)
+    current_barangay = models.CharField(max_length=100, null=True, blank=True)
+    current_municipality = models.CharField(max_length=100, null=True, blank=True)
+    current_province = models.CharField(max_length=100, null=True, blank=True)
+    current_country = models.CharField(max_length=100, null=True, blank=True)
+    current_zip_code = models.CharField(max_length=10, null=True, blank=True)
+    
+    # Permanent Address
+    permanent_house_no = models.CharField(max_length=50, null=True, blank=True)
+    permanent_street = models.CharField(max_length=200, null=True, blank=True)
+    permanent_barangay = models.CharField(max_length=100, null=True, blank=True)
+    permanent_municipality = models.CharField(max_length=100, null=True, blank=True)
+    permanent_province = models.CharField(max_length=100, null=True, blank=True)
+    permanent_country = models.CharField(max_length=100, null=True, blank=True)
+    permanent_zip_code = models.CharField(max_length=10, null=True, blank=True)
+    
+    # Parent's/Guardian's Information
+    father_last_name = models.CharField(max_length=100, null=True, blank=True)
+    father_first_name = models.CharField(max_length=100, null=True, blank=True)
+    father_middle_name = models.CharField(max_length=100, null=True, blank=True)
+    father_contact_number = models.CharField(max_length=20, null=True, blank=True)
+    mother_last_name = models.CharField(max_length=100, null=True, blank=True)
+    mother_first_name = models.CharField(max_length=100, null=True, blank=True)
+    mother_middle_name = models.CharField(max_length=100, null=True, blank=True)
+    mother_contact_number = models.CharField(max_length=20, null=True, blank=True)
+    guardian_last_name = models.CharField(max_length=100, null=True, blank=True)
+    guardian_first_name = models.CharField(max_length=100, null=True, blank=True)
+    guardian_middle_name = models.CharField(max_length=100, null=True, blank=True)
+    guardian_contact_number = models.CharField(max_length=20, null=True, blank=True)
+    
+    # IP Community
+    ip_community = models.CharField(max_length=10, null=True, blank=True)
+    ip_community_specify_text = models.CharField(max_length=200, null=True, blank=True)
+    
+    # 4Ps Beneficiary
+    beneficiary_4ps = models.CharField(max_length=10, null=True, blank=True)
+    household_id_number = models.CharField(max_length=50, null=True, blank=True)
+    
+    # Learner with Disability
+    learner_with_disability = models.CharField(max_length=10, null=True, blank=True)
+    disability_type = models.TextField(null=True, blank=True)  # JSON array stored as text
+    disability_visual_type = models.TextField(null=True, blank=True)  # JSON array
+    disability_health_type = models.TextField(null=True, blank=True)  # JSON array
+    
+    # Learning Modalities
+    learning_modality = models.TextField(null=True, blank=True)  # JSON array
 
     class Meta:
         db_table = "student_information"
@@ -196,6 +341,32 @@ class StudentInformation(models.Model):
         )
         self.mother_tongue = self.mother_tongue.upper() if self.mother_tongue else None
         self.student_type = self.student_type.upper() if self.student_type else None
+        
+        # Address fields uppercase
+        self.current_street = self.current_street.upper() if self.current_street else None
+        self.current_barangay = self.current_barangay.upper() if self.current_barangay else None
+        self.current_municipality = self.current_municipality.upper() if self.current_municipality else None
+        self.current_province = self.current_province.upper() if self.current_province else None
+        self.current_country = self.current_country.upper() if self.current_country else None
+        self.permanent_street = self.permanent_street.upper() if self.permanent_street else None
+        self.permanent_barangay = self.permanent_barangay.upper() if self.permanent_barangay else None
+        self.permanent_municipality = self.permanent_municipality.upper() if self.permanent_municipality else None
+        self.permanent_province = self.permanent_province.upper() if self.permanent_province else None
+        self.permanent_country = self.permanent_country.upper() if self.permanent_country else None
+        self.last_school_attended = self.last_school_attended.upper() if self.last_school_attended else None
+        
+        # Parent/Guardian names uppercase
+        self.father_last_name = self.father_last_name.upper() if self.father_last_name else None
+        self.father_first_name = self.father_first_name.upper() if self.father_first_name else None
+        self.father_middle_name = self.father_middle_name.upper() if self.father_middle_name else None
+        self.mother_last_name = self.mother_last_name.upper() if self.mother_last_name else None
+        self.mother_first_name = self.mother_first_name.upper() if self.mother_first_name else None
+        self.mother_middle_name = self.mother_middle_name.upper() if self.mother_middle_name else None
+        self.guardian_last_name = self.guardian_last_name.upper() if self.guardian_last_name else None
+        self.guardian_first_name = self.guardian_first_name.upper() if self.guardian_first_name else None
+        self.guardian_middle_name = self.guardian_middle_name.upper() if self.guardian_middle_name else None
+        self.ip_community_specify_text = self.ip_community_specify_text.upper() if self.ip_community_specify_text else None
+        
         grade_int = int(self.grade)
         if grade_int in [11, 12]:
             self.jhs_completed = True

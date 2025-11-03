@@ -72,6 +72,24 @@ class StudentForm(BaseLRNForm):
         required=False,
         error_messages={"required": "Strand selection is required."}
     )
+    track = forms.CharField(
+        required=False,
+        error_messages={"required": "Track selection is required."}
+    )
+    science_avg = forms.DecimalField(
+        max_digits=5, decimal_places=2,
+        required=False,
+        error_messages={"required": "Science average is required.", "invalid": "Enter a valid number."},
+    )
+    math_avg = forms.DecimalField(
+        max_digits=5, decimal_places=2,
+        required=False,
+        error_messages={"required": "Math average is required.", "invalid": "Enter a valid number."},
+    )
+    last_grade_level = forms.CharField(required=False)
+    last_school_year = forms.CharField(required=False)
+    last_school_attended = forms.CharField(required=False)
+    school_id = forms.CharField(required=False)
 
     # Learner Information
     psa_no = forms.CharField(error_messages={"required": "PSA number is required."})
@@ -92,6 +110,116 @@ class StudentForm(BaseLRNForm):
     )
     place_of_birth = forms.CharField(error_messages={"required": "Place of birth is required."})
     mother_tongue = forms.CharField(error_messages={"required": "Mother tongue is required."})
+    
+    # IP Community
+    ip_community = forms.ChoiceField(
+        choices=[("yes", "Yes"), ("no", "No")],
+        required=False,
+    )
+    ip_community_specify_text = forms.CharField(required=False)
+    
+    # 4Ps Beneficiary
+    beneficiary_4ps = forms.ChoiceField(
+        choices=[("yes", "Yes"), ("no", "No")],
+        required=False,
+    )
+    household_id_number = forms.CharField(required=False)
+    
+    # Learner with Disability
+    learner_with_disability = forms.ChoiceField(
+        choices=[("yes", "Yes"), ("no", "No")],
+        required=False,
+    )
+    disability_type = forms.CharField(required=False)
+    disability_visual_type = forms.CharField(required=False)
+    disability_health_type = forms.CharField(required=False)
+    
+    # Current Address
+    current_house_no = forms.CharField(required=False)
+    current_street = forms.CharField(
+        required=True,
+        error_messages={"required": "Sitio/Street Name is required."}
+    )
+    current_barangay = forms.CharField(
+        required=True,
+        error_messages={"required": "Barangay is required."}
+    )
+    current_municipality = forms.CharField(
+        required=True,
+        error_messages={"required": "Municipality/City is required."}
+    )
+    current_province = forms.CharField(
+        required=True,
+        error_messages={"required": "Province is required."}
+    )
+    current_country = forms.CharField(
+        required=True,
+        error_messages={"required": "Country is required."}
+    )
+    current_zip_code = forms.CharField(
+        required=True,
+        error_messages={"required": "Zip Code is required."}
+    )
+    
+    # Permanent Address
+    permanent_house_no = forms.CharField(required=False)
+    permanent_street = forms.CharField(
+        required=True,
+        error_messages={"required": "Sitio/Street Name is required."}
+    )
+    permanent_barangay = forms.CharField(
+        required=True,
+        error_messages={"required": "Barangay is required."}
+    )
+    permanent_municipality = forms.CharField(
+        required=True,
+        error_messages={"required": "Municipality/City is required."}
+    )
+    permanent_province = forms.CharField(
+        required=True,
+        error_messages={"required": "Province is required."}
+    )
+    permanent_country = forms.CharField(
+        required=True,
+        error_messages={"required": "Country is required."}
+    )
+    permanent_zip_code = forms.CharField(
+        required=True,
+        error_messages={"required": "Zip Code is required."}
+    )
+    
+    # Father's Information
+    father_last_name = forms.CharField(
+        required=True,
+        error_messages={"required": "Father's Last Name is required."}
+    )
+    father_first_name = forms.CharField(
+        required=True,
+        error_messages={"required": "Father's First Name is required."}
+    )
+    father_middle_name = forms.CharField(required=False)
+    father_contact_number = forms.CharField(required=False)
+    
+    # Mother's Information
+    mother_last_name = forms.CharField(
+        required=True,
+        error_messages={"required": "Mother's Last Name is required."}
+    )
+    mother_first_name = forms.CharField(
+        required=True,
+        error_messages={"required": "Mother's First Name is required."}
+    )
+    mother_middle_name = forms.CharField(required=False)
+    mother_contact_number = forms.CharField(required=False)
+    
+    # Guardian's Information
+    guardian_last_name = forms.CharField(required=False)
+    guardian_first_name = forms.CharField(required=False)
+    guardian_middle_name = forms.CharField(required=False)
+    guardian_contact_number = forms.CharField(required=False)
+    
+    # Distance Learning Modalities
+    learning_modality = forms.CharField(required=False)
     
     def clean_gen_avg(self):
         gen_avg = self.cleaned_data.get("gen_avg")
@@ -127,17 +255,17 @@ class StudentForm(BaseLRNForm):
         age = self.cleaned_data.get("age")
         birth_date = self.cleaned_data.get("birth_date")
         grade_level = self.cleaned_data.get("grade_level")
-        if grade_level == "7" and (not age or age <= 12):
+        if grade_level == "7" and (not age or age < 12):
             raise ValidationError("Age must be 12 years old or above.")
-        if grade_level == "8" and (not age or age <= 13):
+        if grade_level == "8" and (not age or age < 13):
             raise ValidationError("Age must be 13 years old or above.")
-        if grade_level == "9" and (not age or age <= 14):
+        if grade_level == "9" and (not age or age < 14):
             raise ValidationError("Age must be 14 years old or above.")
-        if grade_level == "10" and (not age or age <= 15):
+        if grade_level == "10" and (not age or age < 15):
             raise ValidationError("Age must be 15 years old or above.")
-        if grade_level == "11" and (not age or age <= 16):
+        if grade_level == "11" and (not age or age < 16):
             raise ValidationError("Age must be 16 years old or above.")
-        if grade_level == "12" and (not age or age <= 17):
+        if grade_level == "12" and (not age or age < 17):
             raise ValidationError("Age must be 17 years old or above.")
         if birth_date:
             today = date.today()
@@ -147,6 +275,27 @@ class StudentForm(BaseLRNForm):
             if age != expected_age:
                 raise ValidationError(f"Age does not match the birth date (should be {expected_age}).")
         return age
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        student_type = cleaned_data.get("student_type")
+        last_grade_level = cleaned_data.get("last_grade_level")
+        last_school_year = cleaned_data.get("last_school_year")
+        last_school_attended = cleaned_data.get("last_school_attended")
+        school_id = cleaned_data.get("school_id")
+        
+        # Validate returning/transferee fields if student_type is returning or transferee
+        if student_type in ["returning", "transferee"]:
+            if not last_grade_level or not last_grade_level.strip():
+                raise ValidationError({"last_grade_level": "Last Grade Level Completed is required for returning/transferee students."})
+            if not last_school_year or not last_school_year.strip():
+                raise ValidationError({"last_school_year": "Last School Year Completed is required for returning/transferee students."})
+            if not last_school_attended or not last_school_attended.strip():
+                raise ValidationError({"last_school_attended": "Last School Attended is required for returning/transferee students."})
+            if not school_id or not school_id.strip():
+                raise ValidationError({"school_id": "School ID is required for returning/transferee students."})
+        
+        return cleaned_data
     
 
 class ApplicationForm(forms.Form):
@@ -217,6 +366,114 @@ class ApplicationForm(forms.Form):
     mother_tongue = forms.CharField(error_messages={"required": "Mother tongue is required."})
     documents_submitted = forms.JSONField(required=False)
     submission_remarks = forms.CharField(required=False)
+    
+    # Returning/Transferee fields
+    last_grade_level = forms.CharField(required=False)
+    last_school_year = forms.CharField(required=False)
+    last_school_attended = forms.CharField(required=False)
+    school_id = forms.CharField(required=False)
+    track = forms.CharField(required=False)
+    
+    # IP Community
+    ip_community = forms.CharField(required=False)
+    ip_community_specify_text = forms.CharField(required=False)
+    
+    # 4Ps Beneficiary
+    beneficiary_4ps = forms.CharField(required=False)
+    household_id_number = forms.CharField(required=False)
+    
+    # Learner with Disability
+    learner_with_disability = forms.CharField(required=False)
+    disability_type = forms.CharField(required=False)  # Will be handled as JSON
+    disability_visual_type = forms.CharField(required=False)  # Will be handled as JSON
+    disability_health_type = forms.CharField(required=False)  # Will be handled as JSON
+    
+    # Current Address
+    current_house_no = forms.CharField(required=False)
+    current_street = forms.CharField(
+        required=True,
+        error_messages={"required": "Sitio/Street Name is required."}
+    )
+    current_barangay = forms.CharField(
+        required=True,
+        error_messages={"required": "Barangay is required."}
+    )
+    current_municipality = forms.CharField(
+        required=True,
+        error_messages={"required": "Municipality/City is required."}
+    )
+    current_province = forms.CharField(
+        required=True,
+        error_messages={"required": "Province is required."}
+    )
+    current_country = forms.CharField(
+        required=True,
+        error_messages={"required": "Country is required."}
+    )
+    current_zip_code = forms.CharField(
+        required=True,
+        error_messages={"required": "Zip Code is required."}
+    )
+    
+    # Permanent Address
+    permanent_house_no = forms.CharField(required=False)
+    permanent_street = forms.CharField(
+        required=True,
+        error_messages={"required": "Sitio/Street Name is required."}
+    )
+    permanent_barangay = forms.CharField(
+        required=True,
+        error_messages={"required": "Barangay is required."}
+    )
+    permanent_municipality = forms.CharField(
+        required=True,
+        error_messages={"required": "Municipality/City is required."}
+    )
+    permanent_province = forms.CharField(
+        required=True,
+        error_messages={"required": "Province is required."}
+    )
+    permanent_country = forms.CharField(
+        required=True,
+        error_messages={"required": "Country is required."}
+    )
+    permanent_zip_code = forms.CharField(
+        required=True,
+        error_messages={"required": "Zip Code is required."}
+    )
+    
+    # Father's Information
+    father_last_name = forms.CharField(
+        required=True,
+        error_messages={"required": "Father's Last Name is required."}
+    )
+    father_first_name = forms.CharField(
+        required=True,
+        error_messages={"required": "Father's First Name is required."}
+    )
+    father_middle_name = forms.CharField(required=False)
+    father_contact_number = forms.CharField(required=False)
+    
+    # Mother's Information
+    mother_last_name = forms.CharField(
+        required=True,
+        error_messages={"required": "Mother's Last Name is required."}
+    )
+    mother_first_name = forms.CharField(
+        required=True,
+        error_messages={"required": "Mother's First Name is required."}
+    )
+    mother_middle_name = forms.CharField(required=False)
+    mother_contact_number = forms.CharField(required=False)
+    
+    # Guardian's Information
+    guardian_last_name = forms.CharField(required=False)
+    guardian_first_name = forms.CharField(required=False)
+    guardian_middle_name = forms.CharField(required=False)
+    guardian_contact_number = forms.CharField(required=False)
+    
+    # Distance Learning Modalities
+    learning_modality = forms.CharField(required=False)  # Will be handled as JSON - validated in clean()
 
     # --- Custom Validators ---
     def clean_gen_avg(self):
@@ -247,17 +504,17 @@ class ApplicationForm(forms.Form):
         age = self.cleaned_data.get("age")
         birth_date = self.cleaned_data.get("birth_date")
         grade_level = self.cleaned_data.get("grade_level")
-        if grade_level == "7" and (not age or age <= 12):
+        if grade_level == "7" and (not age or age < 12):
             raise ValidationError("Age must be 12 years old or above.")
-        if grade_level == "8" and (not age or age <= 13):
+        if grade_level == "8" and (not age or age < 13):
             raise ValidationError("Age must be 13 years old or above.")
-        if grade_level == "9" and (not age or age <= 14):
+        if grade_level == "9" and (not age or age < 14):
             raise ValidationError("Age must be 14 years old or above.")
-        if grade_level == "10" and (not age or age <= 15):
+        if grade_level == "10" and (not age or age < 15):
             raise ValidationError("Age must be 15 years old or above.")
-        if grade_level == "11" and (not age or age <= 16):
+        if grade_level == "11" and (not age or age < 16):
             raise ValidationError("Age must be 16 years old or above.")
-        if grade_level == "12" and (not age or age <= 17):
+        if grade_level == "12" and (not age or age < 17):
             raise ValidationError("Age must be 17 years old or above.")
         if birth_date:
             today = date.today()
@@ -274,6 +531,11 @@ class ApplicationForm(forms.Form):
         science_avg = cleaned_data.get("science_avg")
         math_avg = cleaned_data.get("math_avg")
         strand = cleaned_data.get("strand")
+        student_type = cleaned_data.get("student_type")
+        last_grade_level = cleaned_data.get("last_grade_level")
+        last_school_year = cleaned_data.get("last_school_year")
+        last_school_attended = cleaned_data.get("last_school_attended")
+        school_id = cleaned_data.get("school_id")
         
         if enrollment_type != "JHS" and science_avg is not None and math_avg is not None:
             if science_avg >= 85 and math_avg >= 85:
@@ -282,6 +544,17 @@ class ApplicationForm(forms.Form):
             else:
                 if strand != "ABM":
                     raise ValidationError("With your averages, only ABM strand is allowed.")
+        
+        # Validate returning/transferee fields if student_type is returning or transferee
+        if student_type in ["returning", "transferee"]:
+            if not last_grade_level or not last_grade_level.strip():
+                raise ValidationError({"last_grade_level": "Last Grade Level Completed is required for returning/transferee students."})
+            if not last_school_year or not last_school_year.strip():
+                raise ValidationError({"last_school_year": "Last School Year Completed is required for returning/transferee students."})
+            if not last_school_attended or not last_school_attended.strip():
+                raise ValidationError({"last_school_attended": "Last School Attended is required for returning/transferee students."})
+            if not school_id or not school_id.strip():
+                raise ValidationError({"school_id": "School ID is required for returning/transferee students."})
 
         return cleaned_data
     

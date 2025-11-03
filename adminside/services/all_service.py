@@ -160,7 +160,12 @@ class EnrollmentFormService:
             enrollment.gender = cleaned_data["gender"]
             enrollment.place_of_birth = cleaned_data["place_of_birth"]
             enrollment.mother_tongue = cleaned_data["mother_tongue"]
-            enrollment.submission_remarks = cleaned_data.get("submission_remarks")
+            # Update submission remarks - if empty string (checkbox unchecked), set to None
+            submission_remarks = cleaned_data.get("submission_remarks")
+            if submission_remarks and submission_remarks.strip():
+                enrollment.submission_remarks = submission_remarks.strip()
+            else:
+                enrollment.submission_remarks = None
             enrollment.save()
 
             documents = request.POST.getlist("documents")
@@ -325,6 +330,56 @@ class ApplicationApprovedService:
                         "enrollment_type": application.enrollment_type,
                         "semester": application.semester,
                         "strand": application.strand,
+                        "track": application.track,
+                        "science_avg": application.science_avg,
+                        "math_avg": application.math_avg,
+                        "last_grade_level": application.last_grade_level,
+                        "last_school_year": application.last_school_year,
+                        "last_school_attended": application.last_school_attended,
+                        "school_id": application.school_id,
+                        # Current Address
+                        "current_house_no": application.current_house_no,
+                        "current_street": application.current_street,
+                        "current_barangay": application.current_barangay,
+                        "current_municipality": application.current_municipality,
+                        "current_province": application.current_province,
+                        "current_country": application.current_country,
+                        "current_zip_code": application.current_zip_code,
+                        # Permanent Address
+                        "permanent_house_no": application.permanent_house_no,
+                        "permanent_street": application.permanent_street,
+                        "permanent_barangay": application.permanent_barangay,
+                        "permanent_municipality": application.permanent_municipality,
+                        "permanent_province": application.permanent_province,
+                        "permanent_country": application.permanent_country,
+                        "permanent_zip_code": application.permanent_zip_code,
+                        # Parent's/Guardian's Information
+                        "father_last_name": application.father_last_name,
+                        "father_first_name": application.father_first_name,
+                        "father_middle_name": application.father_middle_name,
+                        "father_contact_number": application.father_contact_number,
+                        "mother_last_name": application.mother_last_name,
+                        "mother_first_name": application.mother_first_name,
+                        "mother_middle_name": application.mother_middle_name,
+                        "mother_contact_number": application.mother_contact_number,
+                        "guardian_last_name": application.guardian_last_name,
+                        "guardian_first_name": application.guardian_first_name,
+                        "guardian_middle_name": application.guardian_middle_name,
+                        "guardian_contact_number": application.guardian_contact_number,
+                        # IP Community
+                        "ip_community": application.ip_community,
+                        "ip_community_specify_text": application.ip_community_specify_text,
+                        # 4Ps Beneficiary
+                        "beneficiary_4ps": application.beneficiary_4ps,
+                        "household_id_number": application.household_id_number,
+                        # Learner with Disability
+                        "learner_with_disability": application.learner_with_disability,
+                        "disability_type": application.disability_type,
+                        "disability_visual_type": application.disability_visual_type,
+                        "disability_health_type": application.disability_health_type,
+                        # Learning Modalities
+                        "learning_modality": application.learning_modality,
+                        "submission_remarks": application.submission_remarks if application.submission_remarks else None,
                         "student_status": "Enrolled",
                         "enrollment_status": "PASSED",
                     },
@@ -424,6 +479,56 @@ class ApplicationApprovedService:
                                     "enrollment_type": application.enrollment_type,
                                     "semester": application.semester,
                                     "strand": application.strand,
+                                    "track": application.track,
+                                    "science_avg": application.science_avg,
+                                    "math_avg": application.math_avg,
+                                    "last_grade_level": application.last_grade_level,
+                                    "last_school_year": application.last_school_year,
+                                    "last_school_attended": application.last_school_attended,
+                                    "school_id": application.school_id,
+                                    # Current Address
+                                    "current_house_no": application.current_house_no,
+                                    "current_street": application.current_street,
+                                    "current_barangay": application.current_barangay,
+                                    "current_municipality": application.current_municipality,
+                                    "current_province": application.current_province,
+                                    "current_country": application.current_country,
+                                    "current_zip_code": application.current_zip_code,
+                                    # Permanent Address
+                                    "permanent_house_no": application.permanent_house_no,
+                                    "permanent_street": application.permanent_street,
+                                    "permanent_barangay": application.permanent_barangay,
+                                    "permanent_municipality": application.permanent_municipality,
+                                    "permanent_province": application.permanent_province,
+                                    "permanent_country": application.permanent_country,
+                                    "permanent_zip_code": application.permanent_zip_code,
+                                    # Parent's/Guardian's Information
+                                    "father_last_name": application.father_last_name,
+                                    "father_first_name": application.father_first_name,
+                                    "father_middle_name": application.father_middle_name,
+                                    "father_contact_number": application.father_contact_number,
+                                    "mother_last_name": application.mother_last_name,
+                                    "mother_first_name": application.mother_first_name,
+                                    "mother_middle_name": application.mother_middle_name,
+                                    "mother_contact_number": application.mother_contact_number,
+                                    "guardian_last_name": application.guardian_last_name,
+                                    "guardian_first_name": application.guardian_first_name,
+                                    "guardian_middle_name": application.guardian_middle_name,
+                                    "guardian_contact_number": application.guardian_contact_number,
+                                    # IP Community
+                                    "ip_community": application.ip_community,
+                                    "ip_community_specify_text": application.ip_community_specify_text,
+                                    # 4Ps Beneficiary
+                                    "beneficiary_4ps": application.beneficiary_4ps,
+                                    "household_id_number": application.household_id_number,
+                                    # Learner with Disability
+                                    "learner_with_disability": application.learner_with_disability,
+                                    "disability_type": application.disability_type,
+                                    "disability_visual_type": application.disability_visual_type,
+                                    "disability_health_type": application.disability_health_type,
+                                    # Learning Modalities
+                                    "learning_modality": application.learning_modality,
+                                    "submission_remarks": application.submission_remarks,
                                     "student_status": "Enrolled",
                                     "enrollment_status": "PASSED",
                                 },
@@ -661,8 +766,57 @@ class ApplicationPendingService:
                         "enrollment_type": application.enrollment_type,
                         "semester": application.semester,
                         "strand": application.strand,
-                        "student_status": "Enrolled",
+                        "track": application.track,
+                        "science_avg": application.science_avg,
+                        "math_avg": application.math_avg,
+                        "last_grade_level": application.last_grade_level,
+                        "last_school_year": application.last_school_year,
+                        "last_school_attended": application.last_school_attended,
+                        "school_id": application.school_id,
+                        # Current Address
+                        "current_house_no": application.current_house_no,
+                        "current_street": application.current_street,
+                        "current_barangay": application.current_barangay,
+                        "current_municipality": application.current_municipality,
+                        "current_province": application.current_province,
+                        "current_country": application.current_country,
+                        "current_zip_code": application.current_zip_code,
+                        # Permanent Address
+                        "permanent_house_no": application.permanent_house_no,
+                        "permanent_street": application.permanent_street,
+                        "permanent_barangay": application.permanent_barangay,
+                        "permanent_municipality": application.permanent_municipality,
+                        "permanent_province": application.permanent_province,
+                        "permanent_country": application.permanent_country,
+                        "permanent_zip_code": application.permanent_zip_code,
+                        # Parent's/Guardian's Information
+                        "father_last_name": application.father_last_name,
+                        "father_first_name": application.father_first_name,
+                        "father_middle_name": application.father_middle_name,
+                        "father_contact_number": application.father_contact_number,
+                        "mother_last_name": application.mother_last_name,
+                        "mother_first_name": application.mother_first_name,
+                        "mother_middle_name": application.mother_middle_name,
+                        "mother_contact_number": application.mother_contact_number,
+                        "guardian_last_name": application.guardian_last_name,
+                        "guardian_first_name": application.guardian_first_name,
+                        "guardian_middle_name": application.guardian_middle_name,
+                        "guardian_contact_number": application.guardian_contact_number,
+                        # IP Community
+                        "ip_community": application.ip_community,
+                        "ip_community_specify_text": application.ip_community_specify_text,
+                        # 4Ps Beneficiary
+                        "beneficiary_4ps": application.beneficiary_4ps,
+                        "household_id_number": application.household_id_number,
+                        # Learner with Disability
+                        "learner_with_disability": application.learner_with_disability,
+                        "disability_type": application.disability_type,
+                        "disability_visual_type": application.disability_visual_type,
+                        "disability_health_type": application.disability_health_type,
+                        # Learning Modalities
+                        "learning_modality": application.learning_modality,
                         "submission_remarks": application.submission_remarks if application.submission_remarks else None,
+                        "student_status": "Enrolled",
                         "enrollment_status": "PASSED",
                     },
                 )
@@ -1103,6 +1257,19 @@ class StudentInformationService:
                 password=cleaned["password"],
                 user_role="Student",
             )
+            # Handle checkbox arrays (getlist for multiple values)
+            import json
+            disability_types = request.POST.getlist("disability_type")
+            disability_visual_types = request.POST.getlist("disability_visual_type")
+            disability_health_types = request.POST.getlist("disability_health_type")
+            learning_modalities = request.POST.getlist("learning_modality")
+            
+            # Convert to JSON strings
+            disability_type_json = json.dumps(disability_types) if disability_types else None
+            disability_visual_type_json = json.dumps(disability_visual_types) if disability_visual_types else None
+            disability_health_type_json = json.dumps(disability_health_types) if disability_health_types else None
+            learning_modality_json = json.dumps(learning_modalities) if learning_modalities else None
+            
             student = StudentInformationRepository.create(
                 user=user,
                 lrn=cleaned["lrn"],
@@ -1125,18 +1292,60 @@ class StudentInformationService:
                 place_of_birth=cleaned["place_of_birth"],
                 mother_tongue=cleaned["mother_tongue"],
                 student_status="Enrolled",
+                # Current Address
+                current_house_no=cleaned.get("current_house_no"),
+                current_street=cleaned.get("current_street"),
+                current_barangay=cleaned.get("current_barangay"),
+                current_municipality=cleaned.get("current_municipality"),
+                current_province=cleaned.get("current_province"),
+                current_country=cleaned.get("current_country"),
+                current_zip_code=cleaned.get("current_zip_code"),
+                # Permanent Address
+                permanent_house_no=cleaned.get("permanent_house_no"),
+                permanent_street=cleaned.get("permanent_street"),
+                permanent_barangay=cleaned.get("permanent_barangay"),
+                permanent_municipality=cleaned.get("permanent_municipality"),
+                permanent_province=cleaned.get("permanent_province"),
+                permanent_country=cleaned.get("permanent_country"),
+                permanent_zip_code=cleaned.get("permanent_zip_code"),
+                # Parent's/Guardian's Information
+                father_last_name=cleaned.get("father_last_name"),
+                father_first_name=cleaned.get("father_first_name"),
+                father_middle_name=cleaned.get("father_middle_name"),
+                father_contact_number=cleaned.get("father_contact_number"),
+                mother_last_name=cleaned.get("mother_last_name"),
+                mother_first_name=cleaned.get("mother_first_name"),
+                mother_middle_name=cleaned.get("mother_middle_name"),
+                mother_contact_number=cleaned.get("mother_contact_number"),
+                guardian_last_name=cleaned.get("guardian_last_name"),
+                guardian_first_name=cleaned.get("guardian_first_name"),
+                guardian_middle_name=cleaned.get("guardian_middle_name"),
+                guardian_contact_number=cleaned.get("guardian_contact_number"),
+                # IP Community
+                ip_community=cleaned.get("ip_community"),
+                ip_community_specify_text=cleaned.get("ip_community_specify_text"),
+                # 4Ps Beneficiary
+                beneficiary_4ps=cleaned.get("beneficiary_4ps"),
+                household_id_number=cleaned.get("household_id_number"),
+                # Learner with Disability
+                learner_with_disability=cleaned.get("learner_with_disability"),
+                disability_type=disability_type_json,
+                disability_visual_type=disability_visual_type_json,
+                disability_health_type=disability_health_type_json,
+                # Learning Modalities
+                learning_modality=learning_modality_json,
             )
             user.updated_at = timezone.now()
             user.save()
             
             documents = request.POST.getlist("documents")
             submitted_ids = set(int(doc_id) for doc_id in documents)
-            existing_docs = set(DocumentListRepository.get_document_ids_by_enrollment(student.id))
+            existing_docs = set(DocumentListRepository.get_document_ids_by_student(student.id))
             for doc_id in existing_docs - submitted_ids:
-                DocumentListRepository.delete_by_enrollment_and_document(student.id, doc_id)
+                DocumentListRepository.delete_by_student_and_document(student.id, doc_id)
             for doc_id in submitted_ids - existing_docs:
                 DocumentListRepository.create(document_id=doc_id, student_information=student)
-            current_docs = set(DocumentListRepository.get_document_ids_by_enrollment(student.id))
+            current_docs = set(DocumentListRepository.get_document_ids_by_student(student.id))
             required_ids = set(DocumentRepository.get_required_ids())
             if required_ids.issubset(current_docs):
                 student.status = "Complete"
@@ -1195,10 +1404,69 @@ class StudentInformationService:
             student.place_of_birth = cleaned_data["place_of_birth"]
             student.mother_tongue = cleaned_data["mother_tongue"]
             
-            # Update submission remarks if provided
-            submission_remarks = request.POST.get("submission_remarks")
-            if submission_remarks:
-                student.submission_remarks = submission_remarks
+            # Current Address
+            student.current_house_no = cleaned_data.get("current_house_no")
+            student.current_street = cleaned_data.get("current_street")
+            student.current_barangay = cleaned_data.get("current_barangay")
+            student.current_municipality = cleaned_data.get("current_municipality")
+            student.current_province = cleaned_data.get("current_province")
+            student.current_country = cleaned_data.get("current_country")
+            student.current_zip_code = cleaned_data.get("current_zip_code")
+            
+            # Permanent Address
+            student.permanent_house_no = cleaned_data.get("permanent_house_no")
+            student.permanent_street = cleaned_data.get("permanent_street")
+            student.permanent_barangay = cleaned_data.get("permanent_barangay")
+            student.permanent_municipality = cleaned_data.get("permanent_municipality")
+            student.permanent_province = cleaned_data.get("permanent_province")
+            student.permanent_country = cleaned_data.get("permanent_country")
+            student.permanent_zip_code = cleaned_data.get("permanent_zip_code")
+            
+            # Parent's/Guardian's Information
+            student.father_last_name = cleaned_data.get("father_last_name")
+            student.father_first_name = cleaned_data.get("father_first_name")
+            student.father_middle_name = cleaned_data.get("father_middle_name")
+            student.father_contact_number = cleaned_data.get("father_contact_number")
+            student.mother_last_name = cleaned_data.get("mother_last_name")
+            student.mother_first_name = cleaned_data.get("mother_first_name")
+            student.mother_middle_name = cleaned_data.get("mother_middle_name")
+            student.mother_contact_number = cleaned_data.get("mother_contact_number")
+            student.guardian_last_name = cleaned_data.get("guardian_last_name")
+            student.guardian_first_name = cleaned_data.get("guardian_first_name")
+            student.guardian_middle_name = cleaned_data.get("guardian_middle_name")
+            student.guardian_contact_number = cleaned_data.get("guardian_contact_number")
+            
+            # IP Community
+            student.ip_community = cleaned_data.get("ip_community")
+            student.ip_community_specify_text = cleaned_data.get("ip_community_specify_text")
+            
+            # 4Ps Beneficiary
+            student.beneficiary_4ps = cleaned_data.get("beneficiary_4ps")
+            student.household_id_number = cleaned_data.get("household_id_number")
+            
+            # Learner with Disability
+            student.learner_with_disability = cleaned_data.get("learner_with_disability")
+            
+            # Handle checkbox arrays (getlist for multiple values)
+            import json
+            disability_types = request.POST.getlist("disability_type")
+            disability_visual_types = request.POST.getlist("disability_visual_type")
+            disability_health_types = request.POST.getlist("disability_health_type")
+            learning_modalities = request.POST.getlist("learning_modality")
+            
+            # Convert to JSON strings
+            student.disability_type = json.dumps(disability_types) if disability_types else None
+            student.disability_visual_type = json.dumps(disability_visual_types) if disability_visual_types else None
+            student.disability_health_type = json.dumps(disability_health_types) if disability_health_types else None
+            student.learning_modality = json.dumps(learning_modalities) if learning_modalities else None
+            
+            # Update submission remarks - if empty string (checkbox unchecked), set to None
+            submission_remarks = request.POST.get("submission_remarks", "")
+            # If empty string or None, set to None (null), otherwise use the trimmed value
+            if submission_remarks and submission_remarks.strip():
+                student.submission_remarks = submission_remarks.strip()
+            else:
+                student.submission_remarks = None
             
             student.save()
 
@@ -2020,39 +2288,89 @@ class AssessmentService:
             assessment.save()
             
             # save in student information
+            enrollment = assessment.application_approved.enrollment
             student_information, _ = StudentInformationRepository.update_or_create(
                 application_approved=assessment.application_approved,
                 defaults={
-                    "user": assessment.application_approved.enrollment.user,
-                    "application_no": assessment.application_approved.enrollment.application_no,
-                    "status": assessment.application_approved.enrollment.status,
+                    "user": enrollment.user,
+                    "application_no": enrollment.application_no,
+                    "status": enrollment.status,
                     "created_at": timezone.now(),
-                    "school_year": assessment.application_approved.enrollment.school_year,
-                    "grade": assessment.application_approved.enrollment.grade_level,
-                    "with_lrn": assessment.application_approved.enrollment.with_lrn,
-                    "student_type": assessment.application_approved.enrollment.student_type,
-                    "gen_avg": assessment.application_approved.enrollment.gen_avg,
+                    "school_year": enrollment.school_year,
+                    "grade": enrollment.grade_level,
+                    "with_lrn": enrollment.with_lrn,
+                    "student_type": enrollment.student_type,
+                    "gen_avg": enrollment.gen_avg,
                     "section": None,
-                    "psa_no": assessment.application_approved.enrollment.psa_no,
-                    "lrn": assessment.application_approved.enrollment.lrn,
-                    "first_name": assessment.application_approved.enrollment.first_name,
-                    "middle_name": assessment.application_approved.enrollment.middle_name,
-                    "last_name": assessment.application_approved.enrollment.last_name,
-                    "extension_name": assessment.application_approved.enrollment.extension_name,
-                    "birth_date": assessment.application_approved.enrollment.birth_date,
-                    "age": assessment.application_approved.enrollment.age,
-                    "gender": assessment.application_approved.enrollment.gender,
-                    "place_of_birth": assessment.application_approved.enrollment.place_of_birth,
-                    "mother_tongue": assessment.application_approved.enrollment.mother_tongue,
-                    "documents_submitted": assessment.application_approved.enrollment.documents_submitted,
-                    "early_reg": assessment.application_approved.enrollment.early_reg,
+                    "psa_no": enrollment.psa_no,
+                    "lrn": enrollment.lrn,
+                    "first_name": enrollment.first_name,
+                    "middle_name": enrollment.middle_name,
+                    "last_name": enrollment.last_name,
+                    "extension_name": enrollment.extension_name,
+                    "birth_date": enrollment.birth_date,
+                    "age": enrollment.age,
+                    "gender": enrollment.gender,
+                    "place_of_birth": enrollment.place_of_birth,
+                    "mother_tongue": enrollment.mother_tongue,
+                    "documents_submitted": enrollment.documents_submitted,
+                    "early_reg": enrollment.early_reg,
                     "is_approved": True,
-                    "enrollment_type": assessment.application_approved.enrollment.enrollment_type,
-                    "semester": assessment.application_approved.enrollment.semester,
-                    "strand": assessment.application_approved.enrollment.strand,
+                    "enrollment_type": enrollment.enrollment_type,
+                    "semester": enrollment.semester,
+                    "strand": enrollment.strand,
+                    "track": enrollment.track,
+                    "science_avg": enrollment.science_avg,
+                    "math_avg": enrollment.math_avg,
+                    "last_grade_level": enrollment.last_grade_level,
+                    "last_school_year": enrollment.last_school_year,
+                    "last_school_attended": enrollment.last_school_attended,
+                    "school_id": enrollment.school_id,
+                    # Current Address
+                    "current_house_no": enrollment.current_house_no,
+                    "current_street": enrollment.current_street,
+                    "current_barangay": enrollment.current_barangay,
+                    "current_municipality": enrollment.current_municipality,
+                    "current_province": enrollment.current_province,
+                    "current_country": enrollment.current_country,
+                    "current_zip_code": enrollment.current_zip_code,
+                    # Permanent Address
+                    "permanent_house_no": enrollment.permanent_house_no,
+                    "permanent_street": enrollment.permanent_street,
+                    "permanent_barangay": enrollment.permanent_barangay,
+                    "permanent_municipality": enrollment.permanent_municipality,
+                    "permanent_province": enrollment.permanent_province,
+                    "permanent_country": enrollment.permanent_country,
+                    "permanent_zip_code": enrollment.permanent_zip_code,
+                    # Parent's/Guardian's Information
+                    "father_last_name": enrollment.father_last_name,
+                    "father_first_name": enrollment.father_first_name,
+                    "father_middle_name": enrollment.father_middle_name,
+                    "father_contact_number": enrollment.father_contact_number,
+                    "mother_last_name": enrollment.mother_last_name,
+                    "mother_first_name": enrollment.mother_first_name,
+                    "mother_middle_name": enrollment.mother_middle_name,
+                    "mother_contact_number": enrollment.mother_contact_number,
+                    "guardian_last_name": enrollment.guardian_last_name,
+                    "guardian_first_name": enrollment.guardian_first_name,
+                    "guardian_middle_name": enrollment.guardian_middle_name,
+                    "guardian_contact_number": enrollment.guardian_contact_number,
+                    # IP Community
+                    "ip_community": enrollment.ip_community,
+                    "ip_community_specify_text": enrollment.ip_community_specify_text,
+                    # 4Ps Beneficiary
+                    "beneficiary_4ps": enrollment.beneficiary_4ps,
+                    "household_id_number": enrollment.household_id_number,
+                    # Learner with Disability
+                    "learner_with_disability": enrollment.learner_with_disability,
+                    "disability_type": enrollment.disability_type,
+                    "disability_visual_type": enrollment.disability_visual_type,
+                    "disability_health_type": enrollment.disability_health_type,
+                    # Learning Modalities
+                    "learning_modality": enrollment.learning_modality,
                     "student_status": "Enrolled",
                     "assessment": assessment,
-                    "submission_remarks": assessment.application_approved.enrollment.submission_remarks if assessment.application_approved.enrollment.submission_remarks else None,
+                    "submission_remarks": enrollment.submission_remarks if enrollment.submission_remarks else None,
                     "enrollment_status": "PASSED",
                 }
             )
@@ -2091,38 +2409,90 @@ class AssessmentService:
                 assessment.save()
                 
                 # save in student information
+                enrollment = assessment.application_approved.enrollment
                 student_information, _ = StudentInformationRepository.update_or_create(
                     application_approved=assessment.application_approved,
                     defaults={
-                        "user": assessment.application_approved.enrollment.user,
-                        "application_no": assessment.application_approved.enrollment.application_no,
-                        "status": assessment.application_approved.enrollment.status,
-                        "created_at": assessment.application_approved.enrollment.created_at,
-                        "school_year": assessment.application_approved.enrollment.school_year,
-                        "grade": assessment.application_approved.enrollment.grade_level,
-                        "with_lrn": assessment.application_approved.enrollment.with_lrn,
-                        "student_type": assessment.application_approved.enrollment.student_type,
-                        "gen_avg": assessment.application_approved.enrollment.gen_avg,
+                        "user": enrollment.user,
+                        "application_no": enrollment.application_no,
+                        "status": enrollment.status,
+                        "created_at": enrollment.created_at,
+                        "school_year": enrollment.school_year,
+                        "grade": enrollment.grade_level,
+                        "with_lrn": enrollment.with_lrn,
+                        "student_type": enrollment.student_type,
+                        "gen_avg": enrollment.gen_avg,
                         "section": None,
-                        "psa_no": assessment.application_approved.enrollment.psa_no,
-                        "lrn": assessment.application_approved.enrollment.lrn,
-                        "first_name": assessment.application_approved.enrollment.first_name,
-                        "middle_name": assessment.application_approved.enrollment.middle_name,
-                        "last_name": assessment.application_approved.enrollment.last_name,
-                        "extension_name": assessment.application_approved.enrollment.extension_name,
-                        "birth_date": assessment.application_approved.enrollment.birth_date,
-                        "age": assessment.application_approved.enrollment.age,
-                        "gender": assessment.application_approved.enrollment.gender,
-                        "place_of_birth": assessment.application_approved.enrollment.place_of_birth,
-                        "mother_tongue": assessment.application_approved.enrollment.mother_tongue,
-                        "documents_submitted": assessment.application_approved.enrollment.documents_submitted,
-                        "early_reg": assessment.application_approved.enrollment.early_reg,
+                        "psa_no": enrollment.psa_no,
+                        "lrn": enrollment.lrn,
+                        "first_name": enrollment.first_name,
+                        "middle_name": enrollment.middle_name,
+                        "last_name": enrollment.last_name,
+                        "extension_name": enrollment.extension_name,
+                        "birth_date": enrollment.birth_date,
+                        "age": enrollment.age,
+                        "gender": enrollment.gender,
+                        "place_of_birth": enrollment.place_of_birth,
+                        "mother_tongue": enrollment.mother_tongue,
+                        "documents_submitted": enrollment.documents_submitted,
+                        "early_reg": enrollment.early_reg,
                         "is_approved": True,
-                        "enrollment_type": assessment.application_approved.enrollment.enrollment_type,
-                        "semester": assessment.application_approved.enrollment.semester,
-                        "strand": assessment.application_approved.enrollment.strand,
+                        "enrollment_type": enrollment.enrollment_type,
+                        "semester": enrollment.semester,
+                        "strand": enrollment.strand,
+                        "track": enrollment.track,
+                        "science_avg": enrollment.science_avg,
+                        "math_avg": enrollment.math_avg,
+                        "last_grade_level": enrollment.last_grade_level,
+                        "last_school_year": enrollment.last_school_year,
+                        "last_school_attended": enrollment.last_school_attended,
+                        "school_id": enrollment.school_id,
+                        # Current Address
+                        "current_house_no": enrollment.current_house_no,
+                        "current_street": enrollment.current_street,
+                        "current_barangay": enrollment.current_barangay,
+                        "current_municipality": enrollment.current_municipality,
+                        "current_province": enrollment.current_province,
+                        "current_country": enrollment.current_country,
+                        "current_zip_code": enrollment.current_zip_code,
+                        # Permanent Address
+                        "permanent_house_no": enrollment.permanent_house_no,
+                        "permanent_street": enrollment.permanent_street,
+                        "permanent_barangay": enrollment.permanent_barangay,
+                        "permanent_municipality": enrollment.permanent_municipality,
+                        "permanent_province": enrollment.permanent_province,
+                        "permanent_country": enrollment.permanent_country,
+                        "permanent_zip_code": enrollment.permanent_zip_code,
+                        # Parent's/Guardian's Information
+                        "father_last_name": enrollment.father_last_name,
+                        "father_first_name": enrollment.father_first_name,
+                        "father_middle_name": enrollment.father_middle_name,
+                        "father_contact_number": enrollment.father_contact_number,
+                        "mother_last_name": enrollment.mother_last_name,
+                        "mother_first_name": enrollment.mother_first_name,
+                        "mother_middle_name": enrollment.mother_middle_name,
+                        "mother_contact_number": enrollment.mother_contact_number,
+                        "guardian_last_name": enrollment.guardian_last_name,
+                        "guardian_first_name": enrollment.guardian_first_name,
+                        "guardian_middle_name": enrollment.guardian_middle_name,
+                        "guardian_contact_number": enrollment.guardian_contact_number,
+                        # IP Community
+                        "ip_community": enrollment.ip_community,
+                        "ip_community_specify_text": enrollment.ip_community_specify_text,
+                        # 4Ps Beneficiary
+                        "beneficiary_4ps": enrollment.beneficiary_4ps,
+                        "household_id_number": enrollment.household_id_number,
+                        # Learner with Disability
+                        "learner_with_disability": enrollment.learner_with_disability,
+                        "disability_type": enrollment.disability_type,
+                        "disability_visual_type": enrollment.disability_visual_type,
+                        "disability_health_type": enrollment.disability_health_type,
+                        # Learning Modalities
+                        "learning_modality": enrollment.learning_modality,
                         "student_status": "Enrolled",
                         "assessment": assessment,
+                        "submission_remarks": enrollment.submission_remarks if enrollment.submission_remarks else None,
+                        "enrollment_status": "PASSED",
                     }
                 )
                 # update document list and student information

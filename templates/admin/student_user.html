@@ -88,14 +88,14 @@
 <!-- View Student User Modal-->
 <div class="d-grid gap-2 d-md-block">
     <div class="modal fade" id="viewUserModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-dialog modal-fullscreen-lg-down modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Student Information</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-file-earmark-text-fill me-2"></i>Student Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="" id="enrollmentForm" disabled>
+                    <form action="" id="enrollmentForm">
                         {% csrf_token %}
                         <div id="enrollemnt_jhs"></div>
                         <div id="enrollemnt_shs"></div>
@@ -103,14 +103,14 @@
                             <h5>Learner's Information</h5>
                             <input type="hidden" id="id" name="id">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
                                         <label for="psa_no" class="form-label">PSA Birth Certificate No.</label>
                                         <input type="text" class="form-control text-uppercase" id="psa_no" name="psa_no" disabled>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
                                         <label for="lrn" class="form-label">Learner Reference No.</label>
                                         <input type="text" class="form-control text-uppercase" id="lrn" name="lrn" disabled>
@@ -119,28 +119,28 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3">
+                                <div class="col-12 col-md-6 col-lg-3">
                                     <div class="mb-3">
                                         <label for="first_name" class="form-label">First Name</label>
                                         <input type="text" class="form-control text-uppercase" id="first_name" name="first_name" disabled>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-12 col-md-6 col-lg-3">
                                     <div class="mb-3">
                                         <label for="middle_name" class="form-label">Middle Name</label>
                                         <input type="text" class="form-control text-uppercase" id="middle_name" name="middle_name" disabled>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-12 col-md-6 col-lg-3">
                                     <div class="mb-3">
                                         <label for="last_name" class="form-label">Last Name</label>
                                         <input type="text" class="form-control text-uppercase" id="last_name" name="last_name" disabled>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-12 col-md-6 col-lg-3">
                                     <div class="mb-3">
                                         <label for="extension_name" class="form-label">Extension Name</label>
                                         <input type="text" class="form-control text-uppercase" id="extension_name" name="extension_name" disabled>
@@ -149,21 +149,21 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-12 col-md-4">
                                     <div class="mb-3">
                                         <label for="birth_date" class="form-label">Birth Date</label>
                                         <input type="date" class="form-control" id="birth_date" name="birth_date" disabled>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-12 col-md-4">
                                     <div class="mb-3">
                                         <label for="age" class="form-label">Age</label>
                                         <input type="number" class="form-control" id="age" name="age" disabled>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-12 col-md-4">
                                     <div class="mb-3">
                                         <label for="gender" class="form-label">Gender</label>
                                         <select class="form-select form-control" id="gender" name="gender" disabled>
@@ -175,14 +175,14 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
                                         <label for="place_of_birth" class="form-label">Place of Birth (Municipality/City)</label>
                                         <input type="text" class="form-control text-uppercase" id="place_of_birth" name="place_of_birth" disabled>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6">
                                     <div class="mb-3">
                                         <label for="mother_tongue" class="form-label">Mother Tongue</label>
                                         <input type="text" class="form-control text-uppercase" id="mother_tongue" name="mother_tongue" disabled>
@@ -190,12 +190,333 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Indigenous Peoples (IP) Community -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Belonging to any Indigenous Peoples (IP) Community/Indigenous Cultural Community?</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="ip_community" id="ip_community_yes" value="yes" disabled>
+                                        <label class="form-check-label" for="ip_community_yes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="ip_community" id="ip_community_no" value="no" disabled>
+                                        <label class="form-check-label" for="ip_community_no">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3" id="ip_community_specify_view" style="display: none;">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label for="ip_community_specify_text" class="form-label">If Yes, please specify:</label>
+                                        <input type="text" class="form-control text-uppercase" id="ip_community_specify_text" name="ip_community_specify_text" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 4Ps Beneficiary -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Is your family a beneficiary of 4Ps?</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="beneficiary_4ps" id="beneficiary_4ps_yes" value="yes" disabled>
+                                        <label class="form-check-label" for="beneficiary_4ps_yes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="beneficiary_4ps" id="beneficiary_4ps_no" value="no" disabled>
+                                        <label class="form-check-label" for="beneficiary_4ps_no">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3" id="household_id_field_view" style="display: none;">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label for="household_id_number" class="form-label">If Yes, write the 4Ps Household ID Number below:</label>
+                                        <input type="text" class="form-control" id="household_id_number" name="household_id_number" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Learner with Disability -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Is the child a Learner with Disability?</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="learner_with_disability" id="learner_disability_yes" value="yes" disabled>
+                                        <label class="form-check-label" for="learner_disability_yes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="learner_with_disability" id="learner_disability_no" value="no" disabled>
+                                        <label class="form-check-label" for="learner_disability_no">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Disability Types -->
+                            <div id="disability_types_section_view" style="display: none;">
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">If Yes, specify the type of disability:</label>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <div id="disability_types_display" class="mb-3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Current Address Section -->
+                        <div class="mb-4">
+                            <h5>Current Address</h5>
+                            <div class="row">
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="current_house_no" class="form-label">House No.</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_house_no" name="current_house_no" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="current_street" class="form-label">Sitio/Street Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_street" name="current_street" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="current_barangay" class="form-label">Barangay</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_barangay" name="current_barangay" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="current_municipality" class="form-label">Municipality/City</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_municipality" name="current_municipality" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="current_province" class="form-label">Province</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_province" name="current_province" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="current_country" class="form-label">Country</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_country" name="current_country" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="current_zip_code" class="form-label">Zip Code</label>
+                                        <input type="text" class="form-control" id="current_zip_code" name="current_zip_code" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Permanent Address Section -->
+                        <div class="mb-4">
+                            <h5>Permanent Address</h5>
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="same_as_current_view" name="same_as_current" disabled>
+                                        <label class="form-check-label" for="same_as_current_view">Same as current address</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="permanent_address_fields_view">
+                                <div class="row">
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="permanent_house_no" class="form-label">House No.</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_house_no" name="permanent_house_no" disabled>
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="permanent_street" class="form-label">Sitio/Street Name</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_street" name="permanent_street" disabled>
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="permanent_barangay" class="form-label">Barangay</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_barangay" name="permanent_barangay" disabled>
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="permanent_municipality" class="form-label">Municipality/City</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_municipality" name="permanent_municipality" disabled>
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 col-md-4">
+                                        <div class="mb-3">
+                                            <label for="permanent_province" class="form-label">Province</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_province" name="permanent_province" disabled>
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="mb-3">
+                                            <label for="permanent_country" class="form-label">Country</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_country" name="permanent_country" disabled>
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="mb-3">
+                                            <label for="permanent_zip_code" class="form-label">Zip Code</label>
+                                            <input type="text" class="form-control" id="permanent_zip_code" name="permanent_zip_code" disabled>
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Parent's/Guardian's Information Section -->
+                        <div class="mb-4">
+                            <h5>Parent's/Guardian's Information</h5>
+                            
+                            <!-- Father's Name -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">Father's Name</h6>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="father_last_name" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="father_last_name" name="father_last_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="father_first_name" class="form-label">First Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="father_first_name" name="father_first_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="father_middle_name" class="form-label">Middle Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="father_middle_name" name="father_middle_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="father_contact_number" class="form-label">Contact Number</label>
+                                        <input type="tel" class="form-control" id="father_contact_number" name="father_contact_number" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Mother's Maiden Name -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">Mother's Maiden Name</h6>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="mother_last_name" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="mother_last_name" name="mother_last_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="mother_first_name" class="form-label">First Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="mother_first_name" name="mother_first_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="mother_middle_name" class="form-label">Middle Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="mother_middle_name" name="mother_middle_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="mother_contact_number" class="form-label">Contact Number</label>
+                                        <input type="tel" class="form-control" id="mother_contact_number" name="mother_contact_number" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Legal Guardian's Name -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">Legal Guardian's Name</h6>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="guardian_last_name" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="guardian_last_name" name="guardian_last_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="guardian_first_name" class="form-label">First Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="guardian_first_name" name="guardian_first_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="guardian_middle_name" class="form-label">Middle Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="guardian_middle_name" name="guardian_middle_name" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="guardian_contact_number" class="form-label">Contact Number</label>
+                                        <input type="tel" class="form-control" id="guardian_contact_number" name="guardian_contact_number" disabled>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Distance Learning Modalities Preference (SHS Only) -->
+                        <div class="mb-4" id="learning_modality_section" style="display: none;">
+                            <h5>Distance Learning Modalities Preference</h5>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div id="learning_modality_display" class="mb-3"></div>
+                                </div>
+                            </div>
                         </div>
                         <div id="documentForm">
-                            <div class="d-flex align-items-center gap-2">
-                                <h5 class="mt-2">Document Submitted</h5>
-                                <div id="document-status"></div>
-                            </div>
+                            <h5>Document Submitted</h5>
+                            <div id="document-status" class="d-inline-block ms-2"></div>
                             {% for document in documents %}
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="document-{{ document.id }}" 
@@ -210,14 +531,28 @@
                             </div>
                             {% endfor %}
                         </div>
-                        <div id="submissionRemarksForm" class="mt-3">
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" id="editButton">Edit</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeButton">Close</button>
-                            <button type="button" class="btn btn-success" id="editStudentUserButton" style="display: none;">Save changes</button>
+                        <div id="submissionRemarksForm">
+                            <h5>Submission Remarks</h5>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <label class="form-check-label m-0" for="submission_remarks_check">Has remarks</label>
+                                <input class="form-check-input m-0" type="checkbox" id="submission_remarks_check" name="submission_remarks_check" disabled>
+                            </div>
+                            <div class="mb-3" id="submission_remarks_textarea" style="display: none;">
+                                <textarea class="form-control" id="submission_remarks" name="submission_remarks" rows="4" style="resize: none;" disabled></textarea>
+                            </div>
                         </div>
                     </form>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Close
+                    </button>
+                    <button type="button" class="btn btn-warning" id="editButton">
+                        <i class="bi bi-pencil-square me-1"></i>Edit
+                    </button>
+                    <button type="button" class="btn btn-success" id="editStudentUserButton" style="display: none;">
+                        <i class="bi bi-check-circle me-1"></i>Save Changes
+                    </button>
                 </div>
             </div>
         </div>
@@ -277,15 +612,15 @@
 <!-- Add Student User Modal -->
 <div class="d-grid gap-2 d-md-block">
     <div class="modal fade" id="addStudentUserModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-dialog modal-fullscreen-lg-down modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-                <form id="addStudentUserForm">
-                    {% csrf_token %}
-                    <div class="modal-header">
-                        <h5 class="modal-title">Student Information Form</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-file-earmark-text-fill me-2"></i>Student Information Form</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addStudentUserForm">
+                        {% csrf_token %}
                         <div class="account_information">
                             <h5>Account Information</h5>
                             <div class="row">
@@ -339,6 +674,45 @@
                                 </div>
                             </div>
                             <div id="enrollmentFields" class="row"></div>
+                            
+                            <!-- For Returning Learner (Balik-Aral) and Those Who will Transfer/Move In -->
+                            <div id="returning_transferee_section_add" style="display: none;">
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <h6 class="text-primary mb-3">For Returning Learner (Balik-Aral) and Those Who will Transfer/Move In:</h6>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="last_grade_level_add" class="form-label">Last Grade Level Completed</label>
+                                            <input type="text" class="form-control" id="last_grade_level_add" name="last_grade_level">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="last_school_year_add" class="form-label">Last School Year Completed</label>
+                                            <input type="text" class="form-control" id="last_school_year_add" name="last_school_year">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="last_school_attended_add" class="form-label">Last School Attended</label>
+                                            <input type="text" class="form-control text-uppercase" id="last_school_attended_add" name="last_school_attended">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="school_id_add" class="form-label">School ID</label>
+                                            <input type="text" class="form-control" id="school_id_add" name="school_id" maxlength="6" placeholder="6-digit ID">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="learner_information">
                             <div class="row">
@@ -427,6 +801,415 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Indigenous Peoples (IP) Community -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Belonging to any Indigenous Peoples (IP) Community/Indigenous Cultural Community?</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="ip_community" id="ip_community_yes_add" value="yes">
+                                        <label class="form-check-label" for="ip_community_yes_add">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="ip_community" id="ip_community_no_add" value="no" checked>
+                                        <label class="form-check-label" for="ip_community_no_add">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3" id="ip_community_specify_add" style="display: none;">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label for="ip_community_specify_text" class="form-label">If Yes, please specify:</label>
+                                        <input type="text" class="form-control text-uppercase" id="ip_community_specify_text" name="ip_community_specify_text">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 4Ps Beneficiary -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Is your family a beneficiary of 4Ps?</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="beneficiary_4ps" id="beneficiary_4ps_yes_add" value="yes">
+                                        <label class="form-check-label" for="beneficiary_4ps_yes_add">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="beneficiary_4ps" id="beneficiary_4ps_no_add" value="no" checked>
+                                        <label class="form-check-label" for="beneficiary_4ps_no_add">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3" id="household_id_field_add" style="display: none;">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label for="household_id_number" class="form-label">If Yes, write the 4Ps Household ID Number below:</label>
+                                        <input type="text" class="form-control" id="household_id_number" name="household_id_number" placeholder="Enter 4Ps Household ID Number">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Learner with Disability -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Is the child a Learner with Disability?</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="learner_with_disability" id="learner_disability_yes_add" value="yes">
+                                        <label class="form-check-label" for="learner_disability_yes_add">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="learner_with_disability" id="learner_disability_no_add" value="no" checked>
+                                        <label class="form-check-label" for="learner_disability_no_add">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Disability Types -->
+                            <div id="disability_types_section_add" style="display: none;">
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">If Yes, specify the type of disability:</label>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="disability_type" id="disability_visual_add" value="visual_impairment">
+                                            <label class="form-check-label" for="disability_visual_add">Visual Impairment</label>
+                                        </div>
+                                        <div class="ms-4 mb-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="disability_visual_type" id="disability_visual_blind_add" value="blind">
+                                                <label class="form-check-label" for="disability_visual_blind_add">a. blind</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="disability_visual_type" id="disability_visual_low_vision_add" value="low_vision">
+                                                <label class="form-check-label" for="disability_visual_low_vision_add">b. low vision</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="disability_type" id="disability_hearing_add" value="hearing_impairment">
+                                            <label class="form-check-label" for="disability_hearing_add">Hearing Impairment</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="disability_type" id="disability_speech_add" value="speech_language_disorder">
+                                            <label class="form-check-label" for="disability_speech_add">Speech/Language Disorder</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="disability_type" id="disability_multiple_add" value="multiple_disorder">
+                                            <label class="form-check-label" for="disability_multiple_add">Multiple Disorder</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="disability_type" id="disability_learning_add" value="learning_disability">
+                                            <label class="form-check-label" for="disability_learning_add">Learning Disability</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="disability_type" id="disability_emotional_add" value="emotional_behavioral_disorder">
+                                            <label class="form-check-label" for="disability_emotional_add">Emotional-Behavioral Disorder</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="disability_type" id="disability_cerebral_add" value="cerebral_palsy">
+                                            <label class="form-check-label" for="disability_cerebral_add">Cerebral Palsy</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="disability_type" id="disability_intellectual_add" value="intellectual_disability">
+                                            <label class="form-check-label" for="disability_intellectual_add">Intellectual Disability</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="disability_type" id="disability_orthopedic_add" value="orthopedic_physical_handicap">
+                                            <label class="form-check-label" for="disability_orthopedic_add">Orthopedic/Physical Handicap</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="disability_type" id="disability_health_add" value="special_health_problem">
+                                            <label class="form-check-label" for="disability_health_add">Special Health Problem/Chronic Disease</label>
+                                        </div>
+                                        <div class="ms-4 mb-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="disability_health_type" id="disability_health_cancer_add" value="cancer">
+                                                <label class="form-check-label" for="disability_health_cancer_add">a. Cancer</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Current Address Section -->
+                        <div class="mb-4">
+                            <h5>Current Address</h5>
+                            <div class="row">
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="current_house_no" class="form-label">House No.</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_house_no" name="current_house_no">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="current_street" class="form-label">Sitio/Street Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_street" name="current_street">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="current_barangay" class="form-label">Barangay</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_barangay" name="current_barangay">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="current_municipality" class="form-label">Municipality/City</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_municipality" name="current_municipality">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="current_province" class="form-label">Province</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_province" name="current_province">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="current_country" class="form-label">Country</label>
+                                        <input type="text" class="form-control text-uppercase" id="current_country" name="current_country" value="PHILIPPINES">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="current_zip_code" class="form-label">Zip Code</label>
+                                        <input type="text" class="form-control" id="current_zip_code" name="current_zip_code">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Permanent Address Section -->
+                        <div class="mb-4">
+                            <h5>Permanent Address</h5>
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="same_as_current_add" name="same_as_current">
+                                        <label class="form-check-label" for="same_as_current_add">Same as current address</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="permanent_address_fields_add">
+                                <div class="row">
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="permanent_house_no" class="form-label">House No.</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_house_no" name="permanent_house_no">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="permanent_street" class="form-label">Sitio/Street Name</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_street" name="permanent_street">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="permanent_barangay" class="form-label">Barangay</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_barangay" name="permanent_barangay">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="permanent_municipality" class="form-label">Municipality/City</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_municipality" name="permanent_municipality">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 col-md-4">
+                                        <div class="mb-3">
+                                            <label for="permanent_province" class="form-label">Province</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_province" name="permanent_province">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="mb-3">
+                                            <label for="permanent_country" class="form-label">Country</label>
+                                            <input type="text" class="form-control text-uppercase" id="permanent_country" name="permanent_country" value="PHILIPPINES">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="mb-3">
+                                            <label for="permanent_zip_code" class="form-label">Zip Code</label>
+                                            <input type="text" class="form-control" id="permanent_zip_code" name="permanent_zip_code">
+                                            <div class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Parent's/Guardian's Information Section -->
+                        <div class="mb-4">
+                            <h5>Parent's/Guardian's Information</h5>
+                            
+                            <!-- Father's Name -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">Father's Name</h6>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="father_last_name" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="father_last_name" name="father_last_name">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="father_first_name" class="form-label">First Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="father_first_name" name="father_first_name">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="father_middle_name" class="form-label">Middle Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="father_middle_name" name="father_middle_name">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="father_contact_number" class="form-label">Contact Number</label>
+                                        <input type="tel" class="form-control" id="father_contact_number" name="father_contact_number">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Mother's Maiden Name -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">Mother's Maiden Name</h6>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="mother_last_name" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="mother_last_name" name="mother_last_name">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="mother_first_name" class="form-label">First Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="mother_first_name" name="mother_first_name">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="mother_middle_name" class="form-label">Middle Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="mother_middle_name" name="mother_middle_name">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="mother_contact_number" class="form-label">Contact Number</label>
+                                        <input type="tel" class="form-control" id="mother_contact_number" name="mother_contact_number">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Legal Guardian's Name -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">Legal Guardian's Name</h6>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="guardian_last_name" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="guardian_last_name" name="guardian_last_name">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="guardian_first_name" class="form-label">First Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="guardian_first_name" name="guardian_first_name">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="guardian_middle_name" class="form-label">Middle Name</label>
+                                        <input type="text" class="form-control text-uppercase" id="guardian_middle_name" name="guardian_middle_name">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="guardian_contact_number" class="form-label">Contact Number</label>
+                                        <input type="tel" class="form-control" id="guardian_contact_number" name="guardian_contact_number">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Distance Learning Modalities Preference (SHS Only) -->
+                        <div class="mb-4" id="learning_modality_section_add" style="display: none;">
+                            <h5>Distance Learning Modalities Preference</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="learning_modality" id="modular_print_add" value="modular_print">
+                                        <label class="form-check-label" for="modular_print_add">Modular (Print)</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="learning_modality" id="online_add" value="online">
+                                        <label class="form-check-label" for="online_add">Online</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="learning_modality" id="radio_based_add" value="radio_based">
+                                        <label class="form-check-label" for="radio_based_add">Radio-Based Instruction</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="learning_modality" id="blended_add" value="blended">
+                                        <label class="form-check-label" for="blended_add">Blended</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="learning_modality" id="modular_digital_add" value="modular_digital">
+                                        <label class="form-check-label" for="modular_digital_add">Modular (Digital)</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="learning_modality" id="educational_tv_add" value="educational_tv">
+                                        <label class="form-check-label" for="educational_tv_add">Educational Television</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="learning_modality" id="homeschooling_add" value="homeschooling">
+                                        <label class="form-check-label" for="homeschooling_add">Homeschooling</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div id="documentForm">
                             <h5>Document Submitted</h5>
@@ -444,12 +1227,26 @@
                             </div>
                             {% endfor %}
                         </div>
-                        <div class="d-flex justify-content-end gap-2 mt-3">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeButton">Close</button>
-                            <button type="submit" class="btn btn-success" id="saveButton">Save</button>
+                        <div id="submissionRemarksForm">
+                            <h5>Submission Remarks</h5>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <label class="form-check-label m-0" for="submission_remarks_check_add">Has remarks</label>
+                                <input class="form-check-input m-0" type="checkbox" id="submission_remarks_check_add" name="submission_remarks_check">
+                            </div>
+                            <div class="mb-3" id="submission_remarks_textarea_add" style="display: none;">
+                                <textarea class="form-control" id="submission_remarks_add" name="submission_remarks" rows="4" style="resize: none;" placeholder="Enter any remarks about the student submission..."></textarea>
+                            </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Close
+                    </button>
+                    <button type="button" class="btn btn-success" id="saveButton">
+                        <i class="bi bi-check-circle me-1"></i>Save
+                    </button>
+                </div>
             </div>
         </div>
     </div>
