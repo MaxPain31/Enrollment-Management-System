@@ -151,6 +151,10 @@ class ReportsManager {
         this.initSemesterChart();
         this.initAssessmentChart();
         this.initContentChart();
+        this.initBarangayChart();
+        this.initMunicipalityChart();
+        this.initLiteracyG7Chart();
+        this.initNumeracyG7Chart();
         
         // Setup window resize handler
         this.setupResizeHandler();
@@ -159,6 +163,93 @@ class ReportsManager {
         setTimeout(() => {
             this.applyConsistentStyling();
         }, 100);
+    }
+
+    /**
+     * Barangay Enrollees Chart (top 10 with others)
+     */
+    initBarangayChart() {
+        const chartElement = document.getElementById('barangayChart');
+        if (!chartElement || !this.data || !this.data.barangay_distribution) return;
+        this.charts.barangay = echarts.init(chartElement);
+        // Sort and group others if many
+        const sorted = [...this.data.barangay_distribution].sort((a,b)=>b.value-a.value);
+        const top = sorted.slice(0,10);
+        const othersTotal = sorted.slice(10).reduce((s,i)=>s + (i.value||0),0);
+        const data = othersTotal>0 ? [...top, {name:'Others', value: othersTotal}] : top;
+        const categories = data.map(d=>d.name);
+        const values = data.map(d=>d.value);
+        const option = {
+            color: ['#4e79a7'],
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            grid: { left: 100, right: 20, bottom: 30, top: 10 },
+            xAxis: { type: 'value' },
+            yAxis: { type: 'category', data: categories, axisLabel: { interval: 0 } },
+            series: [{ name: 'Barangay', type: 'bar', data: values, barWidth: '60%' }]
+        };
+        this.charts.barangay.setOption(option);
+    }
+
+    /**
+     * Municipality/City Enrollees Chart (top 10 with others)
+     */
+    initMunicipalityChart() {
+        const chartElement = document.getElementById('municipalityChart');
+        if (!chartElement || !this.data || !this.data.municipality_distribution) return;
+        this.charts.municipality = echarts.init(chartElement);
+        const sorted = [...this.data.municipality_distribution].sort((a,b)=>b.value-a.value);
+        const top = sorted.slice(0,10);
+        const othersTotal = sorted.slice(10).reduce((s,i)=>s + (i.value||0),0);
+        const data = othersTotal>0 ? [...top, {name:'Others', value: othersTotal}] : top;
+        const categories = data.map(d=>d.name);
+        const values = data.map(d=>d.value);
+        const option = {
+            color: ['#59a14f'],
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            grid: { left: 100, right: 20, bottom: 30, top: 10 },
+            xAxis: { type: 'value' },
+            yAxis: { type: 'category', data: categories, axisLabel: { interval: 0 } },
+            series: [{ name: 'Municipality/City', type: 'bar', data: values, barWidth: '60%' }]
+        };
+        this.charts.municipality.setOption(option);
+    }
+
+    /**
+     * Grade 7 Literacy Levels
+     */
+    initLiteracyG7Chart() {
+        const el = document.getElementById('literacyG7Chart');
+        if (!el || !this.data || !this.data.literacy_g7) return;
+        this.charts.literacyG7 = echarts.init(el);
+        const cats = this.data.literacy_g7.map(d=>d.name);
+        const vals = this.data.literacy_g7.map(d=>d.value);
+        const option = {
+            color: ['#4caf50','#2196f3','#ffb300','#e53935'],
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            xAxis: { type: 'category', data: cats },
+            yAxis: { type: 'value' },
+            series: [{ name: 'Literacy (G7)', type: 'bar', data: vals, barWidth: '55%' }]
+        };
+        this.charts.literacyG7.setOption(option);
+    }
+
+    /**
+     * Grade 7 Numeracy Levels
+     */
+    initNumeracyG7Chart() {
+        const el = document.getElementById('numeracyG7Chart');
+        if (!el || !this.data || !this.data.numeracy_g7) return;
+        this.charts.numeracyG7 = echarts.init(el);
+        const cats = this.data.numeracy_g7.map(d=>d.name);
+        const vals = this.data.numeracy_g7.map(d=>d.value);
+        const option = {
+            color: ['#8e44ad','#1abc9c','#f39c12','#c0392b'],
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            xAxis: { type: 'category', data: cats },
+            yAxis: { type: 'value' },
+            series: [{ name: 'Numeracy (G7)', type: 'bar', data: vals, barWidth: '55%' }]
+        };
+        this.charts.numeracyG7.setOption(option);
     }
 
     /**
@@ -178,6 +269,7 @@ class ReportsManager {
 
         
         const option = {
+            color: ['#2ecc71','#f1c40f','#95a5a6'],
             backgroundColor: '#ffffff',
             tooltip: {
                 trigger: 'item',
@@ -282,40 +374,16 @@ class ReportsManager {
         if (!chartElement) return;
 
         this.charts.userRole = echarts.init(chartElement);
-        
+        const cats = this.data.user_roles.map(d=>d.name);
+        const vals = this.data.user_roles.map(d=>d.value);
         const option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: '{a} <br/>{b}: {c} ({d}%)'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left'
-            },
-            series: [{
-                name: 'User Roles',
-                type: 'pie',
-                radius: '50%',
-                data: this.data.user_roles,
-                label: {
-                    show: true,
-                    formatter: function(params) {
-                        return `${params.name}: ${params.value}`;
-                    },
-                    fontSize: 12,
-                    color: '#333',
-                    fontWeight: 'bold'
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }]
+            color: ['#9c27b0'],
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            grid: { left: 60, right: 20, bottom: 40, top: 10 },
+            xAxis: { type: 'category', data: cats, axisLabel: { interval: 0, rotate: 20 } },
+            yAxis: { type: 'value' },
+            series: [{ name: 'User Roles', type: 'bar', data: vals, barWidth: '55%' }]
         };
-        
         this.charts.userRole.setOption(option);
     }
 
@@ -384,40 +452,15 @@ class ReportsManager {
         if (!chartElement) return;
 
         this.charts.gender = echarts.init(chartElement);
-        
+        const gCats = this.data.gender_distribution.map(d=>d.name);
+        const gVals = this.data.gender_distribution.map(d=>d.value);
         const option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: '{a} <br/>{b}: {c} ({d}%)'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left'
-            },
-            series: [{
-                name: 'Gender',
-                type: 'pie',
-                radius: '50%',
-                data: this.data.gender_distribution,
-                label: {
-                    show: true,
-                    formatter: function(params) {
-                        return `${params.name}: ${params.value}`;
-                    },
-                    fontSize: 12,
-                    color: '#333',
-                    fontWeight: 'bold'
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }]
+            color: ['#2980b9','#e91e63'],
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            xAxis: { type: 'category', data: gCats },
+            yAxis: { type: 'value' },
+            series: [{ name: 'Gender', type: 'bar', data: gVals, barWidth: '55%' }]
         };
-        
         this.charts.gender.setOption(option);
     }
 
@@ -429,40 +472,15 @@ class ReportsManager {
         if (!chartElement) return;
 
         this.charts.enrollmentType = echarts.init(chartElement);
-        
+        const eCats = this.data.enrollment_types.map(d=>d.name);
+        const eVals = this.data.enrollment_types.map(d=>d.value);
         const option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: '{a} <br/>{b}: {c} ({d}%)'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left'
-            },
-            series: [{
-                name: 'Enrollment Type',
-                type: 'pie',
-                radius: '50%',
-                data: this.data.enrollment_types,
-                label: {
-                    show: true,
-                    formatter: function(params) {
-                        return `${params.name}: ${params.value}`;
-                    },
-                    fontSize: 12,
-                    color: '#333',
-                    fontWeight: 'bold'
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }]
+            color: ['#16a085','#f39c12'],
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            xAxis: { type: 'category', data: eCats },
+            yAxis: { type: 'value' },
+            series: [{ name: 'Enrollment Type', type: 'bar', data: eVals, barWidth: '55%' }]
         };
-        
         this.charts.enrollmentType.setOption(option);
     }
 
@@ -474,40 +492,13 @@ class ReportsManager {
         if (!chartElement) return;
 
         this.charts.studentType = echarts.init(chartElement);
-        
+        const sCats = this.data.student_types.map(d=>d.name);
+        const sVals = this.data.student_types.map(d=>d.value);
         const option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: '{a} <br/>{b}: {c} ({d}%)'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left'
-            },
-            series: [{
-                name: 'Student Type',
-                type: 'pie',
-                radius: '50%',
-                data: this.data.student_types,
-                label: {
-                    show: true,
-                    formatter: function(params) {
-                        return `${params.name}: ${params.value}`;
-                    },
-                    fontSize: 12,
-                    color: '#333',
-                    fontWeight: 'bold'
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }]
+            color: ['#1abc9c','#e67e22','#c0392b'],
+            tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+            series: [{ name:'Student Type', type:'pie', radius:['40%','65%'], data: this.data.student_types }]
         };
-        
         this.charts.studentType.setOption(option);
     }
 
@@ -612,40 +603,15 @@ class ReportsManager {
         if (!chartElement) return;
 
         this.charts.documentStatus = echarts.init(chartElement);
-        
+        const dCats = this.data.document_status.map(d=>d.name);
+        const dVals = this.data.document_status.map(d=>d.value);
         const option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: '{a} <br/>{b}: {c} ({d}%)'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left'
-            },
-            series: [{
-                name: 'Document Status',
-                type: 'pie',
-                radius: '50%',
-                data: this.data.document_status,
-                label: {
-                    show: true,
-                    formatter: function(params) {
-                        return `${params.name}: ${params.value}`;
-                    },
-                    fontSize: 12,
-                    color: '#333',
-                    fontWeight: 'bold'
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }]
+            color: ['#27ae60','#e74c3c'],
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            xAxis: { type: 'category', data: dCats },
+            yAxis: { type: 'value' },
+            series: [{ name: 'Document Status', type: 'bar', data: dVals, barWidth: '55%' }]
         };
-        
         this.charts.documentStatus.setOption(option);
     }
 
@@ -752,30 +718,24 @@ class ReportsManager {
                 this.filterBySchoolYear(e.target.value);
             });
         }
-        
-        // Print button handlers
-        document.querySelectorAll('.chart-print-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const chartName = e.target.closest('[data-print-chart]').dataset.printChart;
-                this.printChart(chartName);
+
+        // Print chart buttons
+        document.querySelectorAll('.chart-print-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                const chartName = btn.getAttribute('data-print-chart');
+                if (chartName) {
+                    this.printChart(chartName);
+                }
             });
         });
-        
-        // Excel export button handlers
-        document.querySelectorAll('.chart-excel-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const chartName = e.target.closest('[data-excel-chart]').dataset.excelChart;
-                const filename = e.target.closest('[data-filename]').dataset.filename;
-                this.exportChartToExcel(chartName, filename);
-            });
-        });
-        
-        // Image export button handlers
-        document.querySelectorAll('.chart-export-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const chartName = e.target.closest('[data-export-chart]').dataset.exportChart;
-                const filename = e.target.closest('[data-filename]').dataset.filename;
-                this.exportChart(chartName, filename);
+
+        // Export Excel buttons
+        document.querySelectorAll('.chart-excel-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                const chartType = btn.getAttribute('data-excel-chart');
+                if (chartType) {
+                    this.exportExcel(chartType);
+                }
             });
         });
     }
@@ -964,122 +924,34 @@ class ReportsManager {
     }
 
     /**
-     * Print chart
+     * Print a single chart
      */
     printChart(chartName) {
-        if (this.charts[chartName]) {
-            const chartElement = document.getElementById(`${chartName}Chart`);
-            if (chartElement) {
-                const printWindow = window.open('', '_blank');
-                const chartDataURL = this.charts[chartName].getDataURL({
-                    type: 'png',
-                    pixelRatio: 2,
-                    backgroundColor: '#fff'
-                });
-                
-                printWindow.document.write(`
-                    <html>
-                        <head>
-                            <title>Print ${chartName} Chart</title>
-                            <style>
-                                body { margin: 0; padding: 20px; text-align: center; }
-                                img { max-width: 100%; height: auto; }
-                                h1 { color: #333; margin-bottom: 20px; }
-                            </style>
-                        </head>
-                        <body>
-                            <h1>${this.getChartTitle(chartName)}</h1>
-                            <img src="${chartDataURL}" alt="${chartName} Chart">
-                            <script>
-                                window.onload = function() {
-                                    window.print();
-                                }
-                            </script>
-                        </body>
-                    </html>
-                `);
-                printWindow.document.close();
-            }
-        }
+        if (!this.charts[chartName]) return;
+        const dataUrl = this.charts[chartName].getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#fff' });
+        const w = window.open('', '_blank');
+        if (!w) return;
+        w.document.write(`<!doctype html><html><head><title>Print Chart</title></head><body style="margin:0;display:flex;align-items:center;justify-content:center;">
+            <img src="${dataUrl}" style="max-width:100%;max-height:100vh;"/>
+            <script>window.onload=function(){setTimeout(()=>window.print(),100);};<\/script>
+        </body></html>`);
+        w.document.close();
     }
 
     /**
-     * Export chart to Excel
+     * Export a chart's dataset to Excel via backend
      */
-    async exportChartToExcel(chartName, filename) {
-        try {
-            const chartType = this.getChartTypeFromName(chartName);
-            const schoolYear = document.getElementById('schoolYearFilter')?.value || 'all';
-            
-            const url = `/admin/reports-excel-export/?chart_type=${chartType}&school_year=${encodeURIComponent(schoolYear)}`;
-            
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const blob = await response.blob();
-            const downloadUrl = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = filename || `${chartName}.xlsx`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(downloadUrl);
-            
-        } catch (error) {
-            console.error('Error exporting to Excel:', error);
-            this.showError('Error exporting to Excel. Please try again.');
-        }
-    }
-
-    /**
-     * Get chart title for display
-     */
-    getChartTitle(chartName) {
-        const titles = {
-            'applicationStatus': 'Application Status Distribution',
-            'userRole': 'User Role Distribution',
-            'monthlyTrends': 'Monthly Application Trends',
-            'gender': 'Gender Distribution',
-            'enrollmentType': 'Enrollment Type Distribution',
-            'studentType': 'Student Type Distribution',
-            'gradeLevel': 'Grade Level Distribution',
-            'registrationType': 'Registration Type Distribution',
-            'documentStatus': 'Document Status Distribution',
-            'strand': 'SHS Strand Distribution',
-            'studentStatus': 'Student Status Distribution',
-            'ageGroup': 'Age Group Distribution',
-            'semester': 'Semester Distribution',
-            'assessment': 'Assessment Status',
-            'content': 'Content Management'
-        };
-        return titles[chartName] || chartName;
-    }
-
-    /**
-     * Get chart type for Excel export
-     */
-    getChartTypeFromName(chartName) {
-        const typeMap = {
-            'applicationStatus': 'applicationStatus',
-            'userRole': 'userRole',
-            'monthlyTrends': 'monthlyTrends',
-            'gender': 'gender',
-            'enrollmentType': 'enrollmentType',
-            'studentType': 'studentType',
-            'gradeLevel': 'gradeLevel',
-            'registrationType': 'registrationType',
-            'documentStatus': 'documentStatus',
-            'strand': 'strand',
-            'studentStatus': 'studentStatus',
-            'ageGroup': 'ageGroup',
-            'semester': 'semester',
-            'assessment': 'assessment',
-            'content': 'content'
-        };
-        return typeMap[chartName] || chartName;
+    exportExcel(chartType) {
+        const schoolYearFilter = document.getElementById('schoolYearFilter');
+        const schoolYear = schoolYearFilter ? schoolYearFilter.value : 'all';
+        const url = `/admin/reports-excel-export/?chart_type=${encodeURIComponent(chartType)}&school_year=${encodeURIComponent(schoolYear)}`;
+        // trigger download
+        const link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     /**
@@ -1097,40 +969,15 @@ class ReportsManager {
         if (!chartElement) return;
 
         this.charts.studentStatus = echarts.init(chartElement);
-        
+        const stCats = this.data.student_status.map(d=>d.name);
+        const stVals = this.data.student_status.map(d=>d.value);
         const option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: '{a} <br/>{b}: {c} ({d}%)'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left'
-            },
-            series: [{
-                name: 'Student Status',
-                type: 'pie',
-                radius: '50%',
-                data: this.data.student_status,
-                label: {
-                    show: true,
-                    formatter: function(params) {
-                        return `${params.name}: ${params.value}`;
-                    },
-                    fontSize: 12,
-                    color: '#333',
-                    fontWeight: 'bold'
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }]
+            color: ['#2ecc71','#3498db','#e74c3c'],
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            xAxis: { type: 'category', data: stCats },
+            yAxis: { type: 'value' },
+            series: [{ name: 'Student Status', type: 'bar', data: stVals, barWidth: '55%' }]
         };
-
         this.charts.studentStatus.setOption(option);
     }
 
@@ -1142,40 +989,15 @@ class ReportsManager {
         if (!chartElement) return;
 
         this.charts.ageGroup = echarts.init(chartElement);
-        
+        const aCats = this.data.age_groups.map(d=>d.name);
+        const aVals = this.data.age_groups.map(d=>d.value);
         const option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: '{a} <br/>{b}: {c} ({d}%)'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left'
-            },
-            series: [{
-                name: 'Age Groups',
-                type: 'pie',
-                radius: '50%',
-                data: this.data.age_groups,
-                label: {
-                    show: true,
-                    formatter: function(params) {
-                        return `${params.name}: ${params.value}`;
-                    },
-                    fontSize: 12,
-                    color: '#333',
-                    fontWeight: 'bold'
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }]
+            color: ['#8e44ad'],
+            tooltip: { trigger: 'axis' },
+            xAxis: { type: 'category', data: aCats },
+            yAxis: { type: 'value' },
+            series: [{ name:'Age Groups', type:'line', data: aVals, symbol:'circle', symbolSize: 6, areaStyle: { opacity: 0.1 } }]
         };
-
         this.charts.ageGroup.setOption(option);
     }
 
@@ -1187,40 +1009,15 @@ class ReportsManager {
         if (!chartElement) return;
 
         this.charts.semester = echarts.init(chartElement);
-        
+        const seCats = this.data.semester_distribution.map(d=>d.name);
+        const seVals = this.data.semester_distribution.map(d=>d.value);
         const option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: '{a} <br/>{b}: {c} ({d}%)'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left'
-            },
-            series: [{
-                name: 'Semester Distribution',
-                type: 'pie',
-                radius: '50%',
-                data: this.data.semester_distribution,
-                label: {
-                    show: true,
-                    formatter: function(params) {
-                        return `${params.name}: ${params.value}`;
-                    },
-                    fontSize: 12,
-                    color: '#333',
-                    fontWeight: 'bold'
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }]
+            color: ['#34495e','#7f8c8d'],
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            xAxis: { type: 'category', data: seCats },
+            yAxis: { type: 'value' },
+            series: [{ name: 'Semester', type: 'bar', data: seVals, barWidth: '55%' }]
         };
-
         this.charts.semester.setOption(option);
     }
 
@@ -1239,38 +1036,10 @@ class ReportsManager {
         ];
         
         const option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: '{a} <br/>{b}: {c} ({d}%)'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left'
-            },
-            series: [{
-                name: 'Assessment Status',
-                type: 'pie',
-                radius: '50%',
-                data: assessmentData,
-                label: {
-                    show: true,
-                    formatter: function(params) {
-                        return `${params.name}: ${params.value}`;
-                    },
-                    fontSize: 12,
-                    color: '#333',
-                    fontWeight: 'bold'
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }]
+            color: ['#00bcd4','#ffc107'],
+            tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+            series: [{ name:'Assessment Status', type:'pie', radius:['40%','65%'], data: assessmentData }]
         };
-
         this.charts.assessment.setOption(option);
     }
 
@@ -1282,46 +1051,20 @@ class ReportsManager {
         if (!chartElement) return;
 
         this.charts.content = echarts.init(chartElement);
-        
         const contentData = [
             {"value": this.data.content_stats.total_faqs, "name": "FAQs"},
             {"value": this.data.content_stats.total_announcements, "name": "Announcements"},
             {"value": this.data.content_stats.active_announcements, "name": "Active Announcements"}
         ];
-        
+        const cCats = contentData.map(d=>d.name);
+        const cVals = contentData.map(d=>d.value);
         const option = {
-            tooltip: {
-                trigger: 'item',
-                formatter: '{a} <br/>{b}: {c} ({d}%)'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left'
-            },
-            series: [{
-                name: 'Content Management',
-                type: 'pie',
-                radius: '50%',
-                data: contentData,
-                label: {
-                    show: true,
-                    formatter: function(params) {
-                        return `${params.name}: ${params.value}`;
-                    },
-                    fontSize: 12,
-                    color: '#333',
-                    fontWeight: 'bold'
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }]
+            color: ['#3f51b5','#4caf50','#ff9800'],
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            xAxis: { type: 'category', data: cCats },
+            yAxis: { type: 'value' },
+            series: [{ name:'Content', type:'bar', data: cVals, barWidth:'55%' }]
         };
-
         this.charts.content.setOption(option);
     }
 
@@ -1409,34 +1152,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Re-setup event listeners after charts are initialized
-    setTimeout(() => {
-        // Print button handlers
-        document.querySelectorAll('.chart-print-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const chartName = e.target.closest('[data-print-chart]').dataset.printChart;
-                window.reportsManager.printChart(chartName);
-            });
+    // Add export functionality if buttons exist
+    document.querySelectorAll('[data-export-chart]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const chartName = e.target.dataset.exportChart;
+            const filename = e.target.dataset.filename || `${chartName}.png`;
+            window.reportsManager.exportChart(chartName, filename);
         });
-        
-        // Excel export button handlers
-        document.querySelectorAll('.chart-excel-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const chartName = e.target.closest('[data-excel-chart]').dataset.excelChart;
-                const filename = e.target.closest('[data-filename]').dataset.filename;
-                window.reportsManager.exportChartToExcel(chartName, filename);
-            });
-        });
-        
-        // Image export button handlers
-        document.querySelectorAll('.chart-export-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const chartName = e.target.closest('[data-export-chart]').dataset.exportChart;
-                const filename = e.target.closest('[data-filename]').dataset.filename;
-                window.reportsManager.exportChart(chartName, filename);
-            });
-        });
-    }, 1000);
+    });
 });
 
 // Utility functions
