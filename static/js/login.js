@@ -1,4 +1,48 @@
 $(document).ready(function () {
+    const $unverifiedNotice = $("#loginUnverifiedNotice");
+    const $unverifiedEmail = $("#loginUnverifiedEmail");
+    const $resendBtn = $("#loginResendVerificationBtn");
+    const $resendFeedback = $("#loginResendVerificationFeedback");
+    const resendCooldownSeconds = 60;
+    const resendBtnBaseText = $resendBtn.length ? ($resendBtn.text().trim() || "Resend verification email") : "Resend verification email";
+    let resendTimer = null;
+
+    function clearResendTimer() {
+        if (resendTimer) {
+            clearInterval(resendTimer);
+            resendTimer = null;
+        }
+    }
+
+    function setResendButtonText(text) {
+        if ($resendBtn.length) {
+            $resendBtn.text(text);
+        }
+    }
+
+    function resetResendButton() {
+        if (!$resendBtn.length) return;
+        clearResendTimer();
+        $resendBtn.prop("disabled", false);
+        setResendButtonText(resendBtnBaseText);
+    }
+
+    function startResendCountdown(seconds) {
+        if (!$resendBtn.length) return;
+        clearResendTimer();
+        let remaining = seconds;
+        $resendBtn.prop("disabled", true);
+        setResendButtonText(`${resendBtnBaseText} (${remaining}s)`);
+        resendTimer = setInterval(function () {
+            remaining -= 1;
+            if (remaining <= 0) {
+                resetResendButton();
+            } else {
+                setResendButtonText(`${resendBtnBaseText} (${remaining}s)`);
+            }
+        }, 1000);
+    }
+
     // Wait for modal to be ready and bind password toggle
     function bindPasswordToggle() {
         // Password visibility toggle
@@ -53,6 +97,62 @@ $(document).ready(function () {
     // Load saved credentials on page load
     loadSavedCredentials();
 
+    function hideUnverifiedNotice() {
+        if ($unverifiedNotice.length) {
+            $unverifiedNotice.addClass("d-none").removeData("email");
+            $unverifiedEmail.text("");
+            $resendFeedback.removeClass("text-success text-danger").text("");
+            resetResendButton();
+        }
+    }
+
+    if ($resendBtn.length) {
+        $resendBtn.on("click", function () {
+            if ($resendBtn.prop("disabled")) {
+                return;
+            }
+            const email = $unverifiedNotice.data("email");
+            if (!email) {
+                $resendFeedback
+                    .removeClass("text-success")
+                    .addClass("text-danger")
+                    .text("Email address unavailable. Please contact the administrator.");
+                return;
+            }
+
+            clearResendTimer();
+            $resendBtn.prop("disabled", true);
+            setResendButtonText(`${resendBtnBaseText} (sending...)`);
+            $resendFeedback
+                .removeClass("text-success text-danger")
+                .text("Sending verification email...");
+
+            $.ajax({
+                url: "/authentication/resend-verification/",
+                method: "POST",
+                data: $.param({ email: email }),
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+            }).done(function(resp){
+                const cls = resp.success ? "text-success" : "text-danger";
+                $resendFeedback
+                    .removeClass("text-success text-danger")
+                    .addClass(cls)
+                    .text(resp.message || (resp.success ? "Verification email re-sent." : "Unable to resend verification email."));
+                if (resp.success) {
+                    startResendCountdown(resendCooldownSeconds);
+                } else {
+                    resetResendButton();
+                }
+            }).fail(function(){
+                $resendFeedback
+                    .removeClass("text-success text-danger")
+                    .addClass("text-danger")
+                    .text("Something went wrong. Please try again later.");
+                resetResendButton();
+            });
+        });
+    }
+
     $("#loginForm").on("submit", function (e) {
         e.preventDefault();
 
@@ -78,6 +178,7 @@ $(document).ready(function () {
             success: function (data) {
                 setTimeout(function () {
                     $button.prop("disabled", false).text("Login");
+                    hideUnverifiedNotice();
 
                     if (data.success) {
                         // Save credentials if Remember Me is checked
@@ -91,6 +192,25 @@ $(document).ready(function () {
                                 $input.closest(".mb-2").find(".login-error").text(messages.join(" "));
                             }
                         });
+                    } else if (data.unverified) {
+                        $messages.empty();
+                        // Show only the inline unverified notice, suppress extra alert message
+                        const email = data.email || "";
+                        if ($unverifiedNotice.length) {
+                            $unverifiedNotice
+                                .removeClass("d-none")
+                                .data("email", email);
+                            $unverifiedEmail.text(email || "your email address");
+                            $resendFeedback.removeClass("text-success text-danger").text("");
+                            resetResendButton();
+                            if (data.email_sent) {
+                                $resendFeedback
+                                    .removeClass("text-danger")
+                                    .addClass("text-success")
+                                    .text("Verification email sent. Please check your inbox or spam folder.");
+                                startResendCountdown(resendCooldownSeconds);
+                            }
+                        }
                     } else if (data.message) {
                         $messages.html(`<div class="alert alert-danger">${data.message}</div>`);
                     }
@@ -99,6 +219,7 @@ $(document).ready(function () {
             error: function () {
                 setTimeout(function () {
                     $button.prop("disabled", false).text("Login");
+                    hideUnverifiedNotice();
                     $messages.html(`<div class="alert alert-danger">An error occurred. Please try again.</div>`);
                 }, 1000);
             }

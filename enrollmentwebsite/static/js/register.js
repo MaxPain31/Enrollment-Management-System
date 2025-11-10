@@ -35,8 +35,8 @@ $(document).ready(function () {
 
     // Real-time password confirmation validation
     $("#confirm_password").on("input", function() {
-        const password = $("#password").val();
-        const confirmPassword = $(this).val();
+        const password = $("#password").val().trim();
+        const confirmPassword = $(this).val().trim();
         
         if (confirmPassword && password !== confirmPassword) {
             $(this).addClass("is-invalid");
@@ -44,6 +44,7 @@ $(document).ready(function () {
         } else {
             $(this).removeClass("is-invalid");
             $(this).closest(".mb-2").find(".register-error").text("");
+            $("#password").removeClass("is-invalid");
         }
     });
 

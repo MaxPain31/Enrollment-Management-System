@@ -1,16 +1,18 @@
 from django.urls import path
 
 from landingpage.views import (
-    HomeView,
     AboutView,
-    AnnouncementsView,
-    EnrollmentView,
-    ContactView,
-    ProfileView,
-    JuniorEnrollmentView,
-    SeniorEnrollmentView,
-    GetEnrollmentManagementView,
     AnnouncementDetailView,
+    AnnouncementsView,
+    ChangeEmailView,
+    ChangePasswordView,
+    ContactView,
+    EnrollmentView,
+    GetEnrollmentManagementView,
+    HomeView,
+    JuniorEnrollmentView,
+    ProfileView,
+    SeniorEnrollmentView,
 )
 
 urlpatterns = [
@@ -20,6 +22,8 @@ urlpatterns = [
     path("enrollment/", EnrollmentView.as_view(), name="enrollment"),
     path("contact/", ContactView.as_view(), name="contact"),
     path("profile/", ProfileView.as_view(), name="profile"),
+    path("profile/change-email/", ChangeEmailView.as_view(), name="profile_change_email"),
+    path("profile/change-password/", ChangePasswordView.as_view(), name="profile_change_password"),
     path(
         "enrollment/junior/", JuniorEnrollmentView.as_view(), name="junior_enrollment"
     ),

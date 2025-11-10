@@ -14,6 +14,15 @@
                 <form id="loginForm" method="post" action="{% url 'login' %}">
                     {% csrf_token %}
                     <div id="loginMessages"></div>
+                    <div id="loginUnverifiedNotice" class="alert alert-warning d-none">
+                        Please verify your email (<span id="loginUnverifiedEmail"></span>) before logging in.
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-link p-0" id="loginResendVerificationBtn">
+                                Resend verification email
+                            </button>
+                        </div>
+                        <div id="loginResendVerificationFeedback" class="mt-2 small"></div>
+                    </div>
                     <div class="mb-2">
                         <label for="lrn" class="form-label">Learner Reference Number</label>
                         <input type="text" class="form-control" id="lrn" name="lrn" placeholder="Enter your LRN">
@@ -29,6 +38,9 @@
                             </button>
                             <div class="invalid-feedback login-error"></div>
                         </div>
+                    </div>
+                    <div class="mb-3 text-center">
+                        <a href="{% url 'password_reset_request' %}" class="link-primary small">Forgot password?</a>
                     </div>
                     <div class="mb-2 form-check">
                         <input type="checkbox" class="form-check-input" id="rememberMe">

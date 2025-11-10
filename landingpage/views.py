@@ -1,20 +1,33 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.contrib import messages
 import json
+from datetime import datetime, timedelta
+
+from django.contrib import messages
+from django.contrib.auth import get_user_model, logout
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
+from django.core.validators import validate_email
+from django.db.models import Count
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views import View
 
 from adminside.repositories.all_repository import AnnouncementRepository, FAQRepository
-from .models import EnrollmentForm, Announcement, EnrollmentManagement, StudentInformation, OrganizationChart
 from authentication.models import ApplicantInformation
-from django.db.models import Count
-from django.utils import timezone
-from datetime import datetime, timedelta
-from django.utils import timezone
-from django.http import JsonResponse
-from django.core.paginator import Paginator
+from authentication.utils import send_verification_email
 from .forms import EnrollmentForm as EnrollmentValidationForm
+from .models import (
+    Announcement,
+    EnrollmentForm,
+    EnrollmentManagement,
+    OrganizationChart,
+    StudentInformation,
+)
 from .utils import emailNotification
-from django.forms.utils import ErrorList
+import pytz
+
+UserModel = get_user_model()
 
 
 class HomeView(View):
@@ -228,7 +241,7 @@ class JuniorEnrollmentView(View):
         user.jhs_submitted = True
         user.save(update_fields=["jhs_submitted"])
 
-        emailNotification(
+        email_sent = emailNotification(
             form.cleaned_data["first_name"],
             form.cleaned_data["last_name"],
             form.cleaned_data["application_no"],
@@ -236,17 +249,25 @@ class JuniorEnrollmentView(View):
         )
 
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            email_line = (
+                f"An email notification has been sent to {user.email}."
+                if email_sent
+                else "We were unable to send the email notification. Please contact the school if you need assistance."
+            )
             return JsonResponse({
                 "success": True,
                 "message": (
                     f"<strong>Enrollment form has been submitted successfully.</strong><br>"
                     f"Application No: <strong>{form.cleaned_data['application_no']}</strong><br>"
-                    f"An email notification has been sent to {user.email}."
+                    f"{email_line}"
                 ),
                 "redirect_url": "/enrollment/",
             })
 
-        messages.success(request, "Enrollment form submitted successfully!")
+        if email_sent:
+            messages.success(request, "Enrollment form submitted successfully! Please check your email for confirmation.")
+        else:
+            messages.warning(request, "Enrollment form submitted successfully! We could not send the confirmation email, please contact the school if needed.")
         return redirect("enrollment")
 
 
@@ -371,6 +392,121 @@ class AnnouncementDetailView(View):
     def get(self, request, announcement_id):
         announcement = get_object_or_404(Announcement, id=announcement_id, status="active")
         return render(request, "announcement_detail.html", {"announcement": announcement})
+
+
+class ChangeEmailView(View):
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse(
+                {"success": False, "message": "You need to be signed in to update your email."},
+                status=401,
+            )
+
+        new_email = request.POST.get("new_email", "").strip()
+        confirm_email = request.POST.get("confirm_email", "").strip()
+        errors = {}
+
+        if not new_email:
+            errors["new_email"] = "New email is required."
+        else:
+            try:
+                validate_email(new_email)
+            except ValidationError:
+                errors["new_email"] = "Enter a valid email address."
+
+        if not confirm_email:
+            errors["confirm_email"] = "Please confirm your new email address."
+
+        if new_email and confirm_email and new_email.lower() != confirm_email.lower():
+            errors["confirm_email"] = "Email addresses do not match."
+
+        if new_email and new_email.lower() == request.user.email.lower():
+            errors["new_email"] = "This is already your current email address."
+
+        if (
+            new_email
+            and not errors.get("new_email")
+            and UserModel.objects.filter(email__iexact=new_email).exclude(pk=request.user.pk).exists()
+        ):
+            errors["new_email"] = "This email address is already registered."
+
+        if errors:
+            return JsonResponse({"success": False, "errors": errors}, status=400)
+
+        user = request.user
+        previous_email_verified = getattr(user, "email_verified", False)
+        update_fields = ["email"]
+        user.email = new_email
+        if hasattr(user, "email_verified"):
+            user.email_verified = False
+            update_fields.append("email_verified")
+        user.save(update_fields=update_fields)
+
+        verification_sent = False
+        try:
+            verification_sent = send_verification_email(user, request)
+        except Exception:
+            if hasattr(user, "email_verified"):
+                user.email_verified = previous_email_verified
+                user.save(update_fields=["email_verified"])
+
+        message = (
+            "Email updated successfully. We've sent a verification link to your new address."
+            if verification_sent
+            else "Email updated successfully, but we were unable to send a verification email. Please contact support if needed."
+        )
+
+        return JsonResponse({"success": True, "message": message})
+
+
+class ChangePasswordView(View):
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse(
+                {"success": False, "message": "You need to be signed in to update your password."},
+                status=401,
+            )
+
+        current_password = request.POST.get("current_password", "")
+        new_password = request.POST.get("new_password", "")
+        confirm_password = request.POST.get("confirm_password", "")
+        errors = {}
+
+        if not current_password:
+            errors["current_password"] = "Current password is required."
+        elif not request.user.check_password(current_password):
+            errors["current_password"] = "Current password is incorrect."
+
+        if not new_password:
+            errors["new_password"] = "New password is required."
+        else:
+            try:
+                validate_password(new_password, user=request.user)
+            except ValidationError as exc:
+                errors["new_password"] = exc.messages
+
+        if not confirm_password:
+            errors["confirm_password"] = "Please confirm your new password."
+        elif new_password and confirm_password and new_password != confirm_password:
+            errors["confirm_password"] = "Passwords do not match."
+
+        if errors:
+            return JsonResponse({"success": False, "errors": errors}, status=400)
+
+        user = request.user
+        philippine_time = timezone.now().astimezone(pytz.timezone("Asia/Manila"))
+        user.is_active = False
+        user.updated_at = philippine_time
+        user.set_password(new_password)
+        user.save(update_fields=["password", "is_active", "updated_at"])
+
+        logout(request)
+
+        return JsonResponse({
+            "success": True,
+            "message": "Password updated successfully. Please sign in again.",
+            "redirect_url": "/",
+        })
 
 
 def get_enrollment_analytics():

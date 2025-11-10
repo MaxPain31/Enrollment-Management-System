@@ -37,7 +37,7 @@ def emailNotification(first_name, last_name, application_no, recipient_email):
     send_mail(
         subject,
         message_plain,
-        "pdbnhs@gmail.com",  # Sender email (should match settings.DEFAULT_FROM_EMAIL)
+        "pdbnhsv@gmail.com",  # Sender email (should match settings.DEFAULT_FROM_EMAIL)
         [recipient_email],
         html_message=message_html,
         fail_silently=False,
