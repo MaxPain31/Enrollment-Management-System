@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" style="background-color:#f5f7fb;">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Verify your email</title>
+    <style>
+      body { margin:0; padding:0; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; background-color:#f5f7fb; }
+      table { border-spacing:0; border-collapse:separate; mso-table-lspace:0pt; mso-table-rspace:0pt; }
+      img { -ms-interpolation-mode:bicubic; border:0; outline:none; text-decoration:none; display:block; }
+      a { text-decoration:none; }
+      .hover-underline:hover { text-decoration:underline !important; }
+      .container { width:100%; max-width:640px; margin:0 auto; }
+      .card { background:#ffffff; border-radius:12px; box-shadow:0 6px 24px rgba(16,24,40,0.06); }
+      .px { padding-left:32px; padding-right:32px; }
+      .py { padding-top:32px; padding-bottom:32px; }
+      .text-muted { color:#6b7280; }
+      .text-dark { color:#111827; }
+      .btn { background:linear-gradient(90deg,#2563eb,#0ea5e9); color:#ffffff !important; padding:14px 22px; border-radius:10px; font-weight:700; display:inline-block; text-align:center; }
+      .btn:hover { opacity:.95; }
+      .badge { display:inline-block; padding:6px 10px; border-radius:999px; background:#eef2ff; color:#3730a3; font-size:12px; font-weight:600; }
+      .footer { color:#6b7280; font-size:12px; }
+      @media (max-width: 480px) {
+        .px { padding-left:20px !important; padding-right:20px !important; }
+        .py { padding-top:24px !important; padding-bottom:24px !important; }
+      }
+    </style>
+  </head>
+  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; color:#111827;">
+    <table role="presentation" width="100%" style="background-color:#f5f7fb;" aria-hidden="true">
+      <tr>
+        <td>
+          <table role="presentation" width="100%" class="container" aria-hidden="true">
+            <tr>
+              <td style="height:32px"></td>
+            </tr>
+            <tr>
+              <td align="center">
+                <img src="{% static 'img/logo.png' %}" alt="School Logo" width="56" height="56" style="border-radius:50%; margin-bottom:8px;" />
+                <div class="badge">{{ site_name }}</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="height:16px"></td>
+            </tr>
+            <tr>
+              <td>
+                <table role="presentation" width="100%" class="card" aria-hidden="true">
+                  <tr>
+                    <td class="px py">
+                      <h2 style="margin:0 0 12px 0; font-size:22px;">Verify your email</h2>
+                      <p style="margin:0 0 16px 0;">Hi <span class="text-dark">{{ user.email }}</span>,</p>
+                      <p style="margin:0 0 20px 0; line-height:1.55;">Thanks for registering with {{ site_name }}. Please confirm your email address to activate your account and continue.</p>
+                      <table role="presentation" cellspacing="0" cellpadding="0">
+                        <tr>
+                          <td>
+                            <a href="{{ verify_url }}" class="btn" style="color:#ffffff !important;">Verify Email</a>
+                          </td>
+                        </tr>
+                      </table>
+                      <p style="margin:24px 0 8px 0;" class="text-muted">If the button doesn’t work, copy and paste this link into your browser:</p>
+                      <p style="word-break:break-all; margin:0;" class="text-muted hover-underline"><a href="{{ verify_url }}" style="color:#6b7280;">{{ verify_url }}</a></p>
+                      <hr style="border:none; border-top:1px solid #e5e7eb; margin:28px 0;" />
+                      <p style="margin:0;" class="text-muted">If you did not request this, you can safely ignore this email.</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="height:16px"></td>
+            </tr>
+            <tr>
+              <td align="center" class="text-muted footer" style="font-size:12px;">
+                <p style="margin:0;">© {{ site_name }} — All rights reserved</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="height:32px"></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+
+

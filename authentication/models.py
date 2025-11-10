@@ -30,6 +30,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     deactivated = models.BooleanField(default=False)
+    email_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     jhs_submitted = models.BooleanField(default=False, null=True, blank=True)
     shs_submitted = models.BooleanField(default=False, null=True, blank=True)

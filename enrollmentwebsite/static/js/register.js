@@ -80,6 +80,35 @@ $(document).ready(function () {
                     if (data.success) {
                         $messages.html(`<div class="alert alert-success">${data.message}</div>`);
                         $form[0].reset();
+                        // Show resend verification option now that registration started
+                        const $resendContainer = $("#resendVerificationContainer");
+                        const $resendBtn = $("#resendVerificationBtn");
+                        const $resendMsg = $("#resendVerificationMsg");
+                        if ($resendContainer.length) {
+                            $resendContainer.show();
+                            $resendMsg.removeClass().text("");
+                            $resendBtn.off("click").on("click", function(){
+                                const emailVal = $("#email").val().trim();
+                                if (!emailVal) {
+                                    $resendMsg.attr("class", "alert alert-warning").text("Please enter your email above first.");
+                                    return;
+                                }
+                                $resendBtn.prop("disabled", true);
+                                $.ajax({
+                                    url: "/authentication/resend-verification/",
+                                    method: "POST",
+                                    data: $.param({ email: emailVal }),
+                                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                                }).done(function(resp){
+                                    $resendMsg.attr("class", resp.success ? "alert alert-success" : "alert alert-danger")
+                                              .text(resp.message || (resp.success ? "Verification email re-sent." : "Failed to send verification email."));
+                                }).fail(function(){
+                                    $resendMsg.attr("class", "alert alert-danger").text("Something went wrong. Please try again later.");
+                                }).always(function(){
+                                    $resendBtn.prop("disabled", false);
+                                });
+                            });
+                        }
                     } else if (data.errors) {
                         $.each(data.errors, function (field, messages) {
                             let $input = $("#registerForm").find(`[name="${field}"], #${field}`);

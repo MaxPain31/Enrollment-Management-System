@@ -5,11 +5,13 @@ from django.contrib import messages
 from django.views import View
 from .models import MyUser, ApplicantInformation
 from landingpage.models import StudentInformation
-from .utils import capitalize_words
+from .utils import capitalize_words, send_verification_email, send_post_verification_email
 from django.http import JsonResponse, HttpResponse
 from .forms import RegistrationForm, LoginForm
 from django.utils import timezone
 import pytz
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
 
 
 class RegistrationView(View):
@@ -42,10 +44,19 @@ class RegistrationView(View):
             psa_no=form.cleaned_data["psa_no"],
         )
 
-        if request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse({"success": True, "message": f"Account created successfully! Your LRN number is {form.cleaned_data['lrn']}. You can now log in."})
+        try:
+            send_verification_email(user, request)
+        except Exception:
+            pass
 
-        messages.success(request, f"Account created successfully! Your LRN number is {form.cleaned_data['lrn']}. You can now log in.")
+        success_message = (
+            "Registration received. Please check your email to verify your account before logging in."
+        )
+
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"success": True, "message": success_message})
+
+        messages.success(request, success_message)
         return redirect("login")
 
 
@@ -68,6 +79,15 @@ class LoginView(View):
                     response_data = {
                         "success": False,
                         "message": "Your account has been deactivated. Please visit the school administrator for assistance.",
+                    }
+                    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                        return JsonResponse(response_data)
+                    return render(request, "authentication/login.html", {"form": form, "error": response_data["message"]})
+
+                if user.user_role == "Applicant" and not getattr(user, "email_verified", False):
+                    response_data = {
+                        "success": False,
+                        "message": "Please verify your email before logging in.",
                     }
                     if request.headers.get("x-requested-with") == "XMLHttpRequest":
                         return JsonResponse(response_data)
@@ -170,3 +190,54 @@ class SignInView(View):
         return JsonResponse(
             {"success": False, "message": "Invalid email or password"}, status=401
         )
+
+
+class VerifyEmailView(View):
+    def get(self, request, uidb64, token):
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+        except Exception:
+            uid = None
+
+        user = None
+        if uid:
+            try:
+                user = MyUser.objects.get(pk=uid)
+            except MyUser.DoesNotExist:
+                user = None
+
+        if user and default_token_generator.check_token(user, token):
+            if not user.email_verified:
+                user.email_verified = True
+                user.save(update_fields=["email_verified"])
+                try:
+                    applicant = ApplicantInformation.objects.filter(user=user).first()
+                    lrn = applicant.lrn if applicant else ""
+                    send_post_verification_email(user, lrn, request)
+                except Exception:
+                    pass
+            return render(request, "authentication/verify_result.html", {"success": True})
+
+        return render(request, "authentication/verify_result.html", {"success": False})
+
+
+class ResendVerificationView(View):
+    def post(self, request):
+        email = request.POST.get("email", "").strip()
+        if not email:
+            return JsonResponse({"success": False, "message": "Email is required."}, status=400)
+
+        try:
+            user = MyUser.objects.get(email=email)
+        except MyUser.DoesNotExist:
+            return JsonResponse({"success": False, "message": "No account found for this email."}, status=404)
+
+        if getattr(user, "email_verified", False):
+            return JsonResponse({"success": False, "message": "Email is already verified."}, status=400)
+
+        try:
+            send_verification_email(user, request)
+        except Exception:
+            return JsonResponse({"success": False, "message": "Unable to send verification email right now."}, status=500)
+
+        return JsonResponse({"success": True, "message": "Verification email re-sent. Please check your inbox and spam folder."})
